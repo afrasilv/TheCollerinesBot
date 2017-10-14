@@ -28,32 +28,43 @@ def help(bot, update):
 
 def randomResponse(update):
     randomValue = randint(0, 1000)
-    if randomValue == 1:
+    if randomValue < 5 and randomValue >= 3:
         indexMsg = randint(0, len(randomMsg) -1)
         update.message.reply_text(randomMsg[indexMsg], reply_to_message_id=update.message.message_id)
-    elif randomValue < 1:
+    elif randomValue < 2:
         update.message.text = unidecode(update.message.text)
 	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
 
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
+
+def sendGif(pathGif):
+    bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
+    bot.sendDocument(chat_id=update.message.chat_id, document=open(pathGif, 'rb'))
 
 def echo(bot, update):
     if "valencia" in update.message.text.lower():
 	bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voice/teamvalencia.ogg', 'rb'))
     elif "salud" in update.message.text.lower():
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
-    elif "momento cabra" in update.message.text.lower():
-        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4', 'rb'))
+    elif "kele puto" in update.message.text.lower():
+	update.message.reply_text('\/keleputo')
+    elif "pole estonia" in update.message.text.lower():
+	update.message.reply_text('!get Itziar')
+    elif "txumino" in update.message.text.lower():
+        if "\/txumino" not in update.message.text.lower():
+            update.message.reply_text('\/txumino')
     elif "gif del fantasma" in update.message.text.lower():
-        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4', 'rb'), reply_to_message_id=update.message.message_id)
+        sendGif('/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
+    elif "momento cabra" in update.message.text.lower():
+        sendGif('/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
+    elif "gif del fantasma" in update.message.text.lower():
+        sendGif('/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
     elif "random" in update.message.text.lower():
-        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/random.mp4', 'rb'))
+        sendGif('/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
     elif "reviento" in update.message.text.lower():
-        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4', 'rb'))
+        sendGif('/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
+    elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower() or "gym" in update.message.text.lower():
+        sendGif('/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
     elif "ficha" in update.message.text.lower():
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
