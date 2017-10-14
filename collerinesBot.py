@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-randomMsg = ['qué dices payaso']
+randomMsg = ['qué dices payaso', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies']
 
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -27,11 +27,11 @@ def help(bot, update):
     update.message.reply_text('asdqwe')
 
 def randomResponse(update):
-    randomValue = randint(0, 100)
-    if randomValue < 6 and randomValue >= 3:
+    randomValue = randint(0, 1000)
+    if randomValue == 1:
         indexMsg = randint(0, len(randomMsg) -1)
         update.message.reply_text(randomMsg[indexMsg], reply_to_message_id=update.message.message_id)
-    elif randomValue < 3:
+    elif randomValue < 1:
         update.message.text = unidecode(update.message.text)
 	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
 
