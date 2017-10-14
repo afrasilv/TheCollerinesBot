@@ -3,6 +3,7 @@
 
 import telegram
 import re
+from unidecode import unidecode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from random import randint
 import logging
@@ -27,12 +28,13 @@ def help(bot, update):
 
 def randomResponse(update):
     randomValue = randint(0, 100)
-    if randomValue < 10 and randomValue >= 5:
+    if randomValue < 6 and randomValue >= 3:
         indexMsg = randint(0, len(randomMsg) -1)
         update.message.reply_text(randomMsg[indexMsg], reply_to_message_id=update.message.message_id)
-    elif randomValue < 5:
-	update.message.text = re.sub(r'qu[aeiou]|c[aou]|gu[ei]|g[aou]|gü|z[aeou]|[aeou]', 'i', update.message.text)
-        update.message.text = re.sub(r'[áéóú]', 'í', update.message.text)
+    elif randomValue < 3:
+        update.message.text = unidecode(update.message.text)
+	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
+
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
 
 def echo(bot, update):
@@ -43,7 +45,7 @@ def echo(bot, update):
     elif "momento cabra" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
         bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/momento_cabra.mp4', 'rb'))
-    elif "gif fantasma" in update.message.text.lower():
+    elif "gif del fantasma" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
         bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/fantasma.mp4', 'rb'), reply_to_message_id=update.message.message_id)
     elif "random" in update.message.text.lower():
