@@ -39,23 +39,23 @@ def randomResponse(update):
 
 def echo(bot, update):
     if "valencia" in update.message.text.lower():
-	bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/afrasilv/Desktop/ferran.ogg', 'rb'))
+	bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voice/teamvalencia.ogg', 'rb'))
     elif "salud" in update.message.text.lower():
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
     elif "momento cabra" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/momento_cabra.mp4', 'rb'))
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4', 'rb'))
     elif "gif del fantasma" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/fantasma.mp4', 'rb'), reply_to_message_id=update.message.message_id)
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4', 'rb'), reply_to_message_id=update.message.message_id)
     elif "random" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/random.mp4', 'rb'))
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/random.mp4', 'rb'))
     elif "reviento" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
-        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/acho_reviento.mp4', 'rb'))
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4', 'rb'))
     elif "ficha" in update.message.text.lower():
-	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/afrasilv/Desktop/sticker.webp', 'rb'), reply_to_message_id=update.message.message_id)
+	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
         randomResponse(update)
 
