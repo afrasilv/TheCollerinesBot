@@ -37,7 +37,7 @@ def randomResponse(update):
 
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
 
-def sendGif(pathGif):
+def sendGif(bot, update, pathGif):
     bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
     bot.sendDocument(chat_id=update.message.chat_id, document=open(pathGif, 'rb'))
 
@@ -54,17 +54,17 @@ def echo(bot, update):
         if "\/txumino" not in update.message.text.lower():
             update.message.reply_text('\/txumino')
     elif "gif del fantasma" in update.message.text.lower():
-        sendGif('/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
     elif "momento cabra" in update.message.text.lower():
-        sendGif('/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
     elif "gif del fantasma" in update.message.text.lower():
-        sendGif('/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
     elif "random" in update.message.text.lower():
-        sendGif('/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
     elif "reviento" in update.message.text.lower():
-        sendGif('/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
     elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower() or "gym" in update.message.text.lower():
-        sendGif('/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
     elif "ficha" in update.message.text.lower():
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
