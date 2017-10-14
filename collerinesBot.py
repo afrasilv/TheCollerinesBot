@@ -13,34 +13,49 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+randomMsg = ['qué dices payaso']
+
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
-    update.message.reply_text('Hola prim!')
+    update.message.reply_text('Hola prim!', reply_to_message_id=update.message.message_id)
 
 
 def help(bot, update):
     update.message.reply_text('asdqwe')
 
+def randomResponse(update):
+    randomValue = randint(0, 100)
+    if randomValue < 10 and randomValue >= 5:
+        indexMsg = randint(0, len(randomMsg) -1)
+        update.message.reply_text(randomMsg[indexMsg], reply_to_message_id=update.message.message_id)
+    elif randomValue < 5:
+	update.message.text = re.sub(r'qu[aeiou]|c[aou]|gu[ei]|g[aou]|gü|z[aeou]|[aeou]', 'i', update.message.text)
+        update.message.text = re.sub(r'[áéóú]', 'í', update.message.text)
+        update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
+
 def echo(bot, update):
     if "valencia" in update.message.text.lower():
 	bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/afrasilv/Desktop/ferran.ogg', 'rb'))
     elif "salud" in update.message.text.lower():
-	update.message.reply_text('El dedo en el culo es la salud y el bienestar')
+	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
     elif "momento cabra" in update.message.text.lower():
         bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
         bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/momento_cabra.mp4', 'rb'))
+    elif "gif fantasma" in update.message.text.lower():
+        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/fantasma.mp4', 'rb'), reply_to_message_id=update.message.message_id)
+    elif "random" in update.message.text.lower():
+        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/random.mp4', 'rb'))
+    elif "reviento" in update.message.text.lower():
+        bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
+        bot.sendDocument(chat_id=update.message.chat_id, document=open('/home/afrasilv/Desktop/acho_reviento.mp4', 'rb'))
     elif "ficha" in update.message.text.lower():
-	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/afrasilv/Desktop/sticker.webp', 'rb'))
+	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/afrasilv/Desktop/sticker.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
-        randomValue = randint(0, 100)
-        if randomValue < 10:
-	    update.message.reply_text(update.message.text)
-        elif randomValue < 5:
-            update.message.text = re.sub(r'qu[aeiou]|c[aou]|gu[ei]|g[aou]|gü|z[aeou]|[aeou]', 'i', update.message.text)
-            update.message.text = re.sub(r'[áéóú]', 'í', update.message.text)
-	    update.message.reply_text(update.message.text)
+        randomResponse(update)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
