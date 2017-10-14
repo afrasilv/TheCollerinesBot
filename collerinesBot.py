@@ -47,12 +47,12 @@ def echo(bot, update):
     elif "salud" in update.message.text.lower():
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
     elif "kele puto" in update.message.text.lower():
-	update.message.reply_text('\/keleputo')
+	update.message.reply_text('/keleputo')
     elif "pole estonia" in update.message.text.lower():
 	update.message.reply_text('!get Itziar')
     elif "txumino" in update.message.text.lower():
         if "\/txumino" not in update.message.text.lower():
-            update.message.reply_text('\/txumino')
+            update.message.reply_text('/txumino')
     elif "gif del fantasma" in update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
     elif "momento cabra" in update.message.text.lower():
