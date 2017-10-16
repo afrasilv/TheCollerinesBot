@@ -50,6 +50,10 @@ def sendGif(bot, update, pathGif):
 def sendVoice(bot, update, pathVoice):
     bot.send_voice(chat_id=update.message.chat_id, voice=open(pathVoice, 'rb'))
 
+def sendImg(bot, update, pathImg):
+    bot.send_photo(chat_id=update.message.chat_id, photo=open(pathImg, 'rb'))
+
+
 def echo(bot, update):
     if re.search(r'\bvalencia\b', update.message.text.lower()):
         randomValue = getRandomByValue(3)
@@ -78,7 +82,7 @@ def echo(bot, update):
     elif re.search(r'\bpole estonia\b', update.message.text.lower()):
         global lastPoleEstonia
         now = datetime.now()
-        if now.date() != lastPoleEstonia.date() and now.hour >= 23:
+        if now.date() != lastPoleEstonia.date() and now.hour >= 21:
             update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
             lastPoleEstonia = now
     elif re.search(r'\bzyzz\b', update.message.text.lower()):
@@ -95,9 +99,11 @@ def echo(bot, update):
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
     elif re.search(r'\brebiento\b', update.message.text.lower()):
-        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_rebiento.mp4')
     elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
-        bot.send_photo(chat_id=update.message.chat_id, photo=open('/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg', 'rb'))
+        sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
+    elif re.search(r'\bdroga\b', update.message.text.lower()):
+        sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/droga.jpg')
     elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
         randomValue = getRandomByValue(4)
         if randomValue <= 1:
