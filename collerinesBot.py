@@ -48,40 +48,40 @@ def sendGif(bot, update, pathGif):
     bot.sendDocument(chat_id=update.message.chat_id, document=open(pathGif, 'rb'))
 
 def echo(bot, update):
-    if "valencia" in update.message.text.lower():
+    if re.search('\bvalencia\b', update.message.text.lower()) is not None:
         randomValue = getRandomByValue(3)
         if randomValue <= 1:
 	    bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg', 'rb'))
-    elif "salud" in update.message.text.lower():
+    elif re.search('\bsalud\b', update.message.text.lower()) is not None:
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
-    elif "llegas tarde" in update.message.text.lower():
+    elif re.search('\bllegas tarde\b', update.message.text.lower()) is not None
 	update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
-    elif "kele puto" in update.message.text.lower():
+    elif re.search('\beres rápido\b', update.message.text.lower()) is not None
+	update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
+    elif re.search('\bkele puto\b', update.message.text.lower()) is not None:
 	update.message.reply_text(' /keleputo ')
-    elif "sum41" in update.message.text.lower() or "sum 41" in update.message.text.lower():
+    elif re.search('\bsum41\b', update.message.text.lower()) is not None or re.search('\bsum 41\b', update.message.text.lower()) is not None:
 	update.message.reply_text('100% confirmados para el Download')
-    elif "pole estonia" in update.message.text.lower():
+    elif re.search('\bpole estonia\b', update.message.text.lower()) is not None:
         global lastPoleEstonia
         now = datetime.now()
-        if now.date() != lastPoleEstonia.date():
+        if now.date() != lastPoleEstonia.date() and now.hour >= 23:
             update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
             lastPoleEstonia = now
-    elif "zyzz" in update.message.text.lower():
+    elif re.search('\bzyzz\b', update.message.text.lower()) is not None:
 	update.message.reply_text(' /zetayzetazeta ')
-    elif "txumino" in update.message.text.lower():
+    elif re.search('\btxumino\b', update.message.text.lower()) is not None:
         if "/txumino" not in update.message.text.lower():
             update.message.reply_text(' /txumino ')
     elif "gif del fantasma" in update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
     elif "momento cabra" in update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
-    elif "gif del fantasma" in update.message.text.lower():
-        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
-    elif "random" in update.message.text.lower():
+    elif re.search('\brandom\b', update.message.text.lower()) is not None:
         randomValue = getRandomByValue(3)
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
-    elif "reviento" in update.message.text.lower():
+    elif re.search('\brebiento\b', update.message.text.lower()) is not None:
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
     elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
         bot.send_photo(chat_id=update.message.chat_id, photo=open('/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg', 'rb'))
@@ -89,7 +89,7 @@ def echo(bot, update):
         randomValue = getRandomByValue(4)
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
-    elif "ficha" in update.message.text.lower():
+    elif re.search('\bficha\b', update.message.text.lower()) is not None or re.search('\bfichas\b', update.message.text.lower()) is not None:
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
         randomResponse(update)
