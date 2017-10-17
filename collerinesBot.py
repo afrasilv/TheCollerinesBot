@@ -16,6 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 randomMsg = ['qué dices payaso', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies']
+random4GodMsg = ['dime', 'basta', 'déjame', 'ahora no']
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
 
 
@@ -32,9 +33,11 @@ def getRandomByValue(value):
     randomValue = randint(0, value)
     return randomValue
 
-def randomResponse(update):
+def randomResponse(update, bot):
     randomValue = getRandomByValue(1000)
-    if randomValue < 5 and randomValue >= 3:
+    if randomValue == 6:
+        sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/yord.ogg')
+    elif randomValue < 5 and randomValue >= 3:
         indexMsg = getRandomByValue(len(randomMsg) -1)
         update.message.reply_text(randomMsg[indexMsg], reply_to_message_id=update.message.message_id)
     elif randomValue < 2:
@@ -82,11 +85,14 @@ def echo(bot, update):
     elif re.search(r'\bpole estonia\b', update.message.text.lower()):
         global lastPoleEstonia
         now = datetime.now()
-        if now.date() != lastPoleEstonia.date() and now.hour >= 21:
+        if now.date() != lastPoleEstonia.date() and now.hour >= 23:
             update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
             lastPoleEstonia = now
     elif re.search(r'\bzyzz\b', update.message.text.lower()):
 	update.message.reply_text(' /zetayzetazeta ')
+    elif re.search(r'\bdios\b', update.message.text.lower()):
+        indexMsg = getRandomByValue(len(random4GodMsg) -1)
+        update.message.reply_text(random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
     elif re.search(r'\btxumino\b', update.message.text.lower()):
         if "/txumino" not in update.message.text.lower():
             update.message.reply_text(' /txumino ')
@@ -98,12 +104,10 @@ def echo(bot, update):
         randomValue = getRandomByValue(3)
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
-    elif re.search(r'\brebiento\b', update.message.text.lower()):
-        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_rebiento.mp4')
+    elif re.search(r'\breviento\b', update.message.text.lower()):
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
     elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
-    elif re.search(r'\bdroga\b', update.message.text.lower()):
-        sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/droga.jpg')
     elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
         randomValue = getRandomByValue(4)
         if randomValue <= 1:
@@ -111,7 +115,7 @@ def echo(bot, update):
     elif re.search(r'\bficha\b', update.message.text.lower()) or re.search(r'\bfichas\b', update.message.text.lower()):
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
-        randomResponse(update)
+        randomResponse(update, bot)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
