@@ -127,6 +127,9 @@ def echo(bot, update):
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
     elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4')
+    elif re.search(r'\byee\b', update.message.text.lower()):
+        if "/yee" not in update.message.text.lower():
+            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/yee.mp4')
             
     #messages
     elif re.search(r'\bsalud\b', update.message.text.lower()):
