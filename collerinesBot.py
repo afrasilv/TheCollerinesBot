@@ -78,8 +78,6 @@ def sendImg(bot, update, pathImg):
 
 
 def echo(bot, update):
-    entities = message.get_entities()
-    print(entities)
     if re.search(r'\bvalencia\b', update.message.text.lower()):
         randomValue = getRandomByValue(3)
         if randomValue == 0:
@@ -100,7 +98,7 @@ def echo(bot, update):
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
     elif re.search(r'\bllegas tarde\b', update.message.text.lower()):
 	update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
-    elif "eres rápido" in update.message.text.lower() or "eres rapido" in update.message.text.lower():
+    elif "eres rápido" in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
 	update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
     elif re.search(r'\bkele puto\b', update.message.text.lower()):
 	update.message.reply_text(' /keleputo ')
@@ -126,13 +124,15 @@ def echo(bot, update):
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/perro.mp4')
     elif "no me jodas" in update.message.text.lower() or "no me digas" in update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_agua.mp4')
+    elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_thumb.mp4')
     elif "momento cabra" in update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
     elif re.search(r'\bcabra\b', update.message.text.lower()):
         randomValue = getRandomByValue(4)
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra_scream.mp4')
-    elif "qué?" == update.message.text.lower() or "que?" == update.message.text.lower() or:
+    elif "qué?" == unidecode(update.message.text.lower()) or "que?" == update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra.mp4')
     elif re.search(r'\brandom\b', update.message.text.lower()):
         randomValue = getRandomByValue(3)
