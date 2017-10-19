@@ -92,7 +92,7 @@ def echo(bot, update):
             sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/m3Feli.ogg')
     elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
         sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
-    elif re.search(r'\bpfff[f]+\b', update.message.text.lower()):
+    elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/pffff.mp4')
     elif re.search(r'\bsalud\b', update.message.text.lower()):
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
@@ -104,6 +104,10 @@ def echo(bot, update):
 	update.message.reply_text(' /keleputo ')
     elif re.search(r'\bsum41\b', update.message.text.lower()) or re.search(r'\bsum 41\b', update.message.text.lower()):
 	update.message.reply_text('100% confirmados para el Download')
+    elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
+	update.message.reply_text('/jajj')
+    elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
+	update.message.reply_text('/jajj')
     elif re.search(r'\bpole estonia\b', update.message.text.lower()):
         global lastPoleEstonia
         now = datetime.now()
