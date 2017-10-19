@@ -78,6 +78,7 @@ def sendImg(bot, update, pathImg):
 
 
 def echo(bot, update):
+    #voice
     if re.search(r'\bvalencia\b', update.message.text.lower()):
         randomValue = getRandomByValue(3)
         if randomValue == 0:
@@ -92,36 +93,10 @@ def echo(bot, update):
             sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/m3Feli.ogg')
     elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
         sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
+        
+    #gif
     elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/pffff.mp4')
-    elif re.search(r'\bsalud\b', update.message.text.lower()):
-	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
-    elif re.search(r'\bllegas tarde\b', update.message.text.lower()):
-	update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
-    elif "eres rápido" in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
-	update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
-    elif re.search(r'\bkele puto\b', update.message.text.lower()):
-	update.message.reply_text(' /keleputo ')
-    elif re.search(r'\bsum41\b', update.message.text.lower()) or re.search(r'\bsum 41\b', update.message.text.lower()):
-	update.message.reply_text('100% confirmados para el Download')
-    elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
-	update.message.reply_text('/jajj')
-    elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
-	update.message.reply_text('/jajj')
-    elif re.search(r'\bpole estonia\b', update.message.text.lower()):
-        global lastPoleEstonia
-        now = datetime.now()
-        if now.date() != lastPoleEstonia.date() and now.hour >= 23:
-            update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
-            lastPoleEstonia = now
-    elif re.search(r'\bzyzz\b', update.message.text.lower()):
-	update.message.reply_text(' /zetayzetazeta ')
-    elif re.search(r'\bdios\b', update.message.text.lower()):
-        indexMsg = getRandomByValue(len(random4GodMsg) -1)
-        update.message.reply_text(random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
-    elif re.search(r'\btxumino\b', update.message.text.lower()):
-        if "/txumino" not in update.message.text.lower():
-            update.message.reply_text(' /txumino ')
     elif "gif del fantasma" in update.message.text.lower():
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
     elif "bukkake" in update.message.text.lower():
@@ -146,16 +121,52 @@ def echo(bot, update):
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
     elif re.search(r'\bchoca\b', update.message.text.lower()):
         sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/choca.mp4')
+    elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
+        randomValue = getRandomByValue(4)
+        if randomValue <= 1:
+            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
+    elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
+        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4')
+            
+    #messages
+    elif re.search(r'\bsalud\b', update.message.text.lower()):
+	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
+    elif re.search(r'\bllegas tarde\b', update.message.text.lower()):
+	update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
+    elif "eres rápido" in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
+	update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
+    elif re.search(r'\bkele puto\b', update.message.text.lower()):
+	update.message.reply_text(' /keleputo ')
+    elif re.search(r'\bsum41\b', update.message.text.lower()) or re.search(r'\bsum 41\b', update.message.text.lower()):
+	update.message.reply_text('100% confirmados para el Download')
+    elif re.search(r'\bjjaj[ja]*\b', update.message.text.lower()):
+	update.message.reply_text('/jjaj')
+    elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
+	update.message.reply_text('/jajj')
+    elif re.search(r'\bpole estonia\b', update.message.text.lower()):
+        global lastPoleEstonia
+        now = datetime.now()
+        if now.date() != lastPoleEstonia.date() and now.hour >= 23:
+            update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
+            lastPoleEstonia = now
+    elif re.search(r'\bzyzz\b', update.message.text.lower()):
+	update.message.reply_text(' /zetayzetazeta ')
+    elif re.search(r'\bdios\b', update.message.text.lower()):
+        indexMsg = getRandomByValue(len(random4GodMsg) -1)
+        update.message.reply_text(random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
+    elif re.search(r'\btxumino\b', update.message.text.lower()):
+        if "/txumino" not in update.message.text.lower():
+            update.message.reply_text(' /txumino ')
+    
+    # imgs
     elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
     elif re.search(r'\bsecta\b', update.message.text.lower()):
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/secta.jpg')
     elif re.search(r'\bnazi\b', update.message.text.lower()):
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
-    elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
-        randomValue = getRandomByValue(4)
-        if randomValue <= 1:
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
+    
+    #stickers
     elif re.search(r'\bprog\b', update.message.text.lower()):
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif re.search(r'\bsend nudes\b', update.message.text.lower()) or "send noodles" in update.message.text.lower():
