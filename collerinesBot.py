@@ -10,6 +10,11 @@ from random import randint
 from datetime import datetime, timedelta
 import logging
 
+# Create the EventHandler and pass it your bot's token.
+updater = Updater("476217954:AAGpClsrvtCICifhF8yKdDghG8UUofHLTAA")
+    
+j = updater.job_queue
+
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -26,6 +31,12 @@ lastPoleEstonia = datetime.now() - timedelta(days = 1)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     update.message.reply_text('Hola prim!', reply_to_message_id=update.message.message_id)
+    now = datetime.now() - timedelta(days = 1)
+    now = now.replace(hour=19, minute=00)
+    job_daily = j.run_daily(callback_andalucia, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
+    now = now.replace(hour=02, minute=00)
+    job_daily = j.run_daily(callback_bye, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
+
 
 
 def help(bot, update):
@@ -134,7 +145,7 @@ def echo(bot, update):
     #messages
     elif re.search(r'\bsalud\b', update.message.text.lower()):
 	update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
-    elif re.search(r'\bllegas tarde\b', update.message.text.lower()):
+    elif re.search(r'\bllegas tarde\b', update.message.text.lower()) or re.search(r'\bllega tarde\b', update.message.text.lower()):
 	update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
     elif "eres rápido" in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
 	update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
@@ -194,10 +205,17 @@ def echo(bot, update):
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
+def callback_andalucia(bot, job):
+    bot.send_message(chat_id=job.context, text="¡Buenos días, Andalucía! :D")
+    
+def callback_bye(bot, job):
+    bot.send_message(chat_id=job.context, text="BYE")
+    bot.sendChatAction(chat_id=job.context, action=telegram.ChatAction.UPLOAD_PHOTO)
+    bot.sendDocument(chat_id=job.context, document=open('/home/pi/Desktop/collerinesBotData/gifs/bye.mp4', 'rb'))
 
 def main():
-    # Create the EventHandler and pass it your bot's token.
-    updater = Updater("476217954:AAGpClsrvtCICifhF8yKdDghG8UUofHLTAA")
+    
+    
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
