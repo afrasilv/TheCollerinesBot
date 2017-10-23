@@ -105,6 +105,10 @@ def echo(bot, update):
         sendVoice(bot, update, m3AudiosPath[randomAudioIndex])
     elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
         sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
+    elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
+        randomValue = getRandomByValue(3)
+        if randomValue <= 1:
+	    sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
         
     #gif
     elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
