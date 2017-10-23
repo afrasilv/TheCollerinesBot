@@ -22,8 +22,12 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-randomMsg = ['qué pasa, jamboide', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies', 'vale', 'qué dices, prim', 'ok', 'geniaaaaaal', 'fataaaaaal', '/geniaaaaaal', '/fataaaaaal', 'Myrath macho', '/jajj', '/jjaj', '/yee']
-random4GodMsg = ['dime', 'basta', 'déjame', 'ahora no', 'zzzzzzz', '¿qué te pasa?']
+randomMsg = ['qué pasa, jamboide', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies', 'vale', 'qué dices, prim', 'ok', 'geniaaaaaal', 'fataaaaaal', '/geniaaaaaal', '/fataaaaaal', 'Myrath macho', '/jajj', '/jjaj', '/yee', "A topeth!"]
+random4GodMsg = ['dime', 'basta', 'déjame', 'ahora no', 'ZzZzzzZzz', '¿qué te pasa?']
+mimimimiImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/mimimi.jpg', '/home/pi/Desktop/collerinesBotData/imgs/mimimi1.jpg']
+m3AudiosPath = ['/home/pi/Desktop/collerinesBotData/voices/m3Javi.ogg', '/home/pi/Desktop/collerinesBotData/voices/m3Javig.ogg', '/home/pi/Desktop/collerinesBotData/voices/m3Feli.ogg']
+huehuehuePath = ['/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4', '/home/pi/Desktop/collerinesBotData/gifs/huehuehue1.mp4']
+sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/Desktop/collerinesBotData/imgs/secta1.jpg']
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
 
 
@@ -48,7 +52,9 @@ def getRandomByValue(value):
 
 def randomResponse(update, bot):
     randomValue = getRandomByValue(1000)
-    if randomValue == 11:
+    if randomValue < 13 and randomValue > 11:
+        sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/yord.ogg', reply_to_message_id=update.message.message_id)
+    elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
         wasChanged = None
@@ -59,23 +65,21 @@ def randomResponse(update, bot):
             wasChanged = bool(re.search(r'[Vv]+', update.message.text))
             update.message.text = re.sub(r'[Vv]+', 'f', update.message.text)
         else:
-            wasChanged = bool(re.search(r'[Tt]+', update.message.text))
-            update.message.text = re.sub(r'[Tt]+', 'f', update.message.text)
+            wasChanged = bool(re.search(r'[TtVvSsCc]+', update.message.text))
+            update.message.text = re.sub(r'[TtVvSsCc]+', 'f', update.message.text)
         if wasChanged:
             update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
 	    bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/alef.webp', 'rb'))
     elif randomValue == 10:
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
-    elif randomValue == 9:
-        sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/yord.ogg', reply_to_message_id=update.message.message_id)
-    elif randomValue < 8 and randomValue >= 3:
-        indexMsg = getRandomByValue(len(randomMsg) -1)
-        update.message.reply_text(randomMsg[indexMsg], reply_to_message_id=update.message.message_id)
+    elif randomValue <= 9 and randomValue >= 3:
+        update.message.reply_text(sample(randomMsg,  1), reply_to_message_id=update.message.message_id)
     elif randomValue < 2:
         update.message.text = unidecode(update.message.text)
 	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
-
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
+        sendImg(bot, update, sample(mimimimiImgPath,  1))
+        
 
 def sendGif(bot, update, pathGif):
     bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
@@ -92,16 +96,10 @@ def echo(bot, update):
     #voice
     if re.search(r'\bvalencia\b', update.message.text.lower()):
         randomValue = getRandomByValue(3)
-        if randomValue == 0:
+        if randomValue <= 1:
 	    sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
     elif re.search(r'\<3\b', update.message.text.lower()):
-        randomValue = getRandomByValue(3)
-        if randomValue == 0:
-            sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/m3Javi.ogg')
-        elif randomValue == 1:
-            sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/m3Javig.ogg')
-        elif randomValue == 2:
-            sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/m3Feli.ogg')
+        sendVoice(bot, update, sample(m3AudiosPath, 1))
     elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
         sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
         
@@ -137,7 +135,7 @@ def echo(bot, update):
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
     elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
-        sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4')
+        sendGif(bot, update, sample(huehuehuePath, 1))
     elif re.search(r'\byee\b', update.message.text.lower()):
         if "/yee" not in update.message.text.lower():
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/yee.mp4')
@@ -176,7 +174,7 @@ def echo(bot, update):
     elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
     elif re.search(r'\bsecta\b', update.message.text.lower()):
-        sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/secta.jpg')
+        sendImg(bot, update, sample(sectaImgPath,  1))
     elif re.search(r'\bnazi\b', update.message.text.lower()):
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
     
@@ -187,7 +185,7 @@ def echo(bot, update):
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/sendnudes.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif re.search(r'\bficha\b', update.message.text.lower()) or re.search(r'\bfichas\b', update.message.text.lower()):
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
-    elif re.search(r'\bbutanero\b', update.message.text.lower()) or re.search(r'\bbombona\b', update.message.text.lower()):
+    elif re.search(r'\bbutanero\b', update.message.text.lower()) or "bombona" in update.message.text.lower():
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif re.search(r'\bkylo\b', update.message.text.lower()):
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
@@ -197,7 +195,7 @@ def echo(bot, update):
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/voice/willy.ogg', 'rb'), reply_to_message_id=update.message.message_id)
     elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
         randomValue = getRandomByValue(50)
-        if randomValue <= 1:
+        if randomValue <= 5:
 	    bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif len(update.message.text) > 7: ##mimimimimimi
         randomResponse(update, bot)
