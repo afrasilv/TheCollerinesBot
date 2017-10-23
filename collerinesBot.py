@@ -53,7 +53,7 @@ def getRandomByValue(value):
 def randomResponse(update, bot):
     randomValue = getRandomByValue(1000)
     if randomValue < 13 and randomValue > 11:
-        sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/yord.ogg', reply_to_message_id=update.message.message_id)
+        bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
