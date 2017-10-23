@@ -73,12 +73,14 @@ def randomResponse(update, bot):
     elif randomValue == 10:
 	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue <= 9 and randomValue >= 3:
-        update.message.reply_text(sample(randomMsg,  1), reply_to_message_id=update.message.message_id)
+        randomMsgIndex = getRandomByValue(len(randomMsg) -1)
+        update.message.reply_text(randomMsg[randomMsgIndex], reply_to_message_id=update.message.message_id)
     elif randomValue < 2:
         update.message.text = unidecode(update.message.text)
 	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
-        sendImg(bot, update, sample(mimimimiImgPath,  1))
+        randomMsgIndex = getRandomByValue(len(mimimimiImgPath) -1)
+        sendImg(bot, update, mimimimiImgPath[randomMsgIndex])
         
 
 def sendGif(bot, update, pathGif):
@@ -99,7 +101,8 @@ def echo(bot, update):
         if randomValue <= 1:
 	    sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
     elif re.search(r'\<3\b', update.message.text.lower()):
-        sendVoice(bot, update, sample(m3AudiosPath, 1))
+        randomAudioIndex = getRandomByValue(len(m3AudiosPath) -1)
+        sendVoice(bot, update, m3AudiosPath[randomAudioIndex])
     elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
         sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
         
@@ -135,7 +138,8 @@ def echo(bot, update):
         if randomValue <= 1:
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
     elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
-        sendGif(bot, update, sample(huehuehuePath, 1))
+        randomHuehuehueIndex = getRandomByValue(len(huehuehuePath) -1)
+        sendGif(bot, update, huehuehuePath[randomHuehuehueIndex])
     elif re.search(r'\byee\b', update.message.text.lower()):
         if "/yee" not in update.message.text.lower():
             sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/yee.mp4')
@@ -174,7 +178,8 @@ def echo(bot, update):
     elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
     elif re.search(r'\bsecta\b', update.message.text.lower()):
-        sendImg(bot, update, sample(sectaImgPath,  1))
+        randomSectaIndex = getRandomByValue(len(sectaImgPath) -1)
+        sendImg(bot, update, sectaImgPath[randomSectaIndex])
     elif re.search(r'\bnazi\b', update.message.text.lower()):
         sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
     
