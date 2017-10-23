@@ -52,7 +52,9 @@ def getRandomByValue(value):
 
 def randomResponse(update, bot):
     randomValue = getRandomByValue(1000)
-    if randomValue < 13 and randomValue > 11:
+    if randomValue == 20:
+        update.message.reply_text('Chhhhssst... Venga, calla y disfruta https://www.youtube.com/watch?v=fV7KAarJgNg', reply_to_message_id=update.message.message_id)
+    elif randomValue < 20 and randomValue > 11:
         bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue == 11:
         array = update.message.text.split()
