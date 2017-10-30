@@ -8,13 +8,16 @@ from unidecode import unidecode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from random import randint
 from datetime import datetime, timedelta
+from configparser import ConfigParser
 import os
 import sys
 from threading import Thread
 import logging
 
 # Create the EventHandler and pass it your bot's token.
-updater = Updater("476217954:AAGpClsrvtCICifhF8yKdDghG8UUofHLTAA")
+config = ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), "config.ini"))
+updater = Updater(config["main"]["token"])
     
 j = updater.job_queue
 
