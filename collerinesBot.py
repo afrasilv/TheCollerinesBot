@@ -103,9 +103,9 @@ def sendImg(bot, update, pathImg):
 def echo(bot, update):
     global canTalk
     
-    if update.message.from_user.username != None and update.message.from_user.username.lower() in ["afrasilv", "kelevra7"] and update.message.text != None and "miguelito para" == update.message.text.lower():
+    if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id) and update.message.text != None and "miguelito para" == update.message.text.lower():
         canTalk = None
-    elif update.message.from_user.username != None and update.message.from_user.username.lower() in ["afrasilv", "kelevra7"] and update.message.text != None and "miguelito sigue" == update.message.text.lower():
+    elif update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id) and update.message.text != None and "miguelito sigue" == update.message.text.lower():
         canTalk = True
     
     if canTalk:
@@ -251,13 +251,19 @@ def callback_bye(bot, job):
     bot.sendDocument(chat_id=job.context, document=open('/home/pi/Desktop/collerinesBotData/gifs/bye.mp4', 'rb'))
 
 def stop(bot, update):
-    global canTalk
-    canTalk = None
+    if update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
+        global canTalk
+        canTalk = None
 
 def restart(bot, update):
-    global canTalk
-    canTalk = True
+    if update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
+        global canTalk
+        canTalk = True
         
+def get_admin_ids(bot, chat_id):
+    """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
+    return [admin.user.id for admin in bot.get_chat_administrators(chat_id)]
+
 def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -265,8 +271,8 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler('seguir', restart, filters=Filters.user(username=['@afrasilv', '@Kelevra7', '@kelevra7'])))
-    dp.add_handler(CommandHandler('parar', stop, filters=Filters.user(username=['@afrasilv', '@Kelevra7', '@kelevra7'])))
+    dp.add_handler(CommandHandler('seguir', restart))
+    dp.add_handler(CommandHandler('parar', stop))
     
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
