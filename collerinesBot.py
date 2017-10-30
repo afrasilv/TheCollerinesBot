@@ -9,17 +9,12 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from random import randint
 from datetime import datetime, timedelta
 from configparser import ConfigParser
+from collections import OrderedDict
 import os
 import sys
 from threading import Thread
 import logging
 
-# Create the EventHandler and pass it your bot's token.
-config = ConfigParser()
-config.read(os.path.join(os.path.dirname(__file__), "config.ini"))
-updater = Updater(config["main"]["token"])
-    
-j = updater.job_queue
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -37,6 +32,27 @@ sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/D
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
 canTalk = True
 
+def ini_to_dict(path):
+    """ Read an ini path in to a dict
+    :param path: Path to file
+    :return: an OrderedDict of that path ini data
+    """
+    config = ConfigParser()
+    config.read(path)
+    return_value=OrderedDict()
+    for section in reversed(config.sections()):
+        return_value[section]=OrderedDict()
+        section_tuples = config.items(section)
+        for itemTurple in reversed(section_tuples):
+            return_value[section][itemTurple[0]] = itemTurple[1]
+    return return_value
+
+# Create the EventHandler and pass it your bot's token.
+config = ConfigParser()
+settings = ini_to_dict(os.path.join(os.path.dirname(__file__), "config.ini"))
+updater = Updater(settings["main"]["token"])
+    
+j = updater.job_queue
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -98,15 +114,20 @@ def sendVoice(bot, update, pathVoice):
 
 def sendImg(bot, update, pathImg):
     bot.send_photo(chat_id=update.message.chat_id, photo=open(pathImg, 'rb'))
-
+    
+def isAdmin(bot, update):
+    if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
+        return True
+    else:
+        return None
 
 def echo(bot, update):
     global canTalk
     
-    if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id) and update.message.text != None and "miguelito para" == update.message.text.lower():
-        canTalk = None
-    elif update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id) and update.message.text != None and "miguelito sigue" == update.message.text.lower():
-        canTalk = True
+    if update.message.text != None and "miguelito para" == update.message.text.lower():
+        stop(bot, update)
+    elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
+        restart(bot, update)
     
     if canTalk:
         #voice
@@ -251,14 +272,18 @@ def callback_bye(bot, job):
     bot.sendDocument(chat_id=job.context, document=open('/home/pi/Desktop/collerinesBotData/gifs/bye.mp4', 'rb'))
 
 def stop(bot, update):
-    if update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
+    if isAdmin(bot, update):
         global canTalk
         canTalk = None
+    else:
+        bot.send_message(chat_id=job.context, text="JA! No :)")
 
 def restart(bot, update):
-    if update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
+    if isAdmin(bot, update):
         global canTalk
         canTalk = True
+    else:
+        bot.send_message(chat_id=job.context, text="JA! No :)")
         
 def get_admin_ids(bot, chat_id):
     """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
