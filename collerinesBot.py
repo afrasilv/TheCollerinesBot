@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 randomMsg = ['qué pasa, jamboide', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies', 'vale', 'qué dices, prim', 'ok', 'geniaaaaaal', 'fataaaaaal', '/geniaaaaaal', '/fataaaaaal', 'Myrath macho', '/jajj', '/jjaj', '/yee', "A topeth!"]
 random4GodMsg = ['dime', 'basta', 'déjame', 'ahora no', 'ZzZzzzZzz', '¿qué te pasa?']
-mimimimiImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/mimimi.jpg', '/home/pi/Desktop/collerinesBotData/imgs/mimimi1.jpg', '/home/pi/Desktop/collerinesBotData/imgs/mimimi2.jpg']
+mimimimiStickerPath = ['/home/pi/Desktop/collerinesBotData/stickers/mimimi.webp', '/home/pi/Desktop/collerinesBotData/stickers/mimimi1.webp', '/home/pi/Desktop/collerinesBotData/stickers/mimimi2.webp']
 m3AudiosPath = ['/home/pi/Desktop/collerinesBotData/voices/m3Javi.ogg', '/home/pi/Desktop/collerinesBotData/voices/m3Javig.ogg', '/home/pi/Desktop/collerinesBotData/voices/m3Feli.ogg']
 huehuehuePath = ['/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4', '/home/pi/Desktop/collerinesBotData/gifs/huehuehue1.mp4']
 sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/Desktop/collerinesBotData/imgs/secta1.jpg']
@@ -101,8 +101,8 @@ def randomResponse(update, bot):
         update.message.text = unidecode(update.message.text)
 	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
-        randomMsgIndex = getRandomByValue(len(mimimimiImgPath) -1)
-        sendImg(bot, update, mimimimiImgPath[randomMsgIndex])
+        randomMsgIndex = getRandomByValue(len(mimimimiStickerPath) -1)
+        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(mimimimiStickerPath[randomMsgIndex], 'rb'), reply_to_message_id=update.message.message_id)
         
 
 def sendGif(bot, update, pathGif):
