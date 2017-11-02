@@ -186,37 +186,40 @@ def echo(bot, update):
 
     for i in range(len(update.message.entities)):
         if update.message.entities[i].type == 'url':
-            videoid = ""
-            if 'youtu.be' not in update.message.text.lower():
-                videoid = update.message.text.split('v=')
-                videoid = videoid[1].split(' ')[0]
-                videoid = videoid.split('&')[0]
-            else:
-                videoid = update.message.text.split('youtu.be/')
-                videoid = videoid[1].split(' ')[0]
-                videoid = videoid.split('&')[0]
-            youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
-            video = youtube.get_video_info(videoid)
-            videoTitle = video['snippet']['title']
-            if "(official video)" in videoTitle.lower():
-                videoTitle = videoTitle.lower().replace("(official video)", "")
-            if "official video" in videoTitle.lower():
-                videoTitle = videoTitle.lower().replace("official video", "")
-            videoTags = ""
-            tagsIndex = 0
-            videoTags = gimmeTags(video, videoTags, 3)
-            if videoTitle != None and videoTags != None:
-                client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
-                sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-                sp.trace = False
-                results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
-                
-                if results['tracks']['total'] != None and results['tracks']['total'] == 0:
-                    saveDataSong(update)
+            try:
+                videoid = ""
+                if 'youtu.be' not in update.message.text.lower():
+                    videoid = update.message.text.split('v=')
+                    videoid = videoid[1].split(' ')[0]
+                    videoid = videoid.split('&')[0]
                 else:
-                    addToSpotifyPlaylist(results, update)
-            else:
-                saveDataSong(update)
+                    videoid = update.message.text.split('youtu.be/')
+                    videoid = videoid[1].split(' ')[0]
+                    videoid = videoid.split('&')[0]
+                youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
+                video = youtube.get_video_info(videoid)
+                videoTitle = video['snippet']['title']
+                if "(official video)" in videoTitle.lower():
+                    videoTitle = videoTitle.lower().replace("(official video)", "")
+                if "official video" in videoTitle.lower():
+                    videoTitle = videoTitle.lower().replace("official video", "")
+                videoTags = ""
+                tagsIndex = 0
+                videoTags = gimmeTags(video, videoTags, 3)
+                if videoTitle != None and videoTags != None:
+                    client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
+                    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+                    sp.trace = False
+                    results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
+                
+                    if results['tracks']['total'] != None and results['tracks']['total'] == 0:
+                        saveDataSong(update)
+                    else:
+                        addToSpotifyPlaylist(results, update)
+                else:
+                    saveDataSong(update)
+            except:
+            saveDataSong(update)
     
     if update.message.text != None and "miguelito para" == update.message.text.lower():
         stop(bot, update)
