@@ -128,9 +128,10 @@ def isAdmin(bot, update):
 
 def gimmeTags(video, videoTags, maxTags):
     tagsIndex = 0
-    while tagsIndex < len(video['snippet']['tags']) and tagsIndex < maxTags:
-        videoTags += video['snippet']['tags'][tagsIndex] + " "
-        tagsIndex+=1
+    if video['snippet'].get('tags') != None:
+        while tagsIndex < len(video['snippet']['tags']) and tagsIndex < maxTags:
+            videoTags += video['snippet']['tags'][tagsIndex] + " "
+            tagsIndex+=1
     return videoTags
 
 def saveDataSong(update):
@@ -145,21 +146,24 @@ def saveDataSong(update):
     with open('data.txt', 'w') as outfile:  
         json.dump(data, outfile)
 
-    update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :(", reply_to_message_id=update.message.message_id)
+    update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :( la añadiremos a mano...", reply_to_message_id=update.message.message_id)
 
-def callSpotifyApi(videoTitle, videoTags, video, sp):
-    results = sp.search(q=videoTitle, limit=2)
-    if results['tracks']['total'] == 0 :
-        results = sp.search(q=videoTags, limit=2)
-    if results['tracks']['total'] == 0 :
-        videoTags = ""
-        videoTags = gimmeTags(video, videoTags, 2)
-        results = sp.search(q=videoTags, limit=2)
-    if results['tracks']['total'] == 0 :
-        videoTags = ""
-        videoTags = gimmeTags(video, videoTags, 1)
-        results = sp.search(q=videoTags, limit=2)
-    return results
+def callSpotifyApi(videoTitle, videoTags, video, sp, update):
+    try:
+        results = sp.search(q=videoTitle, limit=1)
+        if results['tracks']['total'] == 0 :
+            results = sp.search(q=videoTags, limit=1)
+        if results['tracks']['total'] == 0 :
+            videoTags = ""
+            videoTags = gimmeTags(video, videoTags, 2)
+            results = sp.search(q=videoTags, limit=1)
+        if results['tracks']['total'] == 0 :
+            videoTags = ""
+            videoTags = gimmeTags(video, videoTags, 1)
+            results = sp.search(q=videoTags, limit=1)
+        return results
+    except:
+        saveDataSong(update)
 
 def addToSpotifyPlaylist(results, update):
     resultTracksList=results['tracks']
@@ -174,7 +178,7 @@ def addToSpotifyPlaylist(results, update):
     results = sp.user_playlist_add_tracks(settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
     update.message.reply_text("Añadidas " + str(len(idsToAdd)) + " canciones, gracias! :D", reply_to_message_id=update.message.message_id)
 
-def gimmeTheSpotifyPlaylistLink(update):
+def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text('ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
 
 def echo(bot, update):
@@ -182,9 +186,15 @@ def echo(bot, update):
 
     for i in range(len(update.message.entities)):
         if update.message.entities[i].type == 'url':
-            videoid = update.message.text.split('v=')
-            videoid = videoid[1].split(' ')[0]
-            videoid = videoid.split('&')[0]
+            videoid = ""
+            if 'youtu.be' not in update.message.text.lower():
+                videoid = update.message.text.split('v=')
+                videoid = videoid[1].split(' ')[0]
+                videoid = videoid.split('&')[0]
+            else:
+                videoid = update.message.text.split('youtu.be/')
+                videoid = videoid[1].split(' ')[0]
+                videoid = videoid.split('&')[0]
             youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
             video = youtube.get_video_info(videoid)
             videoTitle = video['snippet']['title']
@@ -199,9 +209,9 @@ def echo(bot, update):
                 client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
                 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
                 sp.trace = False
-                results = callSpotifyApi(videoTitle, videoTags, video, sp)
+                results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
                 
-                if results['tracks']['total'] == 0:
+                if results['tracks']['total'] != None and results['tracks']['total'] == 0:
                     saveDataSong(update)
                 else:
                     addToSpotifyPlaylist(results, update)
@@ -295,7 +305,7 @@ def echo(bot, update):
         elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
             update.message.reply_text('/jajj')
         elif "miguelito dame la lista" in update.message.text.lower():
-            gimmeTheSpotifyPlaylistLink(update)
+            gimmeTheSpotifyPlaylistLink(bot, update)
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
             now = datetime.now()
