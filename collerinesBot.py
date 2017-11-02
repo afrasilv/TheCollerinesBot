@@ -10,10 +10,15 @@ from random import randint
 from datetime import datetime, timedelta
 from configparser import ConfigParser
 from collections import OrderedDict
+import json
 import os
 import sys
 from threading import Thread
 import logging
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy.util as util
+from youtubeApi import YoutubeAPI
 
 
 # Enable logging
@@ -61,7 +66,7 @@ def start(bot, update):
     now = datetime.now() - timedelta(days = 1)
     now = now.replace(hour=19, minute=00)
     job_daily = j.run_daily(callback_andalucia, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
-    now = now.replace(hour=02, minute=00)
+    now = now.replace(hour=2, minute=00)
     job_daily = j.run_daily(callback_bye, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
 
 
@@ -75,7 +80,7 @@ def getRandomByValue(value):
 def randomResponse(update, bot):
     randomValue = getRandomByValue(1000)
     if randomValue < 15 and randomValue > 11:
-        bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'), reply_to_message_id=update.message.message_id)
+        bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'))
     elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
@@ -91,18 +96,18 @@ def randomResponse(update, bot):
             update.message.text = re.sub(r'[TtVvSsCc]+', 'f', update.message.text)
         if wasChanged:
             update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
-	    bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/alef.webp', 'rb'))
+            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/alef.webp', 'rb'))
     elif randomValue == 10:
-	bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
+        bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue <= 9 and randomValue >= 3:
         randomMsgIndex = getRandomByValue(len(randomMsg) -1)
         update.message.reply_text(randomMsg[randomMsgIndex], reply_to_message_id=update.message.message_id)
     elif randomValue < 2:
         update.message.text = unidecode(update.message.text)
-	update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
+        update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
         randomMsgIndex = getRandomByValue(len(mimimimiStickerPath) -1)
-        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(mimimimiStickerPath[randomMsgIndex], 'rb'), reply_to_message_id=update.message.message_id)
+        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(mimimimiStickerPath[randomMsgIndex], 'rb'))
         
 
 def sendGif(bot, update, pathGif):
@@ -121,8 +126,87 @@ def isAdmin(bot, update):
     else:
         return None
 
+def gimmeTags(video, videoTags, maxTags):
+    tagsIndex = 0
+    while tagsIndex < len(video['snippet']['tags']) and tagsIndex < maxTags:
+        videoTags += video['snippet']['tags'][tagsIndex] + " "
+        tagsIndex+=1
+    return videoTags
+
+def saveDataSong(update):
+    data = []
+    try:
+        json_file = open('data.txt', 'r')
+        data = json.load(json_file)
+    except IOError:
+        data = []
+
+    data.append(update.message.text)
+    with open('data.txt', 'w') as outfile:  
+        json.dump(data, outfile)
+
+    update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :(", reply_to_message_id=update.message.message_id)
+
+def callSpotifyApi(videoTitle, videoTags, sp):
+    results = sp.search(q=videoTitle, limit=2)
+    if results['tracks']['total'] == 0 :
+        results = sp.search(q=videoTags, limit=2)
+    if results['tracks']['total'] == 0 :
+        videoTags = ""
+        videoTags = gimmeTags(video, videoTags, 2)
+        results = sp.search(q=videoTags, limit=2)
+    if results['tracks']['total'] == 0 :
+        videoTags = ""
+        videoTags = gimmeTags(video, videoTags, 1)
+        results = sp.search(q=videoTags, limit=2)
+    return results
+
+def addToSpotifyPlaylist(results, update):
+    resultTracksList=results['tracks']
+    idsToAdd=[]
+
+    for j in range(len(results['tracks']['items'])):
+        idsToAdd.insert(0, results['tracks']['items'][j]['id'])
+
+    scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
+    token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"],scope,client_id=settings["spotify"]["spotifyclientid"],client_secret=settings["spotify"]["spotifysecret"],redirect_uri='http://localhost:8000')
+    sp = spotipy.Spotify(auth=token)
+    results = sp.user_playlist_add_tracks(settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
+    update.message.reply_text("Añadidas " + str(len(idsToAdd)) + " canciones, gracias! :D", reply_to_message_id=update.message.message_id)
+
+def gimmeTheSpotifyPlaylistLink(update):
+    update.message.reply_text('ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
+
 def echo(bot, update):
     global canTalk
+
+    for i in range(len(update.message.entities)):
+        if update.message.entities[i].type == 'url':
+            videoid = update.message.text.split('v=')
+            videoid = videoid[1].split(' ')[0]
+            videoid = videoid.split('&')[0]
+            youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
+            video = youtube.get_video_info(videoid)
+            videoTitle = video['snippet']['title']
+            if "(official video)" in videoTitle.lower():
+                videoTitle = videoTitle.lower().replace("(official video)", "")
+            if "official video" in videoTitle.lower():
+                videoTitle = videoTitle.lower().replace("official video", "")
+            videoTags = ""
+            tagsIndex = 0
+            videoTags = gimmeTags(video, videoTags, 3)
+            if videoTitle != None and videoTags != None:
+                client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
+                sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+                sp.trace = False
+                results = callSpotifyApi(videoTitle, videoTags, sp)
+                
+                if results['tracks']['total'] == 0:
+                    saveDataSong(update)
+                else:
+                    addToSpotifyPlaylist(results, update)
+            else:
+                saveDataSong(update)
     
     if update.message.text != None and "miguelito para" == update.message.text.lower():
         stop(bot, update)
@@ -210,6 +294,8 @@ def echo(bot, update):
             update.message.reply_text('/jjaj')
         elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
             update.message.reply_text('/jajj')
+        elif "miguelito dame la lista" in update.message.text.lower():
+            gimmeTheSpotifyPlaylistLink(update)
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
             now = datetime.now()
@@ -298,6 +384,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler('seguir', restart))
     dp.add_handler(CommandHandler('parar', stop))
+    dp.add_handler(CommandHandler('damelalista', gimmeTheSpotifyPlaylistLink))
     
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
