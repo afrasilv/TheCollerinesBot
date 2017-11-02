@@ -223,7 +223,7 @@ def echo(bot, update):
                 else:
                     saveDataSong(update)
             except:
-            saveDataSong(update)
+                saveDataSong(update)
     
     if update.message.text != None and "miguelito para" == update.message.text.lower():
         stop(bot, update)
