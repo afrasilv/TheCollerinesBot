@@ -36,6 +36,7 @@ huehuehuePath = ['/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4', '/home
 sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/Desktop/collerinesBotData/imgs/secta1.jpg']
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
 canTalk = True
+firstMsg = True
 
 def ini_to_dict(path):
     """ Read an ini path in to a dict
@@ -63,12 +64,6 @@ j = updater.job_queue
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     update.message.reply_text('Hola prim!', reply_to_message_id=update.message.message_id)
-    now = datetime.now() - timedelta(days = 1)
-    now = now.replace(hour=19, minute=00)
-    job_daily = j.run_daily(callback_andalucia, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
-    now = now.replace(hour=2, minute=00)
-    job_daily = j.run_daily(callback_bye, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
-
 
 def help(bot, update):
     update.message.reply_text('asdqwe')
@@ -125,6 +120,14 @@ def isAdmin(bot, update):
         return True
     else:
         return None
+
+def startJobs(bot, update):
+    now = datetime.now() - timedelta(days = 1)
+    now = now.replace(hour=19, minute=00)
+    job_daily = j.run_daily(callback_andalucia, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
+    now = now.replace(hour=2, minute=00)
+    job_daily = j.run_daily(callback_bye, now.time(), days=(0,1,2,3,4,5,6), context=update.message.chat_id)
+
 
 def gimmeTags(video, videoTags, maxTags):
     tagsIndex = 0
@@ -183,9 +186,10 @@ def gimmeTheSpotifyPlaylistLink(bot, update):
 
 def echo(bot, update):
     global canTalk
+    global firstMsg
 
     for i in range(len(update.message.entities)):
-        if update.message.entities[i].type == 'url':
+        if update.message.entities[i].type == 'url' and ( 'youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
             try:
                 videoid = ""
                 if 'youtu.be' not in update.message.text.lower():
@@ -225,6 +229,10 @@ def echo(bot, update):
         stop(bot, update)
     elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
         restart(bot, update)
+
+    if firstMsg:
+        startJobs(bot, update)
+        firstMsg=None
     
     if canTalk:
         #voice
@@ -240,9 +248,9 @@ def echo(bot, update):
         elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
             randomValue = getRandomByValue(3)
             if randomValue <= 1:
-                sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
+                sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/rocoso.ogg')
         elif re.search(r'\bmétodo willy\b', update.message.text.lower()) or re.search(r'\bmetodo willy\b', update.message.text.lower()):
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/voice/willy.ogg', 'rb'), reply_to_message_id=update.message.message_id)
+            sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/willy.ogg')
             
         #gif
         elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
@@ -348,7 +356,7 @@ def echo(bot, update):
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
         elif re.search(r'\bkylo\b', update.message.text.lower()):
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bcostra\b', update.message.text.lower()):
+        elif re.search(r'\bkostra\b', update.message.text.lower()):
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
         elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
             randomValue = getRandomByValue(5)
