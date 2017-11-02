@@ -147,7 +147,7 @@ def saveDataSong(update):
 
     update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :(", reply_to_message_id=update.message.message_id)
 
-def callSpotifyApi(videoTitle, videoTags, sp):
+def callSpotifyApi(videoTitle, videoTags, video, sp):
     results = sp.search(q=videoTitle, limit=2)
     if results['tracks']['total'] == 0 :
         results = sp.search(q=videoTags, limit=2)
@@ -199,7 +199,7 @@ def echo(bot, update):
                 client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
                 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
                 sp.trace = False
-                results = callSpotifyApi(videoTitle, videoTags, sp)
+                results = callSpotifyApi(videoTitle, videoTags, video, sp)
                 
                 if results['tracks']['total'] == 0:
                     saveDataSong(update)
