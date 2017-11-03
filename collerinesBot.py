@@ -151,6 +151,45 @@ def saveDataSong(update):
 
     update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :( la añadiremos a mano...", reply_to_message_id=update.message.message_id)
 
+def savePoleStats(update):
+    try:
+        json_file = open('polestats.json', 'r')
+        data = json.load(json_file, object_pairs_hook=OrderedDict)
+    except IOError:
+        data = [{'username': update.message.from_user.name, 'count': 0}]
+
+    found = None
+    i = 0
+    while i < len(data):
+        if data[i]['username'] == update.message.from_user.name:
+            data[i]['count'] += 1
+            found = True
+        i+=1
+    if found == None:
+        data.append({'username': update.message.from_user.name, 'count': 1})
+
+    with open('polestats.json', 'w') as outfile:  
+        json.dump(data, outfile)
+
+def gimmeTheRank(update):
+    try:
+        json_file = open('polestats.json', 'r')
+        data = json.load(json_file, object_pairs_hook=OrderedDict)
+    except IOError:
+        data = {}
+
+    data = json.dumps({'data': sorted(data, key=lambda x: x['count'], reverse=True)})
+    data = json.loads(data)
+    messageValue = ""
+    index = 0
+    data = data['data']
+    while index < len(data):
+        messageValue += data[index]['username'] + " ---> " + str(data[index]['count']) + "\n"
+        index+=1
+
+    update.message.reply_text(messageValue, reply_to_message_id=update.message.message_id)
+
+
 def callSpotifyApi(videoTitle, videoTags, video, sp, update):
     try:
         results = sp.search(q=videoTitle, limit=1)
@@ -322,7 +361,10 @@ def echo(bot, update):
             now = datetime.now()
             if now.date() != lastPoleEstonia.date() and now.hour >= 23:
                 update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
+                savePoleStats(update)
                 lastPoleEstonia = now
+        elif "estoniarank" in update.message.text.lower():
+            gimmeTheRank(update)
         elif re.search(r'\bzyzz\b', update.message.text.lower()):
             update.message.reply_text(' /zetayzetazeta ')
         elif re.search(r'\bdios\b', update.message.text.lower()):
