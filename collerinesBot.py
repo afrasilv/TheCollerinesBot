@@ -224,8 +224,8 @@ def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text('ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
 
 def replaceYouTubeVideoName(videoTitle):
-    videoTitle = re.sub(r'\([\[a-zA-Z \]]+\)', '', videoTitle)
-    videoTitle = re.sub(r'\[[\[a-zA-Z \]]+\]', '', videoTitle)
+    videoTitle = re.sub(r'\([\[a-zA-Z :\'0-9\]]+\)', '', videoTitle)
+    videoTitle = re.sub(r'\[[\[a-zA-Z :\'0-9\]]+\]', '', videoTitle)
     videoTitle = videoTitle.lower().replace("official video", "")
     videoTitle = videoTitle.lower().replace("official music video", "")
     videoTitle = videoTitle.lower().replace("videoclip oficiai", "")
