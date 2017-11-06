@@ -223,6 +223,16 @@ def addToSpotifyPlaylist(results, update):
 def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text('ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
 
+def replaceYouTubeVideoName(videoTitle):
+    videoTitle = re.sub(r'\([\[a-zA-Z \]]+\)', '', videoTitle)
+    videoTitle = re.sub(r'\[[\[a-zA-Z \]]+\]', '', videoTitle)
+    videoTitle = videoTitle.lower().replace("official video", "")
+    videoTitle = videoTitle.lower().replace("official music video", "")
+    videoTitle = videoTitle.lower().replace("videoclip oficiai", "")
+    videoTitle = videoTitle.lower().replace("video clip oficiai", "")
+    videoTitle = videoTitle.lower().replace("videoclip", "")
+    return videoTitle
+
 def echo(bot, update):
     global canTalk
     global firstMsg
@@ -241,11 +251,8 @@ def echo(bot, update):
                     videoid = videoid.split('&')[0]
                 youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
                 video = youtube.get_video_info(videoid)
-                videoTitle = video['snippet']['title']
-                if "(official video)" in videoTitle.lower():
-                    videoTitle = videoTitle.lower().replace("(official video)", "")
-                if "official video" in videoTitle.lower():
-                    videoTitle = videoTitle.lower().replace("official video", "")
+                videoTitle = video['snippet']['title'].lower()
+                videoTitle = replaceYouTubeVideoName(videoTitle)
                 videoTags = ""
                 tagsIndex = 0
                 videoTags = gimmeTags(video, videoTags, 3)
