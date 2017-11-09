@@ -37,16 +37,12 @@ sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/D
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
 canTalk = True
 firstMsg = True
-youtubeCensorData = {}
 
 def ini_to_dict(path):
     """ Read an ini path in to a dict
     :param path: Path to file
     :return: an OrderedDict of that path ini data
     """
-    global youtubeCensorData
-    json_file = open(os.path.join(os.path.dirname(__file__), "youtubeCensor.json"), 'r')
-    youtubeCensorData = json.load(json_file)
     config = ConfigParser()
     config.read(path)
     return_value=OrderedDict()
@@ -222,7 +218,7 @@ def addToSpotifyPlaylist(results, update):
     token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"],scope,client_id=settings["spotify"]["spotifyclientid"],client_secret=settings["spotify"]["spotifysecret"],redirect_uri='http://localhost:8000')
     sp = spotipy.Spotify(auth=token)
     results = sp.user_playlist_add_tracks(settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
-    update.message.reply_text("Añadidas " + str(len(idsToAdd)) + " canciones, gracias! :D", reply_to_message_id=update.message.message_id)
+    update.message.reply_text("Añadida, gracias! :D", reply_to_message_id=update.message.message_id)
 
 def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text('ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
@@ -269,7 +265,9 @@ def echo(bot, update):
                 video = youtube.get_video_info(videoid)
                 videoTitle = video['snippet']['title'].lower()
                 videoTitle = replaceYouTubeVideoName(videoTitle)
-                global youtubeCensorData
+                
+                json_file = open(os.path.join(os.path.dirname(__file__), "youtubeCensor.json"), 'r')
+                youtubeCensorData = json.load(json_file)
                 found = None
 
                 for item in youtubeCensorData:
