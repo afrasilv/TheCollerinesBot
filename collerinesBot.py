@@ -199,11 +199,11 @@ def callSpotifyApi(videoTitle, videoTags, video, sp, update):
         results = sp.search(q=videoTitle, limit=1)
         if results['tracks']['total'] == 0 :
             results = sp.search(q=videoTags, limit=1)
-        if results['tracks']['total'] == 0 :
+        if results['tracks']['total'] == 0 and video != None:
             videoTags = ""
             videoTags = gimmeTags(video, videoTags, 2)
             results = sp.search(q=videoTags, limit=1)
-        if results['tracks']['total'] == 0 :
+        if results['tracks']['total'] == 0 and video != None:
             videoTags = ""
             videoTags = gimmeTags(video, videoTags, 1)
             results = sp.search(q=videoTags, limit=1)
@@ -236,6 +236,18 @@ def replaceYouTubeVideoName(videoTitle):
     videoTitle = videoTitle.lower().replace("video clip oficiai", "")
     videoTitle = videoTitle.lower().replace("videoclip", "")
     return videoTitle
+
+def connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video):
+    client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    sp.trace = False
+    results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
+
+    if results == None or (results['tracks']['total'] != None and results['tracks']['total'] == 0 ):
+        saveDataSong(update)
+    else:
+        addToSpotifyPlaylist(results, update)
+
 
 def echo(bot, update):
     global canTalk
@@ -271,15 +283,7 @@ def echo(bot, update):
                     tagsIndex = 0
                     videoTags = gimmeTags(video, videoTags, 3)
                     if videoTitle != None and videoTags != None:
-                        client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
-                        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-                        sp.trace = False
-                        results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
-
-                        if results['tracks']['total'] != None and results['tracks']['total'] == 0:
-                            saveDataSong(update)
-                        else:
-                            addToSpotifyPlaylist(results, update)
+                        connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video)
                     else:
                         saveDataSong(update)
             except:
@@ -377,6 +381,9 @@ def echo(bot, update):
             update.message.reply_text('/jajj')
         elif "miguelito dame la lista" in update.message.text.lower():
             gimmeTheSpotifyPlaylistLink(bot, update)
+        elif "miguelito añade" in update.message.text.lower():
+            videoTitle = update.message.text.lower().replace("miguelito añade ", "")
+            connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
             now = datetime.now()
