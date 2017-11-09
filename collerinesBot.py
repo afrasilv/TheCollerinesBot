@@ -37,12 +37,16 @@ sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/D
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
 canTalk = True
 firstMsg = True
+youtubeCensorData = {}
 
 def ini_to_dict(path):
     """ Read an ini path in to a dict
     :param path: Path to file
     :return: an OrderedDict of that path ini data
     """
+    global youtubeCensorData
+    json_file = open(os.path.join(os.path.dirname(__file__), "youtubeCensor.json"), 'r')
+    youtubeCensorData = json.load(json_file)
     config = ConfigParser()
     config.read(path)
     return_value=OrderedDict()
@@ -57,7 +61,7 @@ def ini_to_dict(path):
 config = ConfigParser()
 settings = ini_to_dict(os.path.join(os.path.dirname(__file__), "config.ini"))
 updater = Updater(settings["main"]["token"])
-    
+
 j = updater.job_queue
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -67,13 +71,13 @@ def start(bot, update):
 
 def help(bot, update):
     update.message.reply_text('asdqwe')
-    
+
 def getRandomByValue(value):
     randomValue = randint(0, value)
     return randomValue
 
 def randomResponse(update, bot):
-    randomValue = getRandomByValue(1000)
+    randomValue = getRandomByValue(1400)
     if randomValue < 15 and randomValue > 11:
         bot.send_voice(chat_id=update.message.chat_id, voice=open('/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'))
     elif randomValue == 11:
@@ -103,7 +107,7 @@ def randomResponse(update, bot):
         update.message.reply_text(update.message.text, reply_to_message_id=update.message.message_id)
         randomMsgIndex = getRandomByValue(len(mimimimiStickerPath) -1)
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(mimimimiStickerPath[randomMsgIndex], 'rb'))
-        
+
 
 def sendGif(bot, update, pathGif):
     bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_PHOTO)
@@ -114,7 +118,7 @@ def sendVoice(bot, update, pathVoice):
 
 def sendImg(bot, update, pathImg):
     bot.send_photo(chat_id=update.message.chat_id, photo=open(pathImg, 'rb'))
-    
+
 def isAdmin(bot, update):
     if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
         return True
@@ -146,7 +150,7 @@ def saveDataSong(update):
         data = []
 
     data.append(update.message.text)
-    with open('data.txt', 'w') as outfile:  
+    with open('data.txt', 'w') as outfile:
         json.dump(data, outfile)
 
     update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :( la añadiremos a mano...", reply_to_message_id=update.message.message_id)
@@ -168,7 +172,7 @@ def savePoleStats(update):
     if found == None:
         data.append({'username': update.message.from_user.name, 'count': 1})
 
-    with open('polestats.json', 'w') as outfile:  
+    with open('polestats.json', 'w') as outfile:
         json.dump(data, outfile)
 
 def gimmeTheRank(update):
@@ -253,24 +257,34 @@ def echo(bot, update):
                 video = youtube.get_video_info(videoid)
                 videoTitle = video['snippet']['title'].lower()
                 videoTitle = replaceYouTubeVideoName(videoTitle)
-                videoTags = ""
-                tagsIndex = 0
-                videoTags = gimmeTags(video, videoTags, 3)
-                if videoTitle != None and videoTags != None:
-                    client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
-                    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-                    sp.trace = False
-                    results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
-                
-                    if results['tracks']['total'] != None and results['tracks']['total'] == 0:
-                        saveDataSong(update)
-                    else:
-                        addToSpotifyPlaylist(results, update)
+                global youtubeCensorData
+                found = None
+
+                for item in youtubeCensorData:
+                    if item in videoTitle:
+                        found = True
+
+                if found:
+                    update.message.reply_text('...', reply_to_message_id=update.message.message_id)
                 else:
-                    saveDataSong(update)
+                    videoTags = ""
+                    tagsIndex = 0
+                    videoTags = gimmeTags(video, videoTags, 3)
+                    if videoTitle != None and videoTags != None:
+                        client_credentials_manager = SpotifyClientCredentials(client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
+                        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+                        sp.trace = False
+                        results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
+
+                        if results['tracks']['total'] != None and results['tracks']['total'] == 0:
+                            saveDataSong(update)
+                        else:
+                            addToSpotifyPlaylist(results, update)
+                    else:
+                        saveDataSong(update)
             except:
                 saveDataSong(update)
-    
+
     if update.message.text != None and "miguelito para" == update.message.text.lower():
         stop(bot, update)
     elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
@@ -279,7 +293,7 @@ def echo(bot, update):
     if firstMsg:
         startJobs(bot, update)
         firstMsg=None
-    
+
     if canTalk:
         #voice
         if re.search(r'\bvalencia\b', update.message.text.lower()):
@@ -297,7 +311,7 @@ def echo(bot, update):
                 sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/rocoso.ogg')
         elif re.search(r'\bmétodo willy\b', update.message.text.lower()) or re.search(r'\bmetodo willy\b', update.message.text.lower()):
             sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/willy.ogg')
-            
+
         #gif
         elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
             randomValue = getRandomByValue(4)
@@ -345,7 +359,7 @@ def echo(bot, update):
             randomValue = getRandomByValue(4)
             if randomValue <= 1:
                 sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/strike.mp4')
-                
+
         #messages
         elif re.search(r'\bsalud\b', update.message.text.lower()):
             update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
@@ -382,7 +396,7 @@ def echo(bot, update):
         elif re.search(r'\btxumino\b', update.message.text.lower()):
             if "/txumino" not in update.message.text.lower():
                 update.message.reply_text(' /txumino ')
-        
+
         # imgs
         elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
             sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
@@ -393,7 +407,7 @@ def echo(bot, update):
             randomValue = getRandomByValue(3)
             if randomValue < 1:
                 sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
-        
+
         #stickers
         elif re.search(r'\bprog\b', update.message.text.lower()):
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
@@ -421,7 +435,7 @@ def error(bot, update, error):
 
 def callback_andalucia(bot, job):
     bot.send_message(chat_id=job.context, text="¡Buenos días, Andalucía! :D")
-    
+
 def callback_bye(bot, job):
     bot.send_message(chat_id=job.context, text="BYE")
     bot.sendChatAction(chat_id=job.context, action=telegram.ChatAction.UPLOAD_PHOTO)
@@ -440,7 +454,7 @@ def restart(bot, update):
         canTalk = True
     else:
         bot.send_message(chat_id=job.context, text="JA! No :)")
-        
+
 def get_admin_ids(bot, chat_id):
     """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
     return [admin.user.id for admin in bot.get_chat_administrators(chat_id)]
@@ -448,14 +462,14 @@ def get_admin_ids(bot, chat_id):
 def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
-    
+
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler('seguir', restart))
     dp.add_handler(CommandHandler('parar', stop))
     dp.add_handler(CommandHandler('damelalista', gimmeTheSpotifyPlaylistLink))
-    
+
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
