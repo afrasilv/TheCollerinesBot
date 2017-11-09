@@ -137,7 +137,7 @@ def gimmeTags(video, videoTags, maxTags):
             tagsIndex+=1
     return videoTags
 
-def saveDataSong(update):
+def saveDataSong(update, sendMessage):
     data = []
     try:
         json_file = open('data.txt', 'r')
@@ -149,7 +149,8 @@ def saveDataSong(update):
     with open('data.txt', 'w') as outfile:
         json.dump(data, outfile)
 
-    update.message.reply_text("No conseguimos encontrar la canción en Spotify :( sorry :( la añadiremos a mano...", reply_to_message_id=update.message.message_id)
+    if sendMessage:
+        update.message.reply_text("No está. :_(", reply_to_message_id=update.message.message_id)
 
 def savePoleStats(update):
     try:
@@ -205,7 +206,7 @@ def callSpotifyApi(videoTitle, videoTags, video, sp, update):
             results = sp.search(q=videoTags, limit=1)
         return results
     except:
-        saveDataSong(update)
+        saveDataSong(update, True)
 
 def addToSpotifyPlaylist(results, update):
     resultTracksList=results['tracks']
@@ -218,7 +219,6 @@ def addToSpotifyPlaylist(results, update):
     token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"],scope,client_id=settings["spotify"]["spotifyclientid"],client_secret=settings["spotify"]["spotifysecret"],redirect_uri='http://localhost:8000')
     sp = spotipy.Spotify(auth=token)
     results = sp.user_playlist_add_tracks(settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
-    update.message.reply_text("Añadida, gracias! :D", reply_to_message_id=update.message.message_id)
 
 def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text('ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
@@ -240,7 +240,7 @@ def connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video):
     results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
 
     if results == None or (results['tracks']['total'] != None and results['tracks']['total'] == 0 ):
-        saveDataSong(update)
+        saveDataSong(update, None)
     else:
         addToSpotifyPlaylist(results, update)
 
@@ -283,9 +283,9 @@ def echo(bot, update):
                     if videoTitle != None and videoTags != None:
                         connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video)
                     else:
-                        saveDataSong(update)
+                        saveDataSong(update, None)
             except:
-                saveDataSong(update)
+                saveDataSong(update, None)
 
     if update.message.text != None and "miguelito para" == update.message.text.lower():
         stop(bot, update)
