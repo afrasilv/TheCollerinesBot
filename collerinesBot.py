@@ -35,7 +35,8 @@ m3AudiosPath = ['/home/pi/Desktop/collerinesBotData/voices/m3Javi.ogg', '/home/p
 huehuehuePath = ['/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4', '/home/pi/Desktop/collerinesBotData/gifs/huehuehue1.mp4']
 sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/Desktop/collerinesBotData/imgs/secta1.jpg']
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
-canTalk = True
+canTalk = None
+godMode = True
 firstMsg = True
 
 def ini_to_dict(path):
@@ -256,213 +257,223 @@ def censorYoutubeVideo(videoTitle):
 def echo(bot, update):
     global canTalk
     global firstMsg
+    global godMode
 
-    for i in range(len(update.message.entities)):
-        if update.message.entities[i].type == 'url' and ( 'youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
-            try:
-                videoid = ""
-                if 'youtu.be' not in update.message.text.lower():
-                    videoid = update.message.text.split('v=')
-                    videoid = videoid[1].split(' ')[0]
-                    videoid = videoid.split('&')[0]
-                else:
-                    videoid = update.message.text.split('youtu.be/')
-                    videoid = videoid[1].split(' ')[0]
-                    videoid = videoid.split('&')[0]
-                youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
-                video = youtube.get_video_info(videoid)
-                videoTitle = video['snippet']['title'].lower()
-                videoTitle = replaceYouTubeVideoName(videoTitle)
+    if str(update.message.chat_id) == str(settings["main"]["groupid"]):
+        if update.message.text != None and "miguelito para" == update.message.text.lower():
+            stop(bot, update)
+        elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
+            restart(bot, update)
+        elif update.message.text != None and "miguelito al coma" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
+            godMode = None
+        elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
+            godMode = True
+
+
+        if godMode and canTalk:
+            for i in range(len(update.message.entities)):
+                if update.message.entities[i].type == 'url' and ( 'youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
+                    try:
+                        videoid = ""
+                        if 'youtu.be' not in update.message.text.lower():
+                            videoid = update.message.text.split('v=')
+                            videoid = videoid[1].split(' ')[0]
+                            videoid = videoid.split('&')[0]
+                        else:
+                            videoid = update.message.text.split('youtu.be/')
+                            videoid = videoid[1].split(' ')[0]
+                            videoid = videoid.split('&')[0]
+                        youtube = YoutubeAPI({'key': settings["main"]["youtubeapikey"]})
+                        video = youtube.get_video_info(videoid)
+                        videoTitle = video['snippet']['title'].lower()
+                        videoTitle = replaceYouTubeVideoName(videoTitle)
+
+                        if censorYoutubeVideo(videoTitle):
+                            update.message.reply_text('...', reply_to_message_id=update.message.message_id)
+                        else:
+                            videoTags = ""
+                            tagsIndex = 0
+                            videoTags = gimmeTags(video, videoTags, 3)
+                            if videoTitle != None and videoTags != None:
+                                connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video)
+                            else:
+                                saveDataSong(update, None)
+                    except:
+                        saveDataSong(update, None)
+
+            #startJobs
+            if firstMsg:
+                startJobs(bot, update)
+                firstMsg=None
+
+            #voice
+            if re.search(r'\bvalencia\b', update.message.text.lower()):
+                randomValue = getRandomByValue(3)
+                if randomValue <= 1:
+                    sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
+            elif re.search(r'\<3\b', update.message.text.lower()):
+                randomAudioIndex = getRandomByValue(len(m3AudiosPath) -1)
+                sendVoice(bot, update, m3AudiosPath[randomAudioIndex])
+            elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
+                sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
+            elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
+                randomValue = getRandomByValue(3)
+                if randomValue <= 1:
+                    sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/rocoso.ogg')
+            elif re.search(r'\bmétodo willy\b', update.message.text.lower()) or re.search(r'\bmetodo willy\b', update.message.text.lower()):
+                sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/willy.ogg')
+
+            #gif
+            elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
+                randomValue = getRandomByValue(4)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/pffff.mp4')
+            elif "gif del fantasma" in update.message.text.lower():
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
+            elif "bukkake" in update.message.text.lower():
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/perro.mp4')
+            elif "no me jodas" in update.message.text.lower() or "no me digas" in update.message.text.lower():
+                randomValue = getRandomByValue(4)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_agua.mp4')
+            elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
+                randomValue = getRandomByValue(4)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_thumb.mp4')
+            elif "momento cabra" in update.message.text.lower():
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
+            elif re.search(r'\bcabra\b', update.message.text.lower()):
+                randomValue = getRandomByValue(4)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra_scream.mp4')
+            elif "qué?" == unidecode(update.message.text.lower()) or "que?" == update.message.text.lower():
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra.mp4')
+            elif re.search(r'\brandom\b', update.message.text.lower()):
+                randomValue = getRandomByValue(3)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
+            elif re.search(r'\breviento\b', update.message.text.lower()) or re.search(r'\brebiento\b', update.message.text.lower()):
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
+            elif re.search(r'\bchoca\b', update.message.text.lower()):
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/choca.mp4')
+            elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
+                randomValue = getRandomByValue(4)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
+            elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
+                randomHuehuehueIndex = getRandomByValue(len(huehuehuePath) -1)
+                sendGif(bot, update, huehuehuePath[randomHuehuehueIndex])
+            elif re.search(r'\byee\b', update.message.text.lower()):
+                if "/yee" not in update.message.text.lower():
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/yee.mp4')
+            elif re.search(r'\bstrike\b', update.message.text.lower()):
+                randomValue = getRandomByValue(4)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/strike.mp4')
+
+            #messages
+            elif re.search(r'\bsalud\b', update.message.text.lower()):
+                update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bllegas tarde\b', update.message.text.lower()) or re.search(r'\bllega tarde\b', update.message.text.lower()):
+                update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
+            elif "eres rápido" in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
+                update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bkele puto\b', update.message.text.lower()):
+                update.message.reply_text(' /keleputo ')
+            elif re.search(r'\bsum41\b', update.message.text.lower()) or re.search(r'\bsum 41\b', update.message.text.lower()):
+                update.message.reply_text('100% confirmados para el Download')
+            elif re.search(r'\bjjaj[ja]*\b', update.message.text.lower()):
+                update.message.reply_text('/jjaj')
+            elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
+                update.message.reply_text('/jajj')
+            elif "miguelito dame la lista" in update.message.text.lower():
+                gimmeTheSpotifyPlaylistLink(bot, update)
+            elif "miguelito añade" in update.message.text.lower():
+                videoTitle = update.message.text.lower().replace("miguelito añade ", "")
 
                 if censorYoutubeVideo(videoTitle):
-                    update.message.reply_text('...', reply_to_message_id=update.message.message_id)
+                    update.message.reply_text('No. :)', reply_to_message_id=update.message.message_id)
                 else:
-                    videoTags = ""
-                    tagsIndex = 0
-                    videoTags = gimmeTags(video, videoTags, 3)
-                    if videoTitle != None and videoTags != None:
-                        connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video)
-                    else:
-                        saveDataSong(update, None)
-            except:
-                saveDataSong(update, None)
+                    connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
+            elif re.search(r'\bpole estonia\b', update.message.text.lower()):
+                global lastPoleEstonia
+                now = datetime.now()
+                if now.date() != lastPoleEstonia.date() and now.hour >= 23:
+                    update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
+                    savePoleStats(update)
+                    lastPoleEstonia = now
+            elif "estoniarank" in update.message.text.lower():
+                gimmeTheRank(update)
+            elif re.search(r'\bzyzz\b', update.message.text.lower()):
+                update.message.reply_text(' /zetayzetazeta ')
+            elif re.search(r'\bdios\b', update.message.text.lower()):
+                randomValue = getRandomByValue(4)
+                if randomValue < 1 :
+                    indexMsg = getRandomByValue(len(random4GodMsg) -1)
+                    update.message.reply_text(random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
+            elif re.search(r'\btxumino\b', update.message.text.lower()):
+                if "/txumino" not in update.message.text.lower():
+                    update.message.reply_text(' /txumino ')
 
-    if update.message.text != None and "miguelito para" == update.message.text.lower():
-        stop(bot, update)
-    elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
-        restart(bot, update)
+            # imgs
+            elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
+                sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
+            elif re.search(r'\bsecta\b', update.message.text.lower()):
+                randomSectaIndex = getRandomByValue(len(sectaImgPath) -1)
+                sendImg(bot, update, sectaImgPath[randomSectaIndex])
+            elif re.search(r'\bnazi\b', update.message.text.lower()):
+                randomValue = getRandomByValue(3)
+                if randomValue < 1:
+                    sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
 
-    if firstMsg:
-        startJobs(bot, update)
-        firstMsg=None
-
-    if canTalk:
-        #voice
-        if re.search(r'\bvalencia\b', update.message.text.lower()):
-            randomValue = getRandomByValue(3)
-            if randomValue <= 1:
-                sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
-        elif re.search(r'\<3\b', update.message.text.lower()):
-            randomAudioIndex = getRandomByValue(len(m3AudiosPath) -1)
-            sendVoice(bot, update, m3AudiosPath[randomAudioIndex])
-        elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
-            sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
-        elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
-            randomValue = getRandomByValue(3)
-            if randomValue <= 1:
-                sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/rocoso.ogg')
-        elif re.search(r'\bmétodo willy\b', update.message.text.lower()) or re.search(r'\bmetodo willy\b', update.message.text.lower()):
-            sendVoice(bot, update, '/home/pi/Desktop/collerinesBotData/voices/willy.ogg')
-
-        #gif
-        elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
-            randomValue = getRandomByValue(4)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/pffff.mp4')
-        elif "gif del fantasma" in update.message.text.lower():
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
-        elif "bukkake" in update.message.text.lower():
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/perro.mp4')
-        elif "no me jodas" in update.message.text.lower() or "no me digas" in update.message.text.lower():
-            randomValue = getRandomByValue(4)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_agua.mp4')
-        elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
-            randomValue = getRandomByValue(4)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_thumb.mp4')
-        elif "momento cabra" in update.message.text.lower():
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
-        elif re.search(r'\bcabra\b', update.message.text.lower()):
-            randomValue = getRandomByValue(4)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra_scream.mp4')
-        elif "qué?" == unidecode(update.message.text.lower()) or "que?" == update.message.text.lower():
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra.mp4')
-        elif re.search(r'\brandom\b', update.message.text.lower()):
-            randomValue = getRandomByValue(3)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
-        elif re.search(r'\breviento\b', update.message.text.lower()) or re.search(r'\brebiento\b', update.message.text.lower()):
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
-        elif re.search(r'\bchoca\b', update.message.text.lower()):
-            sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/choca.mp4')
-        elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
-            randomValue = getRandomByValue(4)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
-        elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
-            randomHuehuehueIndex = getRandomByValue(len(huehuehuePath) -1)
-            sendGif(bot, update, huehuehuePath[randomHuehuehueIndex])
-        elif re.search(r'\byee\b', update.message.text.lower()):
-            if "/yee" not in update.message.text.lower():
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/yee.mp4')
-        elif re.search(r'\bstrike\b', update.message.text.lower()):
-            randomValue = getRandomByValue(4)
-            if randomValue <= 1:
-                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/strike.mp4')
-
-        #messages
-        elif re.search(r'\bsalud\b', update.message.text.lower()):
-            update.message.reply_text('El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bllegas tarde\b', update.message.text.lower()) or re.search(r'\bllega tarde\b', update.message.text.lower()):
-            update.message.reply_text('como Collera', reply_to_message_id=update.message.message_id)
-        elif "eres rápido" in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
-            update.message.reply_text('no como Collera', reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bkele puto\b', update.message.text.lower()):
-            update.message.reply_text(' /keleputo ')
-        elif re.search(r'\bsum41\b', update.message.text.lower()) or re.search(r'\bsum 41\b', update.message.text.lower()):
-            update.message.reply_text('100% confirmados para el Download')
-        elif re.search(r'\bjjaj[ja]*\b', update.message.text.lower()):
-            update.message.reply_text('/jjaj')
-        elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
-            update.message.reply_text('/jajj')
-        elif "miguelito dame la lista" in update.message.text.lower():
-            gimmeTheSpotifyPlaylistLink(bot, update)
-        elif "miguelito añade" in update.message.text.lower():
-            videoTitle = update.message.text.lower().replace("miguelito añade ", "")
-
-            if censorYoutubeVideo(videoTitle):
-                update.message.reply_text('No. :)', reply_to_message_id=update.message.message_id)
-            else:
-                connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
-        elif re.search(r'\bpole estonia\b', update.message.text.lower()):
-            global lastPoleEstonia
-            now = datetime.now()
-            if now.date() != lastPoleEstonia.date() and now.hour >= 23:
-                update.message.reply_text('El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
-                savePoleStats(update)
-                lastPoleEstonia = now
-        elif "estoniarank" in update.message.text.lower():
-            gimmeTheRank(update)
-        elif re.search(r'\bzyzz\b', update.message.text.lower()):
-            update.message.reply_text(' /zetayzetazeta ')
-        elif re.search(r'\bdios\b', update.message.text.lower()):
-            randomValue = getRandomByValue(4)
-            if randomValue < 1 :
-                indexMsg = getRandomByValue(len(random4GodMsg) -1)
-                update.message.reply_text(random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
-        elif re.search(r'\btxumino\b', update.message.text.lower()):
-            if "/txumino" not in update.message.text.lower():
-                update.message.reply_text(' /txumino ')
-
-        # imgs
-        elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
-            sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
-        elif re.search(r'\bsecta\b', update.message.text.lower()):
-            randomSectaIndex = getRandomByValue(len(sectaImgPath) -1)
-            sendImg(bot, update, sectaImgPath[randomSectaIndex])
-        elif re.search(r'\bnazi\b', update.message.text.lower()):
-            randomValue = getRandomByValue(3)
-            if randomValue < 1:
-                sendImg(bot, update, '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
-
-        #stickers
-        elif re.search(r'\bprog\b', update.message.text.lower()):
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bsend nudes\b', update.message.text.lower()) or "send noodles" in update.message.text.lower():
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/sendnudes.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bficha\b', update.message.text.lower()) or re.search(r'\bfichas\b', update.message.text.lower()):
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bbutanero\b', update.message.text.lower()) or "bombona" in update.message.text.lower():
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bkylo\b', update.message.text.lower()):
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bkostra\b', update.message.text.lower()):
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
-            randomValue = getRandomByValue(5)
-            if randomValue < 1:
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif re.search(r'\blp\b', update.message.text.lower()) or re.search(r'\blinkin park\b', update.message.text.lower()):
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/lp.webp', 'rb'), reply_to_message_id=update.message.message_id)
-        elif len(update.message.text) > 7: ##mimimimimimi
-            randomResponse(update, bot)
+            #stickers
+            elif re.search(r'\bprog\b', update.message.text.lower()):
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bsend nudes\b', update.message.text.lower()) or "send noodles" in update.message.text.lower():
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/sendnudes.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bficha\b', update.message.text.lower()) or re.search(r'\bfichas\b', update.message.text.lower()):
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bbutanero\b', update.message.text.lower()) or "bombona" in update.message.text.lower():
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bkylo\b', update.message.text.lower()):
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bkostra\b', update.message.text.lower()):
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
+                randomValue = getRandomByValue(5)
+                if randomValue < 1:
+                    bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif re.search(r'\blp\b', update.message.text.lower()) or re.search(r'\blinkin park\b', update.message.text.lower()):
+                bot.send_sticker(chat_id=update.message.chat_id, sticker=open('/home/pi/Desktop/collerinesBotData/stickers/lp.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            elif len(update.message.text) > 7: ##mimimimimimi
+                randomResponse(update, bot)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 def callback_andalucia(bot, job):
-    bot.send_message(chat_id=job.context, text="¡Buenos días, Andalucía! :D")
+    if str(job.context) == str(settings["main"]["groupid"]):
+        bot.send_message(chat_id=job.context, text="¡Buenos días, Andalucía! :D")
 
 def callback_bye(bot, job):
-    bot.send_message(chat_id=job.context, text="BYE")
-    bot.sendChatAction(chat_id=job.context, action=telegram.ChatAction.UPLOAD_PHOTO)
-    bot.sendDocument(chat_id=job.context, document=open('/home/pi/Desktop/collerinesBotData/gifs/bye.mp4', 'rb'))
+    if str(job.context) == str(settings["main"]["groupid"]):
+        bot.send_message(chat_id=job.context, text="BYE")
+        bot.sendChatAction(chat_id=job.context, action=telegram.ChatAction.UPLOAD_PHOTO)
+        bot.sendDocument(chat_id=job.context, document=open('/home/pi/Desktop/collerinesBotData/gifs/bye.mp4', 'rb'))
 
 def stop(bot, update):
-    if isAdmin(bot, update):
+    if str(update.message.chat_id) == str(settings["main"]["groupid"]) and isAdmin(bot, update):
         global canTalk
         canTalk = None
     else:
-        bot.send_message(chat_id=job.context, text="JA! No :)")
+        bot.send_message(chat_id=update.message.chat_id, text="JA! No :)")
 
 def restart(bot, update):
-    if isAdmin(bot, update):
+    if str(update.message.chat_id) == str(settings["main"]["groupid"]) and isAdmin(bot, update):
         global canTalk
         canTalk = True
     else:
-        bot.send_message(chat_id=job.context, text="JA! No :)")
+        bot.send_message(chat_id=update.message.chat_id, text="JA! No :)")
 
 def get_admin_ids(bot, chat_id):
     """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
