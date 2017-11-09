@@ -244,6 +244,14 @@ def connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video):
     else:
         addToSpotifyPlaylist(results, update)
 
+def censorYoutubeVideo(videoTitle):
+    json_file = open(os.path.join(os.path.dirname(__file__), "youtubeCensor.json"), 'r')
+    youtubeCensorData = json.load(json_file)
+
+    for item in youtubeCensorData:
+        if item in videoTitle:
+            return True
+    return None
 
 def echo(bot, update):
     global canTalk
@@ -265,16 +273,8 @@ def echo(bot, update):
                 video = youtube.get_video_info(videoid)
                 videoTitle = video['snippet']['title'].lower()
                 videoTitle = replaceYouTubeVideoName(videoTitle)
-                
-                json_file = open(os.path.join(os.path.dirname(__file__), "youtubeCensor.json"), 'r')
-                youtubeCensorData = json.load(json_file)
-                found = None
 
-                for item in youtubeCensorData:
-                    if item in videoTitle:
-                        found = True
-
-                if found:
+                if censorYoutubeVideo(videoTitle):
                     update.message.reply_text('...', reply_to_message_id=update.message.message_id)
                 else:
                     videoTags = ""
@@ -381,7 +381,11 @@ def echo(bot, update):
             gimmeTheSpotifyPlaylistLink(bot, update)
         elif "miguelito añade" in update.message.text.lower():
             videoTitle = update.message.text.lower().replace("miguelito añade ", "")
-            connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
+
+            if censorYoutubeVideo(videoTitle):
+                update.message.reply_text('No. :)', reply_to_message_id=update.message.message_id)
+            else:
+                connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
             now = datetime.now()
