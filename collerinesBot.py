@@ -35,7 +35,7 @@ m3AudiosPath = ['/home/pi/Desktop/collerinesBotData/voices/m3Javi.ogg', '/home/p
 huehuehuePath = ['/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4', '/home/pi/Desktop/collerinesBotData/gifs/huehuehue1.mp4']
 sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg', '/home/pi/Desktop/collerinesBotData/imgs/secta1.jpg']
 lastPoleEstonia = datetime.now() - timedelta(days = 1)
-canTalk = None
+canTalk = True
 godMode = True
 firstMsg = True
 
@@ -338,6 +338,8 @@ def echo(bot, update):
                 randomValue = getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_agua.mp4')
+            elif "tengo cara de que me importe" in update.message.text.lower():
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/importar.mp4')
             elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
                 randomValue = getRandomByValue(5)
                 if randomValue <= 1:
@@ -358,8 +360,14 @@ def echo(bot, update):
                 randomValue = getRandomByValue(2)
                 if randomValue <= 1:
                     sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
+            elif re.search(r'\bpatriarcado\b', update.message.text.lower()):
+                randomValue = getRandomByValue(3)
+                if randomValue <= 1:
+                    sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/patriarcado.mp4')
             elif re.search(r'\bchoca\b', update.message.text.lower()):
                 sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/choca.mp4')
+            elif re.search(r'\bbro\b', update.message.text.lower()):
+                sendGif(bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cat_bro.mp4')
             elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
