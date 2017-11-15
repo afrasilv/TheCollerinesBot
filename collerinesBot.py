@@ -503,7 +503,7 @@ def downloadPhotos(bot, update):
         global lastFileDownloadedCount
         file_id = update.message.photo[-1].file_id
         photo = bot.getFile(file_id)
-        photo.download('/photos/' +str(lastFileDownloadedCount)+'.jpg')
+        photo.download(os.path.join(os.path.dirname(__file__)) +'/photos/' +str(lastFileDownloadedCount)+'.jpg')
         lastFileDownloadedCount += 1
 
 def main():
