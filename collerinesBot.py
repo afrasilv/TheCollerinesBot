@@ -38,6 +38,7 @@ lastPoleEstonia = datetime.now() - timedelta(days = 1)
 canTalk = True
 godMode = True
 firstMsg = True
+lastFileDownloadedCount = 0
 
 def ini_to_dict(path):
     """ Read an ini path in to a dict
@@ -258,7 +259,7 @@ def echo(bot, update):
     global canTalk
     global firstMsg
     global godMode
-
+    
     if str(update.message.chat_id) == str(settings["main"]["groupid"]):
         if update.message.text != None and "miguelito para" == update.message.text.lower():
             stop(bot, update)
@@ -497,6 +498,14 @@ def get_admin_ids(bot, chat_id):
     """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
     return [admin.user.id for admin in bot.get_chat_administrators(chat_id)]
 
+def downloadPhotos(bot, update):
+    if str(update.message.chat_id) == str(settings["main"]["group4photos"]):
+        global lastFileDownloadedCount
+        file_id = update.message.photo[-1].file_id
+        photo = bot.getFile(file_id)
+        photo.download('/photos/' +str(lastFileDownloadedCount)+'.jpg')
+        lastFileDownloadedCount += 1
+
 def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -510,6 +519,7 @@ def main():
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler(Filters.photo, downloadPhotos))
 
     # log all errors
     dp.add_error_handler(error)
