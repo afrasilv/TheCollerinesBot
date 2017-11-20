@@ -155,21 +155,22 @@ def saveDataSong(update, sendMessage):
         update.message.reply_text("No está. :_(", reply_to_message_id=update.message.message_id)
 
 def savePoleStats(update):
+    username = update.message.from_user.name.replace("@", "")
     try:
         json_file = open('polestats.json', 'r')
         data = json.load(json_file, object_pairs_hook=OrderedDict)
     except IOError:
-        data = [{'username': update.message.from_user.name, 'count': 0}]
+        data = [{'username': username, 'count': 0}]
 
     found = None
     i = 0
     while i < len(data):
-        if data[i]['username'] == update.message.from_user.name:
+        if data[i]['username'] == username:
             data[i]['count'] += 1
             found = True
         i+=1
     if found == None:
-        data.append({'username': update.message.from_user.name, 'count': 1})
+        data.append({'username': username 'count': 1})
 
     with open('polestats.json', 'w') as outfile:
         json.dump(data, outfile)
