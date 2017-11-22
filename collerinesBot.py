@@ -20,7 +20,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.util as util
 from youtubeApi import YoutubeAPI
 
-
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -170,7 +169,7 @@ def savePoleStats(update):
             found = True
         i+=1
     if found == None:
-        data.append({'username': username 'count': 1})
+        data.append({'username': username, 'count': 1})
 
     with open('polestats.json', 'w') as outfile:
         json.dump(data, outfile)
@@ -260,7 +259,7 @@ def echo(bot, update):
     global canTalk
     global firstMsg
     global godMode
-    
+
     if str(update.message.chat_id) == str(settings["main"]["groupid"]):
         if update.message.text != None and "miguelito para" == update.message.text.lower():
             stop(bot, update)
