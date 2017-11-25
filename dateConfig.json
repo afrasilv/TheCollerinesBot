@@ -12,8 +12,8 @@
   "type": "day"
 }, {
   "name": "luego",
-  "value": "1",
-  "type": "min"
+  "value": "2",
+  "type": "hour"
 }, {
   "name": "después",
   "value": "1",

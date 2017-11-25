@@ -8,6 +8,7 @@ from unidecode import unidecode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from random import randint
 from datetime import datetime, timedelta
+import dateutil.parser
 from configparser import ConfigParser
 from collections import OrderedDict
 import json
@@ -45,6 +46,8 @@ canTalk = True
 godMode = True
 firstMsg = True
 lastFileDownloadedCount = 0
+weekdayConstant = ['lunes', 'martes', 'miércoles',
+                   'jueves', 'viernes', 'sábado', 'domingo']
 
 
 def ini_to_dict(path):
@@ -83,46 +86,112 @@ def help(bot, update):
     update.message.reply_text('asdqwe')
 
 
+def checkHourToRemember(msg, timeObject):
+    # Check if hour
+    msgArray = msg.split(" ")
+    msgHourData = msgArray[0]
+    print("entramos")
+    print(msgHourData)
+    print(msg)
+    if (msgArray[0] == "a" and "la" in msgArray[1]):
+        msgHourData = msgArray[2]
+        msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "")
+    if ":" in msgHourData:
+        hourDataSplitted = msgHourData.split(":")
+        timeObject["hour"] = hourDataSplitted[0]
+        timeObject["min"] = hourDataSplitted[1]
+        msg = msg.replace(msgHourData + " ", "")
+    elif isinstance(msgHourData, int):
+        timeObject["hour"] = msgHourData
+        msg = msg.replace(msgHourData + " ", "")
+
+    print(msg)
+    print(timeObject)
+    return msg, timeObject
+
+
+def checkRememberDate(now, timeObject, isWeekday):
+    if isWeekday == None:
+        if "type" in timeObject and timeObject["type"] == "day":
+            now = now + timedelta(days=int(timeObject["value"]))
+        elif "type" in timeObject and timeObject["type"] == "hour":
+            now = now + timedelta(hours=int(timeObject["value"]))
+
+    if "hour" in timeObject and timeObject["hour"] != None:
+        now = now.replace(hour=int(timeObject["hour"]))
+        if timeObject["min"] != None:
+            now = now.replace(minute=int(timeObject["min"]))
+    return now
+
+
+def replaceStr(msg, str):
+    if str in msg:
+        msg = msg.replace(str + " ", "", 1)
+    return msg
+
+
 def rememberJobs(bot, update, msg):
     timeObject = checkTimeToRemember(msg)
+    # with key words in config json
     if timeObject != None:
         msg = msg.replace(timeObject["name"] + " ", "")
-        # Check if hour
-        msgArray = msg.split(" ")
-        msgHourData = msgArray[0]
-        if (msgArray[0] == "a" and "la" in msgArray[1]):
-            msgHourData = msgArray[2]
-        if ":" in msgHourData:
-            hourDataSplitted = msgHourData.split(":")
-            timeObject["hour"] = hourDataSplitted[0]
-            timeObject["min"] = hourDataSplitted[1]
-            msg = msg.replace(msgHourData + " ", "")
-        elif isinstance(msgHourData, int):
-            timeObject["hour"] = msgHourData
-            msg = msg.replace(msgHourData + " ", "")
+        msg, timeObject = checkHourToRemember(msg, timeObject)
 
         msgArray = msg.split(" ")
-        if "que" in msgArray[0]:
-            msg = msg.replace("que ", "", 1)
+        msg = replaceStr(msg, "que")
 
         now = datetime.now()
-        if timeObject["type"] == "day":
-            now = now + timedelta(days=int(timeObject["value"]))
-        elif timeObject["type"] == "min":
-            now = now + timedelta(minutes=int(timeObject["value"]))
+        now = checkRememberDate(now, timeObject, None)
+    # with dd/mm/yyyy config
+    elif re.search(r'([0-9]2/[0-9]2/[0-9])', msg):
+        msgArray = msg.split(" ")
+        msg = replaceStr(msg, "el")
 
-        if "hour" in timeObject and timeObject["hour"] != None:
-            now = now.replace(hours=int(timeObject["hour"]))
-            if timeObject["min"] != None:
-                now = now.replace(hours=int(timeObject["min"]))
+        dateWithoutSplit = re.search(r'([0-9]2/[0-9]2/[0-9]*)', msg)
+        dateSplitted = dateWithoutSplit.split('/')
+        now = datetime.now()
 
-        update.message.reply_text(
-            "Vale", reply_to_message_id=update.message.message_id)
-        saveMessageToRemember(
-            update.message.from_user.name, msg, now.isoformat())
-        j.run_once(callback_remember, now, context=update.message.chat_id)
+        msg = replaceStr(msg, "que")
+
+        now = now.replace(int(dateSplitted[2]), int(
+            dateSplitted[1]), int(dateSplitted[0]))
+        timeObject = {}
+        msg, timeObject = checkHourToRemember(msg, timeObject)
+        now = checkRememberDate(now, timeObject, None)
+    # with weekday config
     else:
-        print("no hour")
+        msgArray = msg.split(" ")
+        msg = replaceStr(msg, "el")
+
+        found = None
+        index = 0
+        while index < len(weekdayConstant) and found != True:
+            if weekdayConstant[index] in msg:
+                found = True
+                msg = msg.replace(weekdayConstant[index] + " ", "", 1)
+            else:
+                index += 1
+        now = datetime.now()
+        todayNumber = now.weekday()
+        diffDayCount = 0
+        if found:
+            if int(todayNumber) < index:
+                diffDayCount = index - int(todayNumber) + 1
+            else:
+                diffDayCount = (6 - int(todayNumber)) + index + 1
+
+        msg = replaceStr(msg, "que")
+
+        timeObject = {}
+        msg, timeObject = checkHourToRemember(msg, timeObject)
+        now = checkRememberDate(now, timeObject, True)
+        now = now + timedelta(days=diffDayCount)
+
+    update.message.reply_text(
+        "Vale", reply_to_message_id=update.message.message_id)
+    saveMessageToRemember(
+        update.message.from_user.name, msg, now.isoformat())
+    j.run_once(callback_remember, now, context=update.message.chat_id)
 
 
 def saveMessageToRemember(username, msg, when):
@@ -137,24 +206,26 @@ def saveMessageToRemember(username, msg, when):
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
 
-
-def gimmeMyMemories():
+def loadMemories():
     try:
         json_file = open('memories.json', 'r')
         data = json.load(json_file)
     except IOError:
         data = {}
-
     data = json.dumps(
         {'data': data})
     data = json.loads(data)
-    data = data["data"]
+    return data["data"]
+
+
+def gimmeMyMemories():
+    data = loadMemories()
     data = sorted(
         data,
         key=lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
     )
-    msg = data[0]
-    data.pop()
+    #msg = data[0]
+    msg = data.pop()
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
     return msg
@@ -162,7 +233,8 @@ def gimmeMyMemories():
 
 def callback_remember(bot, job):
     msg = gimmeMyMemories()
-    bot.send_message(chat_id=job.context, text="EH! " + msg["username"] + " te recuerdo que " + msg["msg"])
+    bot.send_message(chat_id=job.context, text="EH! " +
+                     msg["username"] + " te recuerdo que " + msg["msg"])
 
 
 def checkTimeToRemember(msg):
@@ -172,7 +244,6 @@ def checkTimeToRemember(msg):
         data = json.load(json_file)
     except IOError:
         return None
-    found = None
     index = 0
     while index < len(data):
         if data[index]["name"] in msg:
@@ -257,6 +328,9 @@ def startJobs(bot, update):
     now = now.replace(hour=2, minute=00)
     job_daily = j.run_daily(callback_bye, now.time(), days=(
         0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
+    data = loadMemories()
+    for item in data:
+        j.run_once(callback_remember, dateutil.parser.parse(item["when"]), context=update.message.chat_id)
 
 
 def gimmeTags(video, videoTags, maxTags):
