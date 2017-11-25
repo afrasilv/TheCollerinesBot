@@ -90,9 +90,6 @@ def checkHourToRemember(msg, timeObject):
     # Check if hour
     msgArray = msg.split(" ")
     msgHourData = msgArray[0]
-    print("entramos")
-    print(msgHourData)
-    print(msg)
     if (msgArray[0] == "a" and "la" in msgArray[1]):
         msgHourData = msgArray[2]
         msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "")
@@ -105,8 +102,6 @@ def checkHourToRemember(msg, timeObject):
         timeObject["hour"] = msgHourData
         msg = msg.replace(msgHourData + " ", "")
 
-    print(msg)
-    print(timeObject)
     return msg, timeObject
 
 
@@ -142,15 +137,18 @@ def rememberJobs(bot, update, msg):
 
         now = datetime.now()
         now = checkRememberDate(now, timeObject, None)
+
     # with dd/mm/yyyy config
-    elif re.search(r'([0-9]2/[0-9]2/[0-9])', msg):
+    elif re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg):
         msgArray = msg.split(" ")
         msg = replaceStr(msg, "el")
 
-        dateWithoutSplit = re.search(r'([0-9]2/[0-9]2/[0-9]*)', msg)
-        dateSplitted = dateWithoutSplit.split('/')
+        dateWithoutSplit = re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg)
+        dateString = dateWithoutSplit.group(0)
+        dateSplitted = dateString.split('/')
         now = datetime.now()
 
+        msg = replaceStr(msg, dateString)
         msg = replaceStr(msg, "que")
 
         now = now.replace(int(dateSplitted[2]), int(
@@ -189,6 +187,7 @@ def rememberJobs(bot, update, msg):
 
     update.message.reply_text(
         "Vale", reply_to_message_id=update.message.message_id)
+    now = now.replace(second=0)
     saveMessageToRemember(
         update.message.from_user.name, msg, now.isoformat())
     j.run_once(callback_remember, now, context=update.message.chat_id)
@@ -205,6 +204,7 @@ def saveMessageToRemember(username, msg, when):
 
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
+
 
 def loadMemories():
     try:
@@ -224,7 +224,7 @@ def gimmeMyMemories():
         data,
         key=lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
     )
-    #msg = data[0]
+    # msg = data[0]
     msg = data.pop()
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
@@ -330,7 +330,8 @@ def startJobs(bot, update):
         0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
     data = loadMemories()
     for item in data:
-        j.run_once(callback_remember, dateutil.parser.parse(item["when"]), context=update.message.chat_id)
+        j.run_once(callback_remember, dateutil.parser.parse(
+            item["when"]), context=update.message.chat_id)
 
 
 def gimmeTags(video, videoTags, maxTags):
@@ -481,8 +482,11 @@ def echo(bot, update):
     global firstMsg
     global godMode
 
-    if "miguelito recuerda" in update.message.text.lower():
-        msg = update.message.text.lower().replace("miguelito recuerda ", "")
+    if "miguelito recuerda" in update.message.text.lower() or "miguelito recuerdame" in update.message.text.lower() or "miguelito recuérdame" in update.message.text.lower():
+        msg = update.message.text.lower()
+        msgSplit = msg.split(" ")
+        msg = msg.replace(
+            msgSplit[0] + " " + msgSplit[1] + " ", "")
         rememberJobs(bot, update, msg)
 
     if str(update.message.chat_id) == str(settings["main"]["groupid"]):
