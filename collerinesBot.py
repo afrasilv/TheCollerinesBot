@@ -131,7 +131,7 @@ def replaceStr(msg, str):
 
 
 def checkDayDifference(diffDayCount, now, timeObject):
-    if diffDayCount == 0 and now.hour <= int(timeObject["hour"]):
+    if diffDayCount == 0 and "hor" in timeObject and now.hour <= int(timeObject["hour"]):
         if "min" in timeObject and now.minute < int(timeObject["min"]):
             print("nice hour")
         else:
