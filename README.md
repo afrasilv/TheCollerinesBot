@@ -14,6 +14,9 @@ pip3 install unidecode
 ```
 pip3 install spotipy
 ```
+```
+pip3 install python-dateutil --user
+```
 ## Start
 
 Use "python3" or your configurated command for version 3
@@ -32,6 +35,9 @@ pip install unidecode
 ```
 ```
 pip install spotipy
+```
+```
+pip install python-dateutil --user
 ```
 ## Start
 
