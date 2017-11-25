@@ -130,8 +130,39 @@ def replaceStr(msg, str):
     return msg
 
 
+def checkDayDifference(diffDayCount, now, timeObject):
+    if diffDayCount == 0 and now.hour <= int(timeObject["hour"]):
+        if "min" in timeObject and now.minute < int(timeObject["min"]):
+            print("nice hour")
+        else:
+            print(now.minute)
+            print(timeObject["min"])
+            print("sum a day")
+            diffDayCount += 1
+    return diffDayCount
+
+
+def getUsernameToNotify(msg, update):
+    data = []
+    try:
+        json_file = open('userNames.json', 'r')
+        data = json.load(json_file)
+    except IOError:
+        data = []
+
+    msgArray = msg.split(" ")
+    index = 0
+    while index < len(data):
+        if data[index]["name"] in msgArray[1]:
+            msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "", 1)
+            return data[index]["value"], msg
+        index += 1
+    return update.message.from_user.name, msg
+
+
 def rememberJobs(bot, update, msg):
     timeObject = checkTimeToRemember(msg)
+    usernameToNotify, msg = getUsernameToNotify(msg, update)
     # with key words in config json
     if timeObject != None:
         msg = msg.replace(timeObject["name"] + " ", "")
@@ -142,6 +173,8 @@ def rememberJobs(bot, update, msg):
 
         now = datetime.now()
         now = checkRememberDate(now, timeObject, None)
+        if datetime.now() > now:
+            now = now + timedelta(days=1)
 
     # with dd/mm/yyyy config
     elif re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg):
@@ -161,6 +194,9 @@ def rememberJobs(bot, update, msg):
         timeObject = {}
         msg, timeObject = checkHourToRemember(msg, timeObject)
         now = checkRememberDate(now, timeObject, None)
+        if datetime.now() > now:
+            now = now + timedelta(days=1)
+
     # with weekday config
     else:
         msgArray = msg.split(" ")
@@ -177,6 +213,7 @@ def rememberJobs(bot, update, msg):
         now = datetime.now()
         todayNumber = now.weekday()
         diffDayCount = 0
+        # check how many days is from today
         if found:
             if int(todayNumber) < index:
                 diffDayCount = index - int(todayNumber) + 1
@@ -188,24 +225,25 @@ def rememberJobs(bot, update, msg):
         timeObject = {}
         msg, timeObject = checkHourToRemember(msg, timeObject)
         now = checkRememberDate(now, timeObject, True)
+        diffDayCount = checkDayDifference(diffDayCount, datetime.now(), timeObject)
         now = now + timedelta(days=diffDayCount)
 
     update.message.reply_text(
-        "Vale", reply_to_message_id=update.message.message_id)
-    now = now.replace(second=0)
+        "Vale", reply_to_message_id = update.message.message_id)
+    now=now.replace(second = 0)
     saveMessageToRemember(
-        update.message.from_user.name, msg, now.isoformat())
-    j.run_once(callback_remember, now, context=update.message.chat_id)
+        usernameToNotify, msg, now.isoformat())
+    j.run_once(callback_remember, now, context = update.message.chat_id)
 
 
 def saveMessageToRemember(username, msg, when):
-    data = []
+    data=[]
     try:
-        json_file = open('memories.json', 'r')
-        data = json.load(json_file)
+        json_file=open('memories.json', 'r')
+        data=json.load(json_file)
         data.append({'username': username, 'msg': msg, 'when': when})
     except IOError:
-        data = [{'username': username, 'msg': msg, 'when': when}]
+        data=[{'username': username, 'msg': msg, 'when': when}]
 
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
@@ -213,43 +251,43 @@ def saveMessageToRemember(username, msg, when):
 
 def loadMemories():
     try:
-        json_file = open('memories.json', 'r')
-        data = json.load(json_file)
+        json_file=open('memories.json', 'r')
+        data=json.load(json_file)
     except IOError:
-        data = {}
-    data = json.dumps(
+        data={}
+    data=json.dumps(
         {'data': data})
-    data = json.loads(data)
+    data=json.loads(data)
     return data["data"]
 
 
 def gimmeMyMemories():
-    data = loadMemories()
-    data = sorted(
+    data=loadMemories()
+    data=sorted(
         data,
-        key=lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
+        key = lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
     )
     # msg = data[0]
-    msg = data.pop()
+    msg=data.pop()
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
     return msg
 
 
 def callback_remember(bot, job):
-    msg = gimmeMyMemories()
-    bot.send_message(chat_id=job.context, text="EH! " +
+    msg=gimmeMyMemories()
+    bot.send_message(chat_id = job.context, text = "EH! " +
                      msg["username"] + " te recuerdo que " + msg["msg"])
 
 
 def checkTimeToRemember(msg):
-    data = []
+    data=[]
     try:
-        json_file = open('dateConfig.json', 'r')
-        data = json.load(json_file)
+        json_file=open('dateConfig.json', 'r')
+        data=json.load(json_file)
     except IOError:
         return None
-    index = 0
+    index=0
     while index < len(data):
         if data[index]["name"] in msg:
             return data[index]
@@ -258,28 +296,28 @@ def checkTimeToRemember(msg):
 
 
 def getRandomByValue(value):
-    randomValue = randint(0, value)
+    randomValue=randint(0, value)
     return randomValue
 
 
 def randomResponse(update, bot):
-    randomValue = getRandomByValue(1400)
+    randomValue=getRandomByValue(1400)
     if randomValue < 15 and randomValue > 11:
-        bot.send_voice(chat_id=update.message.chat_id, voice=open(
+        bot.send_voice(chat_id = update.message.chat_id, voice = open(
             '/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'))
     elif randomValue == 11:
-        array = update.message.text.split()
-        randomIndex = getRandomByValue(3)
-        wasChanged = None
+        array=update.message.text.split()
+        randomIndex=getRandomByValue(3)
+        wasChanged=None
         if randomIndex == 0:
-            wasChanged = bool(re.search(r'[VvSs]+', update.message.text))
-            update.message.text = re.sub(r'[VvSs]+', 'f', update.message.text)
+            wasChanged=bool(re.search(r'[VvSs]+', update.message.text))
+            update.message.text=re.sub(r'[VvSs]+', 'f', update.message.text)
         elif randomIndex == 1:
-            wasChanged = bool(re.search(r'[Vv]+', update.message.text))
-            update.message.text = re.sub(r'[Vv]+', 'f', update.message.text)
+            wasChanged=bool(re.search(r'[Vv]+', update.message.text))
+            update.message.text=re.sub(r'[Vv]+', 'f', update.message.text)
         else:
-            wasChanged = bool(re.search(r'[TtVvSsCc]+', update.message.text))
-            update.message.text = re.sub(
+            wasChanged=bool(re.search(r'[TtVvSsCc]+', update.message.text))
+            update.message.text=re.sub(
                 r'[TtVvSsCc]+', 'f', update.message.text)
         if wasChanged:
             update.message.reply_text(
@@ -487,13 +525,6 @@ def echo(bot, update):
     global firstMsg
     global godMode
 
-    if "miguelito recuerda" in update.message.text.lower() or "miguelito recuerdame" in update.message.text.lower() or "miguelito recuérdame" in update.message.text.lower():
-        msg = update.message.text.lower()
-        msgSplit = msg.split(" ")
-        msg = msg.replace(
-            msgSplit[0] + " " + msgSplit[1] + " ", "")
-        rememberJobs(bot, update, msg)
-
     if str(update.message.chat_id) == str(settings["main"]["groupid"]):
         if update.message.text != None and "miguelito para" == update.message.text.lower():
             stop(bot, update)
@@ -543,8 +574,15 @@ def echo(bot, update):
                 startJobs(bot, update)
                 firstMsg = None
 
+            if "miguelito recuerda" in update.message.text.lower() or "miguelito recuerdame" in update.message.text.lower() or "miguelito recuérdame" in update.message.text.lower():
+                msg = update.message.text.lower()
+                msgSplit = msg.split(" ")
+                msg = msg.replace(
+                    msgSplit[0] + " " + msgSplit[1] + " ", "")
+                rememberJobs(bot, update, msg)
+
             # voice
-            if re.search(r'\bvalencia\b', update.message.text.lower()):
+            elif re.search(r'\bvalencia\b', update.message.text.lower()):
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
                     sendVoice(
