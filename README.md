@@ -96,6 +96,22 @@ userNames.json ->
 }]
 ```
 
+## How work Miguelito
+### Commands
+#### Add Youtube songs to Spotify List
+```
+Miguelito añade Numb Linkin Park -- 
+Miguelito añade <songname> <groupName - Not necessary if is the first song in Spotify with the songname> 
+
+```
+``` 
+<some text>  https://www.youtube.com/watch?v=hJ_eVIZkjZE --
+<some text>  <youtube link video wt complete url or shorted url>
+Miguelito get the video name and remove all text that be inside () and [] to search in Spotify API.
+If he can't find the song he will try with the different video-tags of youtube
+
+```
+
 ## Extraball
 ### Send messages like a ninja
 
