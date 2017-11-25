@@ -92,12 +92,12 @@ def checkHourToRemember(msg, timeObject):
     msgHourData = msgArray[0]
     if (msgArray[0] == "a" and "la" in msgArray[1]):
         msgHourData = msgArray[2]
-        msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "")
+        msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "", 1)
     if ":" in msgHourData:
         hourDataSplitted = msgHourData.split(":")
         timeObject["hour"] = hourDataSplitted[0]
         timeObject["min"] = hourDataSplitted[1]
-        msg = msg.replace(msgHourData + " ", "")
+        msg = msg.replace(msgHourData + " ", "", 1)
         if int(timeObject["min"]) > 59:
             hours = int(timeObject["hour"]) + 1
             mins = int(timeObject["min"]) - 59
@@ -105,7 +105,7 @@ def checkHourToRemember(msg, timeObject):
             timeObject["min"] = mins
     elif isinstance(msgHourData, int):
         timeObject["hour"] = msgHourData
-        msg = msg.replace(msgHourData + " ", "")
+        msg = msg.replace(msgHourData + " ", "", 1)
 
     return msg, timeObject
 
@@ -165,7 +165,7 @@ def rememberJobs(bot, update, msg):
     usernameToNotify, msg = getUsernameToNotify(msg, update)
     # with key words in config json
     if timeObject != None:
-        msg = msg.replace(timeObject["name"] + " ", "")
+        msg = msg.replace(timeObject["name"] + " ", "", 1)
         msg, timeObject = checkHourToRemember(msg, timeObject)
 
         msgArray = msg.split(" ")
