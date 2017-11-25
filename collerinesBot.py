@@ -98,6 +98,11 @@ def checkHourToRemember(msg, timeObject):
         timeObject["hour"] = hourDataSplitted[0]
         timeObject["min"] = hourDataSplitted[1]
         msg = msg.replace(msgHourData + " ", "")
+        if int(timeObject["min"]) > 59:
+            hours = int(timeObject["hour"]) + 1
+            mins = int(timeObject["min"]) - 59
+            timeObject["hour"] = hours
+            timeObject["min"] = mins
     elif isinstance(msgHourData, int):
         timeObject["hour"] = msgHourData
         msg = msg.replace(msgHourData + " ", "")
