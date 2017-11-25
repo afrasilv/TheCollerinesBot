@@ -72,7 +72,35 @@ https://console.developers.google.com/apis/credentials
 
 If you want to censor a word or a song, just add it in youtubeCensor.json array object.
 
+## Required files for correct functionaly
+youtubeCensor.json -> ```["string", "string"]```
+
+dateConfig.json -> 
+```
+{
+  "name": "mañana",
+  "value": "1",
+  "type": "day"
+}, {
+  "name": "pasado",
+  "value": "2",
+  "type": "day"
+}]
+```
+
+userNames.json -> 
+```
+[{
+	"name": "keyword",
+	"value": "telegramId"
+}]
+```
+
 ## Extraball
 ### Send messages like a ninja
 
 https://api.telegram.org/bot< bot token_id value >/sendMessage?chat_id=< chat_id value >&text=< text_value >
+
+## Special Thanks
+
+Spotipy is from -> https://github.com/plamere/spotipy 
