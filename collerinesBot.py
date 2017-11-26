@@ -28,19 +28,20 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
 
 randomMsg = ['qué pasa, jamboide', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies', 'vale', 'qué dices, prim',
              'ok', 'geniaaaaaal', 'fataaaaaal', '/geniaaaaaal', '/fataaaaaal', 'Myrath macho', '/jajj', '/jjaj', '/yee', "A topeth!"]
 random4GodMsg = ['dime', 'basta', 'déjame',
                  'ahora no', 'ZzZzzzZzz', '¿qué te pasa?']
-mimimimiStickerPath = ['/home/pi/Desktop/collerinesBotData/stickers/mimimi.webp',
-                       '/home/pi/Desktop/collerinesBotData/stickers/mimimi1.webp', '/home/pi/Desktop/collerinesBotData/stickers/mimimi2.webp']
-m3AudiosPath = ['/home/pi/Desktop/collerinesBotData/voices/m3Javi.ogg',
-                '/home/pi/Desktop/collerinesBotData/voices/m3Javig.ogg', '/home/pi/Desktop/collerinesBotData/voices/m3Feli.ogg']
-huehuehuePath = ['/home/pi/Desktop/collerinesBotData/gifs/huehuehue.mp4',
-                 '/home/pi/Desktop/collerinesBotData/gifs/huehuehue1.mp4']
-sectaImgPath = ['/home/pi/Desktop/collerinesBotData/imgs/secta.jpg',
-                '/home/pi/Desktop/collerinesBotData/imgs/secta1.jpg']
+mimimimiStickerPath = ['/stickers/mimimi.webp',
+                       '/stickers/mimimi1.webp', '/stickers/mimimi2.webp']
+m3AudiosPath = ['/voices/m3Javi.ogg',
+                '/voices/m3Javig.ogg', '/voices/m3Feli.ogg']
+huehuehuePath = ['/gifs/huehuehue.mp4',
+                 '/gifs/huehuehue1.mp4']
+sectaImgPath = ['/imgs/secta.jpg',
+                '/imgs/secta1.jpg']
 lastPoleEstonia = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
@@ -225,25 +226,26 @@ def rememberJobs(bot, update, msg):
         timeObject = {}
         msg, timeObject = checkHourToRemember(msg, timeObject)
         now = checkRememberDate(now, timeObject, True)
-        diffDayCount = checkDayDifference(diffDayCount, datetime.now(), timeObject)
+        diffDayCount = checkDayDifference(
+            diffDayCount, datetime.now(), timeObject)
         now = now + timedelta(days=diffDayCount)
 
     update.message.reply_text(
-        "Vale", reply_to_message_id = update.message.message_id)
-    now=now.replace(second = 0)
+        "Vale", reply_to_message_id=update.message.message_id)
+    now = now.replace(second=0)
     saveMessageToRemember(
         usernameToNotify, msg, now.isoformat())
-    j.run_once(callback_remember, now, context = update.message.chat_id)
+    j.run_once(callback_remember, now, context=update.message.chat_id)
 
 
 def saveMessageToRemember(username, msg, when):
-    data=[]
+    data = []
     try:
-        json_file=open('memories.json', 'r')
-        data=json.load(json_file)
+        json_file = open('memories.json', 'r')
+        data = json.load(json_file)
         data.append({'username': username, 'msg': msg, 'when': when})
     except IOError:
-        data=[{'username': username, 'msg': msg, 'when': when}]
+        data = [{'username': username, 'msg': msg, 'when': when}]
 
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
@@ -251,43 +253,43 @@ def saveMessageToRemember(username, msg, when):
 
 def loadMemories():
     try:
-        json_file=open('memories.json', 'r')
-        data=json.load(json_file)
+        json_file = open('memories.json', 'r')
+        data = json.load(json_file)
     except IOError:
-        data={}
-    data=json.dumps(
+        data = {}
+    data = json.dumps(
         {'data': data})
-    data=json.loads(data)
+    data = json.loads(data)
     return data["data"]
 
 
 def gimmeMyMemories():
-    data=loadMemories()
-    data=sorted(
+    data = loadMemories()
+    data = sorted(
         data,
-        key = lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
+        key=lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
     )
     # msg = data[0]
-    msg=data.pop()
+    msg = data.pop()
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
     return msg
 
 
 def callback_remember(bot, job):
-    msg=gimmeMyMemories()
-    bot.send_message(chat_id = job.context, text = "EH! " +
+    msg = gimmeMyMemories()
+    bot.send_message(chat_id=job.context, text="EH! " +
                      msg["username"] + " te recuerdo que " + msg["msg"])
 
 
 def checkTimeToRemember(msg):
-    data=[]
+    data = []
     try:
-        json_file=open('dateConfig.json', 'r')
-        data=json.load(json_file)
+        json_file = open('dateConfig.json', 'r')
+        data = json.load(json_file)
     except IOError:
         return None
-    index=0
+    index = 0
     while index < len(data):
         if data[index]["name"] in msg:
             return data[index]
@@ -296,37 +298,40 @@ def checkTimeToRemember(msg):
 
 
 def getRandomByValue(value):
-    randomValue=randint(0, value)
+    randomValue = randint(0, value)
     return randomValue
 
 
 def randomResponse(update, bot):
-    randomValue=getRandomByValue(1400)
+    randomValue = getRandomByValue(1400)
     if randomValue < 15 and randomValue > 11:
-        bot.send_voice(chat_id = update.message.chat_id, voice = open(
-            '/home/pi/Desktop/collerinesBotData/voices/yord.ogg', 'rb'))
+        bot.send_voice(chat_id=update.message.chat_id, voice=open(
+            os.path.join(os.path.dirname(__file__)) +
+            '/data' + '/voices/yord.ogg', 'rb'))
     elif randomValue == 11:
-        array=update.message.text.split()
-        randomIndex=getRandomByValue(3)
-        wasChanged=None
+        array = update.message.text.split()
+        randomIndex = getRandomByValue(3)
+        wasChanged = None
         if randomIndex == 0:
-            wasChanged=bool(re.search(r'[VvSs]+', update.message.text))
-            update.message.text=re.sub(r'[VvSs]+', 'f', update.message.text)
+            wasChanged = bool(re.search(r'[VvSs]+', update.message.text))
+            update.message.text = re.sub(r'[VvSs]+', 'f', update.message.text)
         elif randomIndex == 1:
-            wasChanged=bool(re.search(r'[Vv]+', update.message.text))
-            update.message.text=re.sub(r'[Vv]+', 'f', update.message.text)
+            wasChanged = bool(re.search(r'[Vv]+', update.message.text))
+            update.message.text = re.sub(r'[Vv]+', 'f', update.message.text)
         else:
-            wasChanged=bool(re.search(r'[TtVvSsCc]+', update.message.text))
-            update.message.text=re.sub(
+            wasChanged = bool(re.search(r'[TtVvSsCc]+', update.message.text))
+            update.message.text = re.sub(
                 r'[TtVvSsCc]+', 'f', update.message.text)
         if wasChanged:
             update.message.reply_text(
                 update.message.text, reply_to_message_id=update.message.message_id)
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                '/home/pi/Desktop/collerinesBotData/stickers/alef.webp', 'rb'))
+                os.path.join(os.path.dirname(__file__)) +
+                '/data' + '/stickers/alef.webp', 'rb'))
     elif randomValue == 10:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            '/home/pi/Desktop/collerinesBotData/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            os.path.join(os.path.dirname(__file__)) +
+            '/data' + '/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue <= 9 and randomValue >= 3:
         randomMsgIndex = getRandomByValue(len(randomMsg) - 1)
         update.message.reply_text(
@@ -338,7 +343,7 @@ def randomResponse(update, bot):
             update.message.text, reply_to_message_id=update.message.message_id)
         randomMsgIndex = getRandomByValue(len(mimimimiStickerPath) - 1)
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            mimimimiStickerPath[randomMsgIndex], 'rb'))
+            dataPath + mimimimiStickerPath[randomMsgIndex], 'rb'))
 
 
 def sendGif(bot, update, pathGif):
@@ -586,98 +591,98 @@ def echo(bot, update):
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
                     sendVoice(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/voices/teamvalencia.ogg')
+                        bot, update, dataPath + '/voices/teamvalencia.ogg')
             elif re.search(r'\<3\b', update.message.text.lower()):
                 randomAudioIndex = getRandomByValue(len(m3AudiosPath) - 1)
-                sendVoice(bot, update, m3AudiosPath[randomAudioIndex])
+                sendVoice(bot, update, dataPath + m3AudiosPath[randomAudioIndex])
             elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
                 randomValue = getRandomByValue(5)
                 if randomValue <= 1:
                     sendVoice(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/voices/geniaaa.ogg')
+                        bot, update, dataPath + '/voices/geniaaa.ogg')
             elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
                 randomValue = getRandomByValue(3)
                 if randomValue <= 1:
                     sendVoice(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/voices/rocoso.ogg')
+                        bot, update, dataPath + '/voices/rocoso.ogg')
             elif re.search(r'\bmétodo willy\b', update.message.text.lower()) or re.search(r'\bmetodo willy\b', update.message.text.lower()):
                 sendVoice(
-                    bot, update, '/home/pi/Desktop/collerinesBotData/voices/willy.ogg')
+                    bot, update, dataPath + '/voices/willy.ogg')
 
             # gif
             elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
                 randomValue = getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/pffff.mp4')
+                        bot, update,  dataPath + '/gifs/pffff.mp4')
             elif "gif del fantasma" in update.message.text.lower():
                 sendGif(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/gifs/fantasma.mp4')
+                        dataPath + '/gifs/fantasma.mp4')
             elif "bukkake" in update.message.text.lower() or "galletitas" in update.message.text.lower():
                 sendGif(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/gifs/perro.mp4')
+                        dataPath + '/gifs/perro.mp4')
             elif "no me jodas" in update.message.text.lower() or "no me digas" in update.message.text.lower():
                 randomValue = getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_agua.mp4')
+                        bot, update, dataPath + '/gifs/ferran_agua.mp4')
             elif "tengo cara de que me importe" in update.message.text.lower():
-                sendGif(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/gifs/importar.mp4')
+                sendGif(bot, update, dataPath+
+                        '/gifs/importar.mp4')
             elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
                 randomValue = getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/ferran_thumb.mp4')
+                        bot, update, dataPath + '/gifs/ferran_thumb.mp4')
             elif "momento cabra" in update.message.text.lower():
                 sendGif(
-                    bot, update, '/home/pi/Desktop/collerinesBotData/gifs/momento_cabra.mp4')
+                    bot, update, dataPath + '/gifs/momento_cabra.mp4')
             elif re.search(r'\bcabra\b', update.message.text.lower()):
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/cabra_scream.mp4')
+                        bot, update, dataPath + '/gifs/cabra_scream.mp4')
             elif unidecode(u'qué?') == unidecode(update.message.text.lower()) or "que?" == update.message.text.lower():
                 sendGif(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/gifs/cabra.mp4')
+                        dataPath+ '/gifs/cabra.mp4')
             elif re.search(r'\brandom\b', update.message.text.lower()):
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/random.mp4')
+                        bot, update, dataPath + '/gifs/random.mp4')
             elif re.search(r'\breviento\b', update.message.text.lower()) or re.search(r'\brebiento\b', update.message.text.lower()):
                 randomValue = getRandomByValue(2)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/acho_reviento.mp4')
+                        bot, update, dataPath + '/gifs/acho_reviento.mp4')
             elif re.search(r'\bpatriarcado\b', update.message.text.lower()):
                 randomValue = getRandomByValue(3)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/patriarcado.mp4')
+                        bot, update, dataPath + '/gifs/patriarcado.mp4')
             elif re.search(r'\bchoca\b', update.message.text.lower()):
                 sendGif(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/gifs/choca.mp4')
+                        dataPath + '/gifs/choca.mp4')
             elif re.search(r'\bbro\b', update.message.text.lower()):
                 sendGif(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/gifs/cat_bro.mp4')
+                        dataPath+ '/gifs/cat_bro.mp4')
             elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/templo.mp4')
+                        bot, update,  dataPath + '/gifs/templo.mp4')
             elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
                 randomHuehuehueIndex = getRandomByValue(len(huehuehuePath) - 1)
-                sendGif(bot, update, huehuehuePath[randomHuehuehueIndex])
+                sendGif(bot, update, dataPath + huehuehuePath[randomHuehuehueIndex])
             elif re.search(r'\byee\b', update.message.text.lower()):
                 if "/yee" not in update.message.text.lower():
                     sendGif(bot, update,
-                            '/home/pi/Desktop/collerinesBotData/gifs/yee.mp4')
+                            dataPath + '/gifs/yee.mp4')
             elif re.search(r'\bstrike\b', update.message.text.lower()) or re.search(r'\breport\b', update.message.text.lower()):
                 randomValue = getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, '/home/pi/Desktop/collerinesBotData/gifs/strike.mp4')
+                        bot, update, dataPath+ '/gifs/strike.mp4')
 
             # messages
             elif re.search(r'\bsalud\b', update.message.text.lower()):
@@ -736,45 +741,45 @@ def echo(bot, update):
             # imgs
             elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
                 sendImg(bot, update,
-                        '/home/pi/Desktop/collerinesBotData/imgs/dropban.jpg')
+                        dataPath+ '/imgs/dropban.jpg')
             elif re.search(r'\bsecta\b', update.message.text.lower()):
                 randomSectaIndex = getRandomByValue(len(sectaImgPath) - 1)
-                sendImg(bot, update, sectaImgPath[randomSectaIndex])
+                sendImg(bot, update, dataPath + sectaImgPath[randomSectaIndex])
             elif re.search(r'\bnazi\b', update.message.text.lower()):
                 randomValue = getRandomByValue(3)
                 if randomValue < 1:
                     sendImg(bot, update,
-                            '/home/pi/Desktop/collerinesBotData/imgs/nazi.jpg')
+                            dataPath + '/imgs/nazi.jpg')
 
             # stickers
             elif re.search(r'\bprog\b', update.message.text.lower()):
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    '/home/pi/Desktop/collerinesBotData/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                    dataPath + '/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bsend nudes\b', update.message.text.lower()) or "send noodles" in update.message.text.lower():
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    '/home/pi/Desktop/collerinesBotData/stickers/sendnudes.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                    dataPath + '/stickers/sendnudes.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bficha\b', update.message.text.lower()) or re.search(r'\bfichas\b', update.message.text.lower()):
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    '/home/pi/Desktop/collerinesBotData/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                    dataPath + '/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bbutanero\b', update.message.text.lower()) or "bombona" in update.message.text.lower():
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    '/home/pi/Desktop/collerinesBotData/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                    dataPath + '/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bkylo\b', update.message.text.lower()):
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    '/home/pi/Desktop/collerinesBotData/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                    dataPath + '/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bkostra\b', update.message.text.lower()):
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    '/home/pi/Desktop/collerinesBotData/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                    dataPath + '/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
                 randomValue = getRandomByValue(5)
                 if randomValue < 1:
                     bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                        '/home/pi/Desktop/collerinesBotData/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                        dataPath + '/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\blp\b', update.message.text.lower()) or re.search(r'\blinkin park\b', update.message.text.lower()):
                 randomValue = getRandomByValue(3)
                 if randomValue <= 1:
                     bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                        '/home/pi/Desktop/collerinesBotData/stickers/lp.webp', 'rb'), reply_to_message_id=update.message.message_id)
+                        dataPath + '/stickers/lp.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif len(update.message.text) > 7:  # mimimimimimi
                 randomResponse(update, bot)
 
@@ -795,7 +800,7 @@ def callback_bye(bot, job):
         bot.sendChatAction(chat_id=job.context,
                            action=telegram.ChatAction.UPLOAD_PHOTO)
         bot.sendDocument(chat_id=job.context, document=open(
-            '/home/pi/Desktop/collerinesBotData/gifs/bye.mp4', 'rb'))
+            dataPath + '/gifs/bye.mp4', 'rb'))
 
 
 def stop(bot, update):
