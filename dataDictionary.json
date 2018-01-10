@@ -8,7 +8,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 2,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "m3",
@@ -22,7 +24,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "genial",
@@ -34,7 +38,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 2,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "rocoso",
@@ -46,7 +52,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 1,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "metodowilly",
@@ -58,7 +66,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "pffff",
@@ -73,7 +83,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "fantasma",
@@ -88,7 +100,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "ferranAgua",
@@ -106,7 +120,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "ferranDedo",
@@ -121,7 +137,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "momentoCabra",
@@ -136,7 +154,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "gritoCabra",
@@ -148,7 +168,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "cabra",
@@ -163,7 +185,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "random",
@@ -175,7 +199,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "reviento",
@@ -187,7 +213,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "patriarcado",
@@ -199,7 +227,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "choca",
@@ -211,7 +241,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "bro",
@@ -223,7 +255,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "templo",
@@ -241,7 +275,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "huehue",
@@ -255,7 +291,9 @@
     "lastTimeSentIt": "",
     "nextTimeValue": "",
     "timeToIncrement": 0,
-    "kindTime": "min"
+    "kindTime": "min",
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "yee",
@@ -268,7 +306,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": ["/yee"]
+    "notIn": ["/yee"],
+    "isReply": false
   },
   {
     "id": "strike",
@@ -281,7 +320,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": ["/yee"]
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "salud",
@@ -294,7 +334,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 2,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "kelePuto",
@@ -307,7 +348,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "sum41",
@@ -320,7 +362,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "zyzz",
@@ -333,7 +376,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "txumino",
@@ -346,7 +390,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": ["/txumino"]
+    "notIn": ["/txumino"],
+    "isReply": false
   },
   {
     "id": "kulevraTirano",
@@ -365,7 +410,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "secta",
@@ -380,7 +426,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "secta",
@@ -395,7 +442,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "nazi",
@@ -408,7 +456,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "prog",
@@ -421,7 +470,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "sendNudes",
@@ -434,20 +484,22 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "ficha",
     "type": "sticker",
     "regexpValue": ["r'\bficha\b'"],
     "msgToCheck": [],
-    "randomMaxValue": 0,
+    "randomMaxValue": 8,
     "path": ["/stickers/ficha.webp"],
     "lastTimeSentIt": "",
     "nextTimeValue": "",
-    "timeToIncrement": 0,
+    "timeToIncrement": 2,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "bombona",
@@ -463,7 +515,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "kylo",
@@ -476,7 +529,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "costra",
@@ -489,7 +543,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 0,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "huevo",
@@ -502,7 +557,8 @@
     "nextTimeValue": "",
     "timeToIncrement": 5,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   },
   {
     "id": "huevo",
@@ -515,6 +571,7 @@
     "nextTimeValue": "",
     "timeToIncrement": 5,
     "kindTime": "min",
-    "notIn": []
+    "notIn": [],
+    "isReply": false
   }
 ]
