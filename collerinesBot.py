@@ -346,21 +346,6 @@ def randomResponse(update, bot):
             dataPath + mimimimiStickerPath[randomMsgIndex], 'rb'))
 
 
-def sendGif(bot, update, pathGif):
-    bot.sendChatAction(chat_id=update.message.chat_id,
-                       action=telegram.ChatAction.UPLOAD_PHOTO)
-    bot.sendDocument(chat_id=update.message.chat_id,
-                     document=open(pathGif, 'rb'))
-
-
-def sendVoice(bot, update, pathVoice):
-    bot.send_voice(chat_id=update.message.chat_id, voice=open(pathVoice, 'rb'))
-
-
-def sendImg(bot, update, pathImg):
-    bot.send_photo(chat_id=update.message.chat_id, photo=open(pathImg, 'rb'))
-
-
 def isAdmin(bot, update):
     if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
         return True
@@ -525,6 +510,58 @@ def censorYoutubeVideo(videoTitle):
     return None
 
 
+def sendGif(bot, update, pathGif):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=telegram.ChatAction.UPLOAD_PHOTO)
+    bot.sendDocument(chat_id=update.message.chat_id,
+                     document=open(pathGif, 'rb'))
+
+
+def sendVoice(bot, update, pathVoice):
+    bot.send_voice(chat_id=update.message.chat_id, voice=open(pathVoice, 'rb'))
+
+
+def sendImg(bot, update, pathImg):
+    bot.send_photo(chat_id=update.message.chat_id, photo=open(pathImg, 'rb'))
+
+
+def sendMsg(bot, update, text, isReply):
+    if isReply:
+        update.message.reply_text(
+            text, reply_to_message_id=update.message.message_id)
+    else:
+        update.message.reply_text(
+            text)
+
+
+def sendSticker(bot, update, pathSticker, isReply):
+    if isReply:
+        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
+            dataPath + pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
+    else:
+        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
+            dataPath + pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
+
+
+def sendData(bot, update, object):
+    if object["type"] == "voice":
+        sendVoice(
+            bot, update, dataPath + getPath(object["path"]))
+    elif object["type"] == "gif":
+        sendGif(
+            bot, update, dataPath + getPath(object["path"]))
+    elif object["type"] == "text":
+        sendMsg(
+            bot, update, dataPath + getPath(object["path"]), object["isReply"])
+    elif object["type"] == "img":
+        sendImg(bot, update, dataPath + getPath(object["path"])
+    elif object["type"] == "sticker":
+        sendSticker(bot, update, dataPath + getPath(object["path"]), object["isReply"])
+
+def getPath(arrayData):
+    index=getRandomByValue(len(arrayData) - 1)
+    return arrayData[index]
+
 def echo(bot, update):
     global canTalk
     global firstMsg
@@ -536,36 +573,36 @@ def echo(bot, update):
         elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
             restart(bot, update)
         elif update.message.text != None and "miguelito al coma" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
-            godMode = None
+            godMode=None
         elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
-            godMode = True
+            godMode=True
 
         if godMode and canTalk:
             for i in range(len(update.message.entities)):
                 if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
                     try:
-                        videoid = ""
+                        videoid=""
                         if 'youtu.be' not in update.message.text.lower():
-                            videoid = update.message.text.split('v=')
-                            videoid = videoid[1].split(' ')[0]
-                            videoid = videoid.split('&')[0]
+                            videoid=update.message.text.split('v=')
+                            videoid=videoid[1].split(' ')[0]
+                            videoid=videoid.split('&')[0]
                         else:
-                            videoid = update.message.text.split('youtu.be/')
-                            videoid = videoid[1].split(' ')[0]
-                            videoid = videoid.split('&')[0]
-                        youtube = YoutubeAPI(
+                            videoid=update.message.text.split('youtu.be/')
+                            videoid=videoid[1].split(' ')[0]
+                            videoid=videoid.split('&')[0]
+                        youtube=YoutubeAPI(
                             {'key': settings["main"]["youtubeapikey"]})
-                        video = youtube.get_video_info(videoid)
-                        videoTitle = video['snippet']['title'].lower()
-                        videoTitle = replaceYouTubeVideoName(videoTitle)
+                        video=youtube.get_video_info(videoid)
+                        videoTitle=video['snippet']['title'].lower()
+                        videoTitle=replaceYouTubeVideoName(videoTitle)
 
                         if censorYoutubeVideo(videoTitle):
                             update.message.reply_text(
                                 '...', reply_to_message_id=update.message.message_id)
                         else:
-                            videoTags = ""
-                            tagsIndex = 0
-                            videoTags = gimmeTags(video, videoTags, 3)
+                            videoTags=""
+                            tagsIndex=0
+                            videoTags=gimmeTags(video, videoTags, 3)
                             if videoTitle != None and videoTags != None:
                                 connectToSpotifyAndCheckAPI(
                                     update, videoTitle, videoTags, video)
@@ -577,31 +614,32 @@ def echo(bot, update):
             # startJobs
             if firstMsg:
                 startJobs(bot, update)
-                firstMsg = None
+                firstMsg=None
 
             if "miguelito recuerda" in update.message.text.lower() or "miguelito recuerdame" in update.message.text.lower() or "miguelito recuérdame" in update.message.text.lower():
-                msg = update.message.text.lower()
-                msgSplit = msg.split(" ")
-                msg = msg.replace(
+                msg=update.message.text.lower()
+                msgSplit=msg.split(" ")
+                msg=msg.replace(
                     msgSplit[0] + " " + msgSplit[1] + " ", "")
                 rememberJobs(bot, update, msg)
 
             # voice
             elif re.search(r'\bvalencia\b', update.message.text.lower()):
-                randomValue = getRandomByValue(4)
+                randomValue=getRandomByValue(4)
                 if randomValue <= 1:
                     sendVoice(
                         bot, update, dataPath + '/voices/teamvalencia.ogg')
             elif re.search(r'\<3\b', update.message.text.lower()):
-                randomAudioIndex = getRandomByValue(len(m3AudiosPath) - 1)
-                sendVoice(bot, update, dataPath + m3AudiosPath[randomAudioIndex])
+                randomAudioIndex=getRandomByValue(len(m3AudiosPath) - 1)
+                sendVoice(bot, update, dataPath +
+                          m3AudiosPath[randomAudioIndex])
             elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
-                randomValue = getRandomByValue(5)
+                randomValue=getRandomByValue(5)
                 if randomValue <= 1:
                     sendVoice(
                         bot, update, dataPath + '/voices/geniaaa.ogg')
             elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
-                randomValue = getRandomByValue(3)
+                randomValue=getRandomByValue(3)
                 if randomValue <= 1:
                     sendVoice(
                         bot, update, dataPath + '/voices/rocoso.ogg')
@@ -611,7 +649,7 @@ def echo(bot, update):
 
             # gif
             elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
-                randomValue = getRandomByValue(5)
+                randomValue=getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(
                         bot, update,  dataPath + '/gifs/pffff.mp4')
@@ -622,15 +660,15 @@ def echo(bot, update):
                 sendGif(bot, update,
                         dataPath + '/gifs/perro.mp4')
             elif "no me jodas" in update.message.text.lower() or "no me digas" in update.message.text.lower():
-                randomValue = getRandomByValue(5)
+                randomValue=getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(
                         bot, update, dataPath + '/gifs/ferran_agua.mp4')
             elif "tengo cara de que me importe" in update.message.text.lower():
-                sendGif(bot, update, dataPath+
+                sendGif(bot, update, dataPath +
                         '/gifs/importar.mp4')
             elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
-                randomValue = getRandomByValue(5)
+                randomValue=getRandomByValue(5)
                 if randomValue <= 1:
                     sendGif(
                         bot, update, dataPath + '/gifs/ferran_thumb.mp4')
@@ -638,25 +676,25 @@ def echo(bot, update):
                 sendGif(
                     bot, update, dataPath + '/gifs/momento_cabra.mp4')
             elif re.search(r'\bcabra\b', update.message.text.lower()):
-                randomValue = getRandomByValue(4)
+                randomValue=getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
                         bot, update, dataPath + '/gifs/cabra_scream.mp4')
             elif unidecode(u'qué?') == unidecode(update.message.text.lower()) or "que?" == update.message.text.lower():
                 sendGif(bot, update,
-                        dataPath+ '/gifs/cabra.mp4')
+                        dataPath + '/gifs/cabra.mp4')
             elif re.search(r'\brandom\b', update.message.text.lower()):
-                randomValue = getRandomByValue(4)
+                randomValue=getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
                         bot, update, dataPath + '/gifs/random.mp4')
             elif re.search(r'\breviento\b', update.message.text.lower()) or re.search(r'\brebiento\b', update.message.text.lower()):
-                randomValue = getRandomByValue(2)
+                randomValue=getRandomByValue(2)
                 if randomValue <= 1:
                     sendGif(
                         bot, update, dataPath + '/gifs/acho_reviento.mp4')
             elif re.search(r'\bpatriarcado\b', update.message.text.lower()):
-                randomValue = getRandomByValue(3)
+                randomValue=getRandomByValue(3)
                 if randomValue <= 1:
                     sendGif(
                         bot, update, dataPath + '/gifs/patriarcado.mp4')
@@ -665,28 +703,29 @@ def echo(bot, update):
                         dataPath + '/gifs/choca.mp4')
             elif re.search(r'\bbro\b', update.message.text.lower()):
                 sendGif(bot, update,
-                        dataPath+ '/gifs/cat_bro.mp4')
+                        dataPath + '/gifs/cat_bro.mp4')
             elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
-                randomValue = getRandomByValue(4)
+                randomValue=getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
                         bot, update,  dataPath + '/gifs/templo.mp4')
             elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
-                randomHuehuehueIndex = getRandomByValue(len(huehuehuePath) - 1)
-                sendGif(bot, update, dataPath + huehuehuePath[randomHuehuehueIndex])
+                randomHuehuehueIndex=getRandomByValue(len(huehuehuePath) - 1)
+                sendGif(bot, update, dataPath +
+                        huehuehuePath[randomHuehuehueIndex])
             elif re.search(r'\byee\b', update.message.text.lower()):
                 if "/yee" not in update.message.text.lower():
                     sendGif(bot, update,
                             dataPath + '/gifs/yee.mp4')
             elif re.search(r'\bstrike\b', update.message.text.lower()) or re.search(r'\breport\b', update.message.text.lower()):
-                randomValue = getRandomByValue(4)
+                randomValue=getRandomByValue(4)
                 if randomValue <= 1:
                     sendGif(
-                        bot, update, dataPath+ '/gifs/strike.mp4')
+                        bot, update, dataPath + '/gifs/strike.mp4')
 
             # messages
             elif re.search(r'\bsalud\b', update.message.text.lower()):
-                randomValue = getRandomByValue(3)
+                randomValue=getRandomByValue(3)
                 if randomValue <= 1:
                     update.message.reply_text(
                         'El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
@@ -704,34 +743,37 @@ def echo(bot, update):
                 update.message.reply_text('/jjaj')
             elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
                 update.message.reply_text('/jajj')
+
             elif "miguelito dame la lista" in update.message.text.lower():
                 gimmeTheSpotifyPlaylistLink(bot, update)
             elif "miguelito añade" in update.message.text.lower():
-                videoTitle = update.message.text.lower().replace("miguelito añade ", "")
+                videoTitle=update.message.text.lower().replace("miguelito añade ", "")
 
                 if censorYoutubeVideo(videoTitle):
                     update.message.reply_text(
                         'No. :)', reply_to_message_id=update.message.message_id)
                 else:
                     connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
+
             elif re.search(r'\bpole estonia\b', update.message.text.lower()):
                 global lastPoleEstonia
-                now = datetime.now()
+                now=datetime.now()
                 if now.date() != lastPoleEstonia.date() and now.hour >= 23:
                     update.message.reply_text(
                         'El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
                     savePoleStats(update)
-                    lastPoleEstonia = now
+                    lastPoleEstonia=now
             elif "estoniarank" in update.message.text.lower():
                 gimmeTheRank(update)
+
             elif re.search(r'\bzyzz\b', update.message.text.lower()):
-                randomValue = getRandomByValue(3)
+                randomValue=getRandomByValue(3)
                 if randomValue <= 1:
                     update.message.reply_text(' /zetayzetazeta ')
             elif re.search(r'\bdios\b', update.message.text.lower()):
-                randomValue = getRandomByValue(5)
+                randomValue=getRandomByValue(5)
                 if randomValue < 1:
-                    indexMsg = getRandomByValue(len(random4GodMsg) - 1)
+                    indexMsg=getRandomByValue(len(random4GodMsg) - 1)
                     update.message.reply_text(
                         random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
             elif re.search(r'\btxumino\b', update.message.text.lower()):
@@ -741,12 +783,12 @@ def echo(bot, update):
             # imgs
             elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
                 sendImg(bot, update,
-                        dataPath+ '/imgs/dropban.jpg')
+                        dataPath + '/imgs/dropban.jpg')
             elif re.search(r'\bsecta\b', update.message.text.lower()):
-                randomSectaIndex = getRandomByValue(len(sectaImgPath) - 1)
+                randomSectaIndex=getRandomByValue(len(sectaImgPath) - 1)
                 sendImg(bot, update, dataPath + sectaImgPath[randomSectaIndex])
             elif re.search(r'\bnazi\b', update.message.text.lower()):
-                randomValue = getRandomByValue(3)
+                randomValue=getRandomByValue(3)
                 if randomValue < 1:
                     sendImg(bot, update,
                             dataPath + '/imgs/nazi.jpg')
@@ -771,12 +813,12 @@ def echo(bot, update):
                 bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
                     dataPath + '/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
-                randomValue = getRandomByValue(5)
+                randomValue=getRandomByValue(5)
                 if randomValue < 1:
                     bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
                         dataPath + '/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
             elif re.search(r'\blp\b', update.message.text.lower()) or re.search(r'\blinkin park\b', update.message.text.lower()):
-                randomValue = getRandomByValue(3)
+                randomValue=getRandomByValue(3)
                 if randomValue <= 1:
                     bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
                         dataPath + '/stickers/lp.webp', 'rb'), reply_to_message_id=update.message.message_id)
@@ -806,7 +848,7 @@ def callback_bye(bot, job):
 def stop(bot, update):
     if str(update.message.chat_id) == str(settings["main"]["groupid"]) and isAdmin(bot, update):
         global canTalk
-        canTalk = None
+        canTalk=None
     else:
         bot.send_message(chat_id=update.message.chat_id, text="JA! No :)")
 
@@ -814,7 +856,7 @@ def stop(bot, update):
 def restart(bot, update):
     if str(update.message.chat_id) == str(settings["main"]["groupid"]) and isAdmin(bot, update):
         global canTalk
-        canTalk = True
+        canTalk=True
     else:
         bot.send_message(chat_id=update.message.chat_id, text="JA! No :)")
 
@@ -827,8 +869,8 @@ def get_admin_ids(bot, chat_id):
 def downloadPhotos(bot, update):
     if str(update.message.chat_id) == str(settings["main"]["group4photos"]):
         global lastFileDownloadedCount
-        file_id = update.message.photo[-1].file_id
-        photo = bot.getFile(file_id)
+        file_id=update.message.photo[-1].file_id
+        photo=bot.getFile(file_id)
         photo.download(os.path.join(os.path.dirname(__file__)) +
                        '/photos/' + str(lastFileDownloadedCount) + '.jpg')
         lastFileDownloadedCount += 1
@@ -836,7 +878,7 @@ def downloadPhotos(bot, update):
 
 def main():
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dp=updater.dispatcher
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
