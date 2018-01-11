@@ -566,7 +566,7 @@ def checkIfSendData(bot, update, object):
     if len(object["lastTimeSentIt"]) not 0:
         lastTimeSentIt = datetime.strptime(object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
         now=datetime.now()
-        if now.date() > lastPoleEstonia.date():
+        if now.date() > lastTimeSentIt.date():
             if object["randomMaxValue"] not 0:
                 randomValue=getRandomByValue(object["randomMaxValue"])
                 if randomValue <= 1:
