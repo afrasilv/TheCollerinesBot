@@ -136,9 +136,6 @@ def checkDayDifference(diffDayCount, now, timeObject):
         if "min" in timeObject and now.minute < int(timeObject["min"]):
             print("nice hour")
         else:
-            print(now.minute)
-            print(timeObject["min"])
-            print("sum a day")
             diffDayCount += 1
     return diffDayCount
 
