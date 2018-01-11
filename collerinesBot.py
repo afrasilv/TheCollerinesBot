@@ -46,6 +46,7 @@ lastPoleEstonia = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
 firstMsg = True
+botDict = {}
 lastFileDownloadedCount = 0
 weekdayConstant = ['lunes', 'martes', 'miércoles',
                    'jueves', 'viernes', 'sábado', 'domingo']
@@ -549,38 +550,64 @@ def sendData(bot, update, object):
             bot, update, dataPath + getPath(object["path"]))
     elif object["type"] == "text":
         sendMsg(
-            bot, update, dataPath + getPath(object["path"]), object["isReply"])
+            bot, update, getPath(object["path"]), object["isReply"])
     elif object["type"] == "img":
-        sendImg(bot, update, dataPath + getPath(object["path"])
+        sendImg(bot, update, dataPath + getPath(object["path"]))
     elif object["type"] == "sticker":
-        sendSticker(bot, update, dataPath + getPath(object["path"]), object["isReply"])
+        sendSticker(bot, update, dataPath +
+                    getPath(object["path"]), object["isReply"])
+
 
 def getPath(arrayData):
-    index=getRandomByValue(len(arrayData) - 1)
+    index = getRandomByValue(len(arrayData) - 1)
     return arrayData[index]
 
+
 def checkIfSendData(bot, update, object):
-    if len(object["lastTimeSentIt"]) not 0:
-        lastTimeSentIt = datetime.strptime(object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
-        now=datetime.now()
+    if len(object["lastTimeSentIt"]) is not 0:
+        lastTimeSentIt = datetime.strptime(
+            object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
+        now = datetime.now()
         if now.date() > lastTimeSentIt.date():
-            if object["randomMaxValue"] not 0:
-                randomValue=getRandomByValue(object["randomMaxValue"])
+            if object["randomMaxValue"] is not 0:
+                randomValue = getRandomByValue(object["randomMaxValue"])
                 if randomValue <= 1:
                     sendData(bot, update, object)
                     return True
-            elif:
+            else:
                 sendData(bot, update, object)
                 return True
-    elif:
+    else:
         sendData(bot, update, object)
         return True
     return False
+
+
+def addTime(now, object):
+    if object["timeToIncrement"] is not 0:
+        timeObject = {'type': object["kindTime"],
+                      'value':  object["timeToIncrement"]}
+        return checkRememberDate(now, timeObject, None).isoformat()
+    else:
+        return ""
+
+def loadDictionary(bot, update):
+    global botDict
+    try:
+        json_file = open('dataDictionary.json', 'r')
+        botDict = json.load(json_file)
+        data = json.dumps(
+            {'data': botDict})
+        botDict = json.loads(data)
+        botDict = botDict["data"]
+    except IOError:
+        botDict = {}
 
 def echo(bot, update):
     global canTalk
     global firstMsg
     global godMode
+    global botDict
 
     if str(update.message.chat_id) == str(settings["main"]["groupid"]):
         if update.message.text != None and "miguelito para" == update.message.text.lower():
@@ -588,281 +615,114 @@ def echo(bot, update):
         elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
             restart(bot, update)
         elif update.message.text != None and "miguelito al coma" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
-            godMode=None
+            godMode = None
         elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
-            godMode=True
+            godMode = True
+
+        for i in range(len(update.message.entities)):
+            if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
+                try:
+                    videoid = ""
+                    if 'youtu.be' not in update.message.text.lower():
+                        videoid = update.message.text.split('v=')
+                        videoid = videoid[1].split(' ')[0]
+                        videoid = videoid.split('&')[0]
+                    else:
+                        videoid = update.message.text.split('youtu.be/')
+                        videoid = videoid[1].split(' ')[0]
+                        videoid = videoid.split('&')[0]
+                    youtube = YoutubeAPI(
+                        {'key': settings["main"]["youtubeapikey"]})
+                    video = youtube.get_video_info(videoid)
+                    videoTitle = video['snippet']['title'].lower()
+                    videoTitle = replaceYouTubeVideoName(videoTitle)
+
+                    if censorYoutubeVideo(videoTitle):
+                        update.message.reply_text(
+                            '...', reply_to_message_id=update.message.message_id)
+                    else:
+                        videoTags = ""
+                        tagsIndex = 0
+                        videoTags = gimmeTags(video, videoTags, 3)
+                        if videoTitle != None and videoTags != None:
+                            connectToSpotifyAndCheckAPI(
+                                update, videoTitle, videoTags, video)
+                        else:
+                            saveDataSong(update, None)
+                except:
+                    saveDataSong(update, None)
+
+        # startJobs
+        if firstMsg:
+            startJobs(bot, update)
+            loadDictionary(bot, update)
+            firstMsg = None
+
+        if "miguelito recuerda" in update.message.text.lower() or "miguelito recuerdame" in update.message.text.lower() or "miguelito recuérdame" in update.message.text.lower():
+            msg = update.message.text.lower()
+            msgSplit = msg.split(" ")
+            msg = msg.replace(
+                msgSplit[0] + " " + msgSplit[1] + " ", "")
+            rememberJobs(bot, update, msg)
 
         if godMode and canTalk:
-            for i in range(len(update.message.entities)):
-                if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
-                    try:
-                        videoid=""
-                        if 'youtu.be' not in update.message.text.lower():
-                            videoid=update.message.text.split('v=')
-                            videoid=videoid[1].split(' ')[0]
-                            videoid=videoid.split('&')[0]
-                        else:
-                            videoid=update.message.text.split('youtu.be/')
-                            videoid=videoid[1].split(' ')[0]
-                            videoid=videoid.split('&')[0]
-                        youtube=YoutubeAPI(
-                            {'key': settings["main"]["youtubeapikey"]})
-                        video=youtube.get_video_info(videoid)
-                        videoTitle=video['snippet']['title'].lower()
-                        videoTitle=replaceYouTubeVideoName(videoTitle)
-
-                        if censorYoutubeVideo(videoTitle):
-                            update.message.reply_text(
-                                '...', reply_to_message_id=update.message.message_id)
-                        else:
-                            videoTags=""
-                            tagsIndex=0
-                            videoTags=gimmeTags(video, videoTags, 3)
-                            if videoTitle != None and videoTags != None:
-                                connectToSpotifyAndCheckAPI(
-                                    update, videoTitle, videoTags, video)
-                            else:
-                                saveDataSong(update, None)
-                    except:
-                        saveDataSong(update, None)
-
-            # startJobs
-            if firstMsg:
-                startJobs(bot, update)
-                firstMsg=None
-
-            if "miguelito recuerda" in update.message.text.lower() or "miguelito recuerdame" in update.message.text.lower() or "miguelito recuérdame" in update.message.text.lower():
-                msg=update.message.text.lower()
-                msgSplit=msg.split(" ")
-                msg=msg.replace(
-                    msgSplit[0] + " " + msgSplit[1] + " ", "")
-                rememberJobs(bot, update, msg)
-
-            foundKey = false
+            foundKey = False
             indexArray = 0
-            for i in len(botDict["keywords"]):
-                if len(botDict["keywords"][i]["regexpValue"]) > 0:
-                    while indexArray < len(botDict["keywords"][i]["regexpValue"]) and msgSent not True:
-                        if re.search(botDict["keywords"][i]["regexpValue"][indexArray], update.message.text.lower()):
-                            if checkIfSendData(bot, update, botDict["keywords"][i]):
-                                botDict["keywords"][i]["lastTimeSentIt"] = now.isoformat()
+            dictionaryIndex = 0
+            now = datetime.now()
+            while dictionaryIndex < len(botDict["keywords"]) and foundKey is not True:
+                if len(botDict["keywords"][dictionaryIndex]["regexpValue"]) > 0:
+                    while indexArray < len(botDict["keywords"][dictionaryIndex]["regexpValue"]) and foundKey is not True:
+                        regexr = re.compile(botDict["keywords"][dictionaryIndex]["regexpValue"][indexArray])
+                        if regexr.search(update.message.text.lower()):
+                            if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
+                                botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
+                                    now, botDict["keywords"][dictionaryIndex])
                             foundKey = True
                         indexArray += 1
                 indexArray = 0
-                if len(botDict["keywords"][i]["msgToCheck"]) > 0:
-                    while indexArray < len(botDict["keywords"][i]["msgToCheck"]) and msgSent not True:
-                        if botDict["keywords"][i]["msgToCheck"][indexArray]["type"] == "in":
-                            if botDict["keywords"][i]["msgToCheck"][indexArray]["text"] in update.message.text.lower():
-                                if checkIfSendData(bot, update, botDict["keywords"][i]):
-                                    botDict["keywords"][i]["lastTimeSentIt"] = now.isoformat()
+                if len(botDict["keywords"][dictionaryIndex]["msgToCheck"]) > 0:
+                    while indexArray < len(botDict["keywords"][dictionaryIndex]["msgToCheck"]) and foundKey is not True:
+                        if botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["type"] == "in":
+                            if botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["text"] in update.message.text.lower():
+                                if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
+                                    botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
+                                        now, botDict["keywords"][dictionaryIndex])
                                 foundKey = True
-                        elif botDict["keywords"][i]["msgToCheck"][indexArray]["text"] == update.message.text:
-                            if checkIfSendData(bot, update, botDict["keywords"][i]):
-                                botDict["keywords"][i]["lastTimeSentIt"] = now.isoformat()
+                        elif botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["text"] == update.message.text:
+                            if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
+                                botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
+                                    now, botDict["keywords"][dictionaryIndex])
                             foundKey = True
                         indexArray += 1
+                dictionaryIndex += 1
 
-            # voice
-            elif re.search(r'\bvalencia\b', update.message.text.lower()):
-                randomValue=getRandomByValue(4)
-                if randomValue <= 1:
-                    sendVoice(
-                        bot, update, dataPath + '/voices/teamvalencia.ogg')
-            elif re.search(r'\<3\b', update.message.text.lower()):
-                randomAudioIndex=getRandomByValue(len(m3AudiosPath) - 1)
-                sendVoice(bot, update, dataPath +
-                          m3AudiosPath[randomAudioIndex])
-            elif re.search(r'\bgeni[a]+[a-zA-Z]+\b', update.message.text.lower()):
-                randomValue=getRandomByValue(5)
-                if randomValue <= 1:
-                    sendVoice(
-                        bot, update, dataPath + '/voices/geniaaa.ogg')
-            elif re.search(r'\brocoso\b', update.message.text.lower()) or re.search(r'\bciclado\b', update.message.text.lower()) or re.search(r'\bciclao\b', update.message.text.lower()):
-                randomValue=getRandomByValue(3)
-                if randomValue <= 1:
-                    sendVoice(
-                        bot, update, dataPath + '/voices/rocoso.ogg')
-            elif re.search(r'\bmétodo willy\b', update.message.text.lower()) or re.search(r'\bmetodo willy\b', update.message.text.lower()):
-                sendVoice(
-                    bot, update, dataPath + '/voices/willy.ogg')
+            if foundKey is not True:
+                if "miguelito dame la lista" in update.message.text.lower():
+                    gimmeTheSpotifyPlaylistLink(bot, update)
+                elif "miguelito añade" in update.message.text.lower():
+                    videoTitle = update.message.text.lower().replace("miguelito añade ", "")
 
-            # gif
-            elif re.search(r'\bpfff[f]+\b', update.message.text.lower()) or '...' == update.message.text:
-                randomValue=getRandomByValue(5)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update,  dataPath + '/gifs/pffff.mp4')
-            elif "gif del fantasma" in update.message.text.lower():
-                sendGif(bot, update,
-                        dataPath + '/gifs/fantasma.mp4')
-            elif "bukkake" in update.message.text.lower() or "galletitas" in update.message.text.lower():
-                sendGif(bot, update,
-                        dataPath + '/gifs/perro.mp4')
-            elif "no me jodas" in update.message.text.lower() or "no me digas" in update.message.text.lower():
-                randomValue=getRandomByValue(5)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/ferran_agua.mp4')
-            elif "tengo cara de que me importe" in update.message.text.lower():
-                sendGif(bot, update, dataPath +
-                        '/gifs/importar.mp4')
-            elif "all right" in update.message.text.lower() or re.search(r'\bestupendo\b', update.message.text.lower()) or re.search(r'\bmaravilloso\b', update.message.text.lower()):
-                randomValue=getRandomByValue(5)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/ferran_thumb.mp4')
-            elif "momento cabra" in update.message.text.lower():
-                sendGif(
-                    bot, update, dataPath + '/gifs/momento_cabra.mp4')
-            elif re.search(r'\bcabra\b', update.message.text.lower()):
-                randomValue=getRandomByValue(4)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/cabra_scream.mp4')
-            elif unidecode(u'qué?') == unidecode(update.message.text.lower()) or "que?" == update.message.text.lower():
-                sendGif(bot, update,
-                        dataPath + '/gifs/cabra.mp4')
-            elif re.search(r'\brandom\b', update.message.text.lower()):
-                randomValue=getRandomByValue(4)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/random.mp4')
-            elif re.search(r'\breviento\b', update.message.text.lower()) or re.search(r'\brebiento\b', update.message.text.lower()):
-                randomValue=getRandomByValue(2)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/acho_reviento.mp4')
-            elif re.search(r'\bpatriarcado\b', update.message.text.lower()):
-                randomValue=getRandomByValue(3)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/patriarcado.mp4')
-            elif re.search(r'\bchoca\b', update.message.text.lower()):
-                sendGif(bot, update,
-                        dataPath + '/gifs/choca.mp4')
-            elif re.search(r'\bbro\b', update.message.text.lower()):
-                sendGif(bot, update,
-                        dataPath + '/gifs/cat_bro.mp4')
-            elif "templo" in update.message.text.lower() or "gimnasio" in update.message.text.lower():
-                randomValue=getRandomByValue(4)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update,  dataPath + '/gifs/templo.mp4')
-            elif re.search(r'\bhuehue[hue]+\b', update.message.text.lower()):
-                randomHuehuehueIndex=getRandomByValue(len(huehuehuePath) - 1)
-                sendGif(bot, update, dataPath +
-                        huehuehuePath[randomHuehuehueIndex])
-            elif re.search(r'\byee\b', update.message.text.lower()):
-                if "/yee" not in update.message.text.lower():
-                    sendGif(bot, update,
-                            dataPath + '/gifs/yee.mp4')
-            elif re.search(r'\bstrike\b', update.message.text.lower()) or re.search(r'\breport\b', update.message.text.lower()):
-                randomValue=getRandomByValue(4)
-                if randomValue <= 1:
-                    sendGif(
-                        bot, update, dataPath + '/gifs/strike.mp4')
+                    if censorYoutubeVideo(videoTitle):
+                        update.message.reply_text(
+                            'No. :)', reply_to_message_id=update.message.message_id)
+                    else:
+                        connectToSpotifyAndCheckAPI(
+                            update, videoTitle, [], None)
 
-            # messages
-            elif re.search(r'\bsalud\b', update.message.text.lower()):
-                randomValue=getRandomByValue(3)
-                if randomValue <= 1:
-                    update.message.reply_text(
-                        'El dedo en el culo es la salud y el bienestar', reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bllegas tarde\b', update.message.text.lower()) or re.search(r'\bllega tarde\b', update.message.text.lower()):
-                update.message.reply_text(
-                    'como Collera', reply_to_message_id=update.message.message_id)
-            elif unidecode(u'eres rápido') in unidecode(update.message.text.lower()) or "eres rapido" in update.message.text.lower():
-                update.message.reply_text(
-                    'no como Collera', reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bkele puto\b', update.message.text.lower()):
-                update.message.reply_text(' /keleputo ')
-            elif re.search(r'\bsum41\b', update.message.text.lower()) or re.search(r'\bsum 41\b', update.message.text.lower()):
-                update.message.reply_text('100% confirmados para el Download')
-            elif re.search(r'\bjjaj[ja]*\b', update.message.text.lower()):
-                update.message.reply_text('/jjaj')
-            elif re.search(r'\bjajj[ja]*\b', update.message.text.lower()):
-                update.message.reply_text('/jajj')
+                elif re.search(r'\bpole estonia\b', update.message.text.lower()):
+                    global lastPoleEstonia
+                    now = datetime.now()
+                    if now.date() != lastPoleEstonia.date() and now.hour >= 23:
+                        update.message.reply_text(
+                            'El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
+                        savePoleStats(update)
+                        lastPoleEstonia = now
+                elif "estoniarank" in update.message.text.lower():
+                    gimmeTheRank(update)
 
-            elif "miguelito dame la lista" in update.message.text.lower():
-                gimmeTheSpotifyPlaylistLink(bot, update)
-            elif "miguelito añade" in update.message.text.lower():
-                videoTitle=update.message.text.lower().replace("miguelito añade ", "")
-
-                if censorYoutubeVideo(videoTitle):
-                    update.message.reply_text(
-                        'No. :)', reply_to_message_id=update.message.message_id)
-                else:
-                    connectToSpotifyAndCheckAPI(update, videoTitle, [], None)
-
-            elif re.search(r'\bpole estonia\b', update.message.text.lower()):
-                global lastPoleEstonia
-                now=datetime.now()
-                if now.date() != lastPoleEstonia.date() and now.hour >= 23:
-                    update.message.reply_text(
-                        'El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
-                    savePoleStats(update)
-                    lastPoleEstonia=now
-            elif "estoniarank" in update.message.text.lower():
-                gimmeTheRank(update)
-
-            elif re.search(r'\bzyzz\b', update.message.text.lower()):
-                randomValue=getRandomByValue(3)
-                if randomValue <= 1:
-                    update.message.reply_text(' /zetayzetazeta ')
-            elif re.search(r'\bdios\b', update.message.text.lower()):
-                randomValue=getRandomByValue(5)
-                if randomValue < 1:
-                    indexMsg=getRandomByValue(len(random4GodMsg) - 1)
-                    update.message.reply_text(
-                        random4GodMsg[indexMsg], reply_to_message_id=update.message.message_id)
-            elif re.search(r'\btxumino\b', update.message.text.lower()):
-                if "/txumino" not in update.message.text.lower():
-                    update.message.reply_text(' /txumino ')
-
-            # imgs
-            elif "kulevra tirano" in update.message.text.lower() or "drop the ban" in update.message.text.lower():
-                sendImg(bot, update,
-                        dataPath + '/imgs/dropban.jpg')
-            elif re.search(r'\bsecta\b', update.message.text.lower()):
-                randomSectaIndex=getRandomByValue(len(sectaImgPath) - 1)
-                sendImg(bot, update, dataPath + sectaImgPath[randomSectaIndex])
-            elif re.search(r'\bnazi\b', update.message.text.lower()):
-                randomValue=getRandomByValue(3)
-                if randomValue < 1:
-                    sendImg(bot, update,
-                            dataPath + '/imgs/nazi.jpg')
-
-            # stickers
-            elif re.search(r'\bprog\b', update.message.text.lower()):
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    dataPath + '/stickers/prog.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bsend nudes\b', update.message.text.lower()) or "send noodles" in update.message.text.lower():
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    dataPath + '/stickers/sendnudes.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bficha\b', update.message.text.lower()) or re.search(r'\bfichas\b', update.message.text.lower()):
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    dataPath + '/stickers/ficha.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bbutanero\b', update.message.text.lower()) or "bombona" in update.message.text.lower():
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    dataPath + '/stickers/butanero.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bkylo\b', update.message.text.lower()):
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    dataPath + '/stickers/kylo.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bkostra\b', update.message.text.lower()):
-                bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                    dataPath + '/stickers/costra.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\bhuevo\b', update.message.text.lower()) or re.search(r'\bhuevos\b', update.message.text.lower()):
-                randomValue=getRandomByValue(5)
-                if randomValue < 1:
-                    bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                        dataPath + '/stickers/huevo.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif re.search(r'\blp\b', update.message.text.lower()) or re.search(r'\blinkin park\b', update.message.text.lower()):
-                randomValue=getRandomByValue(3)
-                if randomValue <= 1:
-                    bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                        dataPath + '/stickers/lp.webp', 'rb'), reply_to_message_id=update.message.message_id)
-            elif len(update.message.text) > 7:  # mimimimimimi
-                randomResponse(update, bot)
+                elif len(update.message.text) > 7:  # mimimimimimi
+                    randomResponse(update, bot)
 
 
 def error(bot, update, error):
@@ -887,7 +747,7 @@ def callback_bye(bot, job):
 def stop(bot, update):
     if str(update.message.chat_id) == str(settings["main"]["groupid"]) and isAdmin(bot, update):
         global canTalk
-        canTalk=None
+        canTalk = None
     else:
         bot.send_message(chat_id=update.message.chat_id, text="JA! No :)")
 
@@ -895,7 +755,7 @@ def stop(bot, update):
 def restart(bot, update):
     if str(update.message.chat_id) == str(settings["main"]["groupid"]) and isAdmin(bot, update):
         global canTalk
-        canTalk=True
+        canTalk = True
     else:
         bot.send_message(chat_id=update.message.chat_id, text="JA! No :)")
 
@@ -908,8 +768,8 @@ def get_admin_ids(bot, chat_id):
 def downloadPhotos(bot, update):
     if str(update.message.chat_id) == str(settings["main"]["group4photos"]):
         global lastFileDownloadedCount
-        file_id=update.message.photo[-1].file_id
-        photo=bot.getFile(file_id)
+        file_id = update.message.photo[-1].file_id
+        photo = bot.getFile(file_id)
         photo.download(os.path.join(os.path.dirname(__file__)) +
                        '/photos/' + str(lastFileDownloadedCount) + '.jpg')
         lastFileDownloadedCount += 1
@@ -917,7 +777,7 @@ def downloadPhotos(bot, update):
 
 def main():
     # Get the dispatcher to register handlers
-    dp=updater.dispatcher
+    dp = updater.dispatcher
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))

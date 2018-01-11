@@ -2,7 +2,7 @@
   "keywords": [{
       "id": "valencia",
       "type": "voice",
-      "regexpValue": ["r'\bvalencia\b'"],
+      "regexpValue": ["\\bvalencia\\b"],
       "msgToCheck": [],
       "randomMaxValue": 4,
       "path": ["/voices/teamvalencia.ogg"],
@@ -15,7 +15,7 @@
     {
       "id": "m3",
       "type": "voice",
-      "regexpValue": ["r'\\<3\b'"],
+      "regexpValue": ["\\<3\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/voices/m3Javi.ogg",
@@ -30,7 +30,7 @@
     {
       "id": "genial",
       "type": "voice",
-      "regexpValue": ["r'\bgeni[a]+[a-zA-Z]+\b'"],
+      "regexpValue": ["\\bgeni[a]+[a-zA-Z]+\\b"],
       "msgToCheck": [],
       "randomMaxValue": 5,
       "path": ["/voices/geniaaa.ogg"],
@@ -43,7 +43,7 @@
     {
       "id": "rocoso",
       "type": "voice",
-      "regexpValue": ["r'\brocoso\b'"],
+      "regexpValue": ["\\brocoso\\b"],
       "msgToCheck": [],
       "randomMaxValue": 3,
       "path": ["/voices/rocoso.ogg"],
@@ -56,7 +56,7 @@
     {
       "id": "metodowilly",
       "type": "voice",
-      "regexpValue": ["r'\bmétodo willy\b'", "r'\bmetodo willy\b'"],
+      "regexpValue": ["\\bmétodo willy\\b", "\\bmetodo willy\\b"],
       "msgToCheck": [],
       "randomMaxValue": 3,
       "path": ["/voices/willy.ogg"],
@@ -69,7 +69,7 @@
     {
       "id": "pffff",
       "type": "gif",
-      "regexpValue": ["r'\bpfff[f]+\b'"],
+      "regexpValue": ["\\bpfff[f]+\\b"],
       "msgToCheck": [{
         "text": "...",
         "type": "eq"
@@ -120,7 +120,7 @@
     {
       "id": "ferranDedo",
       "type": "gif",
-      "regexpValue": ["r'\bestupendo\b'", "r'\bmaravilloso\b'"],
+      "regexpValue": ["\\bestupendo\\b", "\\bmaravilloso\\b"],
       "msgToCheck": [{
         "text": "all right",
         "type": "in"
@@ -152,7 +152,7 @@
     {
       "id": "gritoCabra",
       "type": "gif",
-      "regexpValue": ["r'\bcabra\b'"],
+      "regexpValue": ["\\bcabra\\b"],
       "msgToCheck": [],
       "randomMaxValue": 4,
       "path": ["/gifs/cabra_scream.mp4"],
@@ -165,7 +165,7 @@
     {
       "id": "cabra",
       "type": "gif",
-      "regexpValue": ["u'qué?'"],
+      "regexpValue": ["u'qué?"],
       "msgToCheck": [{
         "text": "que?",
         "type": "eq"
@@ -181,7 +181,7 @@
     {
       "id": "random",
       "type": "gif",
-      "regexpValue": ["r'\brandom\b'"],
+      "regexpValue": ["\\brandom\\b"],
       "msgToCheck": [],
       "randomMaxValue": 4,
       "path": ["/gifs/random.mp4"],
@@ -194,7 +194,7 @@
     {
       "id": "reviento",
       "type": "gif",
-      "regexpValue": ["r'\breviento\b'", "r'\brebiento\b'"],
+      "regexpValue": ["\\breviento\\b", "\\brebiento\\b"],
       "msgToCheck": [],
       "randomMaxValue": 2,
       "path": ["/gifs/acho_reviento.mp4"],
@@ -207,7 +207,7 @@
     {
       "id": "patriarcado",
       "type": "gif",
-      "regexpValue": ["r'\bpatriarcado\b'"],
+      "regexpValue": ["\\bpatriarcado\\b"],
       "msgToCheck": [],
       "randomMaxValue": 3,
       "path": ["/gifs/patriarcado.mp4"],
@@ -220,7 +220,7 @@
     {
       "id": "choca",
       "type": "gif",
-      "regexpValue": ["r'\bchoca\b'"],
+      "regexpValue": ["\\bchoca\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/gifs/choca.mp4"],
@@ -233,7 +233,7 @@
     {
       "id": "bro",
       "type": "gif",
-      "regexpValue": ["r'\bbro\b'"],
+      "regexpValue": ["\\bbro\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/gifs/cat_bro.mp4"],
@@ -265,7 +265,7 @@
     {
       "id": "huehue",
       "type": "gif",
-      "regexpValue": ["r'\bhuehue[hue]+\b'"],
+      "regexpValue": ["\\bhuehue[hue]+\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/gifs/huehuehue.mp4",
@@ -280,7 +280,7 @@
     {
       "id": "yee",
       "type": "gif",
-      "regexpValue": ["r'\byee\b'"],
+      "regexpValue": ["\\byee\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/gifs/yee.mp4"],
@@ -293,7 +293,7 @@
     {
       "id": "strike",
       "type": "gif",
-      "regexpValue": ["r'\bstrike\b'", "r'\breport\b'"],
+      "regexpValue": ["\\bstrike\\b", "\\breport\\b"],
       "msgToCheck": [],
       "randomMaxValue": 2,
       "path": ["/gifs/strike.mp4"],
@@ -306,7 +306,7 @@
     {
       "id": "salud",
       "type": "text",
-      "regexpValue": ["r'\bsalud\b'"],
+      "regexpValue": ["\\bsalud\\b"],
       "msgToCheck": [],
       "randomMaxValue": 3,
       "path": ["El dedo en el culo es la salud y el bienestar"],
@@ -319,7 +319,7 @@
     {
       "id": "kelePuto",
       "type": "text",
-      "regexpValue": ["r'\bkele puto\b'"],
+      "regexpValue": ["\\bkele puto\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/keleputo"],
@@ -332,7 +332,7 @@
     {
       "id": "sum41",
       "type": "text",
-      "regexpValue": ["r'\bsum41\b'", "r'\bsum 41\b'"],
+      "regexpValue": ["\\bsum41\\b", "\\bsum 41\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["100% confirmados para el Download"],
@@ -345,7 +345,7 @@
     {
       "id": "zyzz",
       "type": "text",
-      "regexpValue": ["r'\bzyzz\b'"],
+      "regexpValue": ["\\bzyzz\\b"],
       "msgToCheck": [],
       "randomMaxValue": 3,
       "path": ["/zetayzetazeta"],
@@ -358,7 +358,7 @@
     {
       "id": "txumino",
       "type": "text",
-      "regexpValue": ["r'\btxumino\b'"],
+      "regexpValue": ["\\btxumino\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/txumino"],
@@ -371,7 +371,7 @@
     {
       "id": "kulevraTirano",
       "type": "img",
-      "regexpValue": ["r'\btxumino\b'"],
+      "regexpValue": ["\\btxumino\\b"],
       "msgToCheck": [{
         "text": "kulevra tirano",
         "type": "in"
@@ -390,7 +390,7 @@
     {
       "id": "secta",
       "type": "img",
-      "regexpValue": ["r'\bsecta\b'"],
+      "regexpValue": ["\\bsecta\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/imgs/secta.jpg",
@@ -405,7 +405,7 @@
     {
       "id": "secta",
       "type": "img",
-      "regexpValue": ["r'\bsecta\b'"],
+      "regexpValue": ["\\bsecta\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/imgs/secta.jpg",
@@ -420,7 +420,7 @@
     {
       "id": "nazi",
       "type": "img",
-      "regexpValue": ["r'\bnazi\b'"],
+      "regexpValue": ["\\bnazi\\b"],
       "msgToCheck": [],
       "randomMaxValue": 3,
       "path": ["/imgs/nazi.jpg"],
@@ -433,7 +433,7 @@
     {
       "id": "prog",
       "type": "sticker",
-      "regexpValue": ["r'\bprog\b'"],
+      "regexpValue": ["\\bprog\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/stickers/prog.webp"],
@@ -446,7 +446,7 @@
     {
       "id": "sendNudes",
       "type": "sticker",
-      "regexpValue": ["r'\bsend nudes\b'"],
+      "regexpValue": ["\\bsend nudes\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/stickers/sendnudes.webp"],
@@ -459,7 +459,7 @@
     {
       "id": "ficha",
       "type": "sticker",
-      "regexpValue": ["r'\bficha\b'"],
+      "regexpValue": ["\\bficha\\b"],
       "msgToCheck": [],
       "randomMaxValue": 8,
       "path": ["/stickers/ficha.webp"],
@@ -472,7 +472,7 @@
     {
       "id": "bombona",
       "type": "sticker",
-      "regexpValue": ["r'\bbutanero\b'"],
+      "regexpValue": ["\\bbutanero\\b"],
       "msgToCheck": [{
         "text": "bombona",
         "type": "in"
@@ -488,7 +488,7 @@
     {
       "id": "kylo",
       "type": "sticker",
-      "regexpValue": ["r'\bkylo\b'"],
+      "regexpValue": ["\\bkylo\\b"],
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/stickers/kylo.webp"],
@@ -501,7 +501,7 @@
     {
       "id": "costra",
       "type": "sticker",
-      "regexpValue": ["r'\bkostra\b'", "r'\bcostra\b'"],
+      "regexpValue": ["\\bkostra\\b", "\\bcostra\\b"],
       "msgToCheck": [],
       "randomMaxValue": 4,
       "path": ["/stickers/costra.webp"],
@@ -514,7 +514,7 @@
     {
       "id": "huevo",
       "type": "sticker",
-      "regexpValue": ["r'\bhuevo\b'", "r'\bhuevos\b'"],
+      "regexpValue": ["\\bhuevo\\b", "\\bhuevos\\b"],
       "msgToCheck": [],
       "randomMaxValue": 15,
       "path": ["/stickers/huevo.webp"],
@@ -525,9 +525,9 @@
       "isReply": false
     },
     {
-      "id": "huevo",
+      "id": "lp",
       "type": "sticker",
-      "regexpValue": ["r'\blp\b'", "r'\blinkin park\b'"],
+      "regexpValue": ["\\blp\\b", "\\blinkin park\\b"],
       "msgToCheck": [],
       "randomMaxValue": 7,
       "path": ["/stickers/lp.webp"],
