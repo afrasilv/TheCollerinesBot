@@ -67,6 +67,25 @@
       "isReply": false
     },
     {
+      "id": "galletitas",
+      "type": "gif",
+      "regexpValue": [],
+      "msgToCheck": [{
+        "text": "bukkake",
+        "type": "in"
+      }, {
+        "text": "galletitas",
+        "type": "in"
+      }],
+      "randomMaxValue": 0,
+      "path": ["/gifs/perro.mp4"],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 0,
+      "kindTime": "min",
+      "notIn": [],
+      "isReply": false
+    },
+    {
       "id": "pffff",
       "type": "gif",
       "regexpValue": ["\\bpfff[f]+\\b"],

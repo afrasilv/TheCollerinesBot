@@ -535,10 +535,10 @@ def sendMsg(bot, update, text, isReply):
 def sendSticker(bot, update, pathSticker, isReply):
     if isReply:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            dataPath + pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
+            pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
     else:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            dataPath + pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
+            pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
 
 
 def sendData(bot, update, object):
