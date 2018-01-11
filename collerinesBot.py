@@ -562,6 +562,24 @@ def getPath(arrayData):
     index=getRandomByValue(len(arrayData) - 1)
     return arrayData[index]
 
+def checkIfSendData(bot, update, object):
+    if len(object["lastTimeSentIt"]) not 0:
+        lastTimeSentIt = datetime.strptime(object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
+        now=datetime.now()
+        if now.date() > lastPoleEstonia.date():
+            if object["randomMaxValue"] not 0:
+                randomValue=getRandomByValue(object["randomMaxValue"])
+                if randomValue <= 1:
+                    sendData(bot, update, object)
+                    return True
+            elif:
+                sendData(bot, update, object)
+                return True
+    elif:
+        sendData(bot, update, object)
+        return True
+    return False
+
 def echo(bot, update):
     global canTalk
     global firstMsg
@@ -622,6 +640,30 @@ def echo(bot, update):
                 msg=msg.replace(
                     msgSplit[0] + " " + msgSplit[1] + " ", "")
                 rememberJobs(bot, update, msg)
+
+            foundKey = false
+            indexArray = 0
+            for i in len(botDict["keywords"]):
+                if len(botDict["keywords"][i]["regexpValue"]) > 0:
+                    while indexArray < len(botDict["keywords"][i]["regexpValue"]) and msgSent not True:
+                        if re.search(botDict["keywords"][i]["regexpValue"][indexArray], update.message.text.lower()):
+                            if checkIfSendData(bot, update, botDict["keywords"][i]):
+                                botDict["keywords"][i]["lastTimeSentIt"] = now.isoformat()
+                            foundKey = True
+                        indexArray += 1
+                indexArray = 0
+                if len(botDict["keywords"][i]["msgToCheck"]) > 0:
+                    while indexArray < len(botDict["keywords"][i]["msgToCheck"]) and msgSent not True:
+                        if botDict["keywords"][i]["msgToCheck"][indexArray]["type"] == "in":
+                            if botDict["keywords"][i]["msgToCheck"][indexArray]["text"] in update.message.text.lower():
+                                if checkIfSendData(bot, update, botDict["keywords"][i]):
+                                    botDict["keywords"][i]["lastTimeSentIt"] = now.isoformat()
+                                foundKey = True
+                        elif botDict["keywords"][i]["msgToCheck"][indexArray]["text"] == update.message.text:
+                            if checkIfSendData(bot, update, botDict["keywords"][i]):
+                                botDict["keywords"][i]["lastTimeSentIt"] = now.isoformat()
+                            foundKey = True
+                        indexArray += 1
 
             # voice
             elif re.search(r'\bvalencia\b', update.message.text.lower()):
