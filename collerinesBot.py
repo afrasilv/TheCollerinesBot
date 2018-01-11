@@ -663,6 +663,10 @@ def echo(bot, update):
             msgSplit = msg.split(" ")
             msg = msg.replace(
                 msgSplit[0] + " " + msgSplit[1] + " ", "")
+            for i in range(len(update.message.entities)):
+                if update.message.entities[i].type == 'url':
+                    url = update.message.text[int(update.message.entities[i]["offset"]):int(int(update.message.entities[i]["offset"])+int(update.message.entities[i]["length"]))]
+                    msg= msg.replace(url.lower(), url)
             rememberJobs(bot, update, msg)
 
         if godMode and canTalk:
