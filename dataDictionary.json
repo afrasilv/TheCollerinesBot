@@ -556,5 +556,16 @@
       "notIn": [],
       "isReply": false
     }
-  ]
+  ],
+  "randomMsg": ["ok", "geniaaaaaal", "fataaaaaal", "/geniaaaaaal", "/fataaaaaal", "Myrath macho", "/jajj", "/jjaj", "/yee", "A topeth!"],
+  "audios" : {
+    "yordPath" : ["/voices/yord.ogg"]
+  },
+  "stickers" : {
+    "mimimimiStickerPath": ["/stickers/mimimi.webp",
+      "/stickers/mimimi1.webp", "/stickers/mimimi2.webp"
+    ],
+    "dinofaurioPath": ["/stickers/alef.webp"],
+    "approvalStickerPath" : ["/stickers/approval.webp"]
+  }
 }
