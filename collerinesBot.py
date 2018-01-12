@@ -30,18 +30,6 @@ logger = logging.getLogger(__name__)
 
 dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
 
-randomMsg = ['qué pasa, jamboide', 'no seas bobo', 'basta', 'no te rayes', 'no te agobies', 'vale', 'qué dices, prim',
-             'ok', 'geniaaaaaal', 'fataaaaaal', '/geniaaaaaal', '/fataaaaaal', 'Myrath macho', '/jajj', '/jjaj', '/yee', "A topeth!"]
-random4GodMsg = ['dime', 'basta', 'déjame',
-                 'ahora no', 'ZzZzzzZzz', '¿qué te pasa?']
-mimimimiStickerPath = ['/stickers/mimimi.webp',
-                       '/stickers/mimimi1.webp', '/stickers/mimimi2.webp']
-m3AudiosPath = ['/voices/m3Javi.ogg',
-                '/voices/m3Javig.ogg', '/voices/m3Feli.ogg']
-huehuehuePath = ['/gifs/huehuehue.mp4',
-                 '/gifs/huehuehue1.mp4']
-sectaImgPath = ['/imgs/secta.jpg',
-                '/imgs/secta1.jpg']
 lastPoleEstonia = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
@@ -302,10 +290,10 @@ def getRandomByValue(value):
 
 def randomResponse(update, bot):
     randomValue = getRandomByValue(1400)
-    if randomValue < 15 and randomValue > 11:
+    if randomValue < 13 and randomValue > 11:
         bot.send_voice(chat_id=update.message.chat_id, voice=open(
             os.path.join(os.path.dirname(__file__)) +
-            '/data' + '/voices/yord.ogg', 'rb'))
+            '/data' + botDictbotDict["audios"]["yordPath"][0], 'rb'))
     elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
@@ -325,23 +313,23 @@ def randomResponse(update, bot):
                 update.message.text, reply_to_message_id=update.message.message_id)
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
                 os.path.join(os.path.dirname(__file__)) +
-                '/data' + '/stickers/alef.webp', 'rb'))
+                '/data' + botDictbotDict["stickers"]["dinofaurioPath"][0], 'rb'))
     elif randomValue == 10:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
             os.path.join(os.path.dirname(__file__)) +
-            '/data' + '/stickers/approval.webp', 'rb'), reply_to_message_id=update.message.message_id)
+            '/data' + botDictbotDict["stickers"]["approvalStickerPath"][0], 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue <= 9 and randomValue >= 3:
-        randomMsgIndex = getRandomByValue(len(randomMsg) - 1)
+        randomMsgIndex = getRandomByValue(len(botDict["randomMsg"]) - 1)
         update.message.reply_text(
-            randomMsg[randomMsgIndex], reply_to_message_id=update.message.message_id)
+            botDict["randomMsg"][randomMsgIndex], reply_to_message_id=update.message.message_id)
     elif randomValue < 2:
         update.message.text = unidecode(update.message.text)
         update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
         update.message.reply_text(
             update.message.text, reply_to_message_id=update.message.message_id)
-        randomMsgIndex = getRandomByValue(len(mimimimiStickerPath) - 1)
+        randomMsgIndex = getRandomByValue(len(botDictbotDict["stickers"]["mimimimiStickerPath"]) - 1)
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            dataPath + mimimimiStickerPath[randomMsgIndex], 'rb'))
+            dataPath + botDict["stickers"]["mimimimiStickerPath"][randomMsgIndex], 'rb'))
 
 
 def isAdmin(bot, update):
@@ -468,6 +456,20 @@ def addToSpotifyPlaylist(results, update):
         settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
 
 
+def recommendAGroup(bot, update):
+    scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
+    token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
+                                       ["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
+    sp = spotipy.Spotify(auth=token)
+    results = sp.user_playlist(
+        settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"])
+    #results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
+    playlistData = json.dumps(results)
+    playlistData = json.loads(playlistData)
+    index = getRandomByValue(len(playListData["tracks"]) -1)
+    sendMsg(bot, update, "Ahí te va " + playListData["tracks"][index], True)
+
+
 def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text(
         'ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
@@ -538,7 +540,7 @@ def sendSticker(bot, update, pathSticker, isReply):
             pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
     else:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
+            pathSticker, 'rb'))
 
 
 def sendData(bot, update, object):
@@ -713,6 +715,8 @@ def echo(bot, update):
                     else:
                         connectToSpotifyAndCheckAPI(
                             update, videoTitle, [], None)
+                elif "miguelito recomienda" in update.message.text.lower():
+                    recommendAGroup(bot, update)
 
                 elif re.search(r'\bpole estonia\b', update.message.text.lower()):
                     global lastPoleEstonia
@@ -724,6 +728,10 @@ def echo(bot, update):
                         lastPoleEstonia = now
                 elif "estoniarank" in update.message.text.lower():
                     gimmeTheRank(update)
+
+                elif "random" in update.message.text.lower():
+                    indexRandom = getRandomByValue(len(botDict["keywords"]))
+                    sendData(bot, update, botDict["keywords"][indexRandom])
 
                 elif len(update.message.text) > 7:  # mimimimimimi
                     randomResponse(update, bot)
