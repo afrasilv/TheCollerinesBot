@@ -327,7 +327,8 @@ def randomResponse(update, bot):
         update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
         update.message.reply_text(
             update.message.text, reply_to_message_id=update.message.message_id)
-        randomMsgIndex = getRandomByValue(len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
+        randomMsgIndex = getRandomByValue(
+            len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
             dataPath + botDict["stickers"]["mimimimiStickerPath"][randomMsgIndex], 'rb'))
 
@@ -426,13 +427,13 @@ def gimmeTheRank(update):
 def callSpotifyApi(videoTitle, videoTags, video, sp, update):
     try:
         results = sp.search(q=videoTitle, limit=1)
-        if results['tracks']['total'] == 0:
+        if int(results['tracks']['total']) == 0:
             results = sp.search(q=videoTags, limit=1)
-        if results['tracks']['total'] == 0 and video != None:
+        if int(results['tracks']['total']) == 0 and video != None:
             videoTags = ""
             videoTags = gimmeTags(video, videoTags, 2)
             results = sp.search(q=videoTags, limit=1)
-        if results['tracks']['total'] == 0 and video != None:
+        if int(results['tracks']['total']) == 0 and video != None:
             videoTags = ""
             videoTags = gimmeTags(video, videoTags, 1)
             results = sp.search(q=videoTags, limit=1)
@@ -449,6 +450,7 @@ def addToSpotifyPlaylist(results, update):
         idsToAdd.insert(0, results['tracks']['items'][j]['id'])
 
     callSpotifyApiToAddSong(idsToAdd)
+
 
 def callSpotifyApiToAddSong(idsToAdd):
     scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
@@ -471,9 +473,10 @@ def recommendAGroup(bot, update):
     playlistData = json.dumps(results)
     playlistData = json.loads(playlistData)
     if len(playlistData["items"]) > 0:
-        index = getRandomByValue(len(playlistData["items"]) -1)
+        index = getRandomByValue(len(playlistData["items"]) - 1)
         track = playlistData["items"][index]["track"]
-        sendMsg(bot, update, "Ahí te va " + track["external_urls"]["spotify"], True)
+        sendMsg(bot, update, "Ahí te va " +
+                track["external_urls"]["spotify"], True)
     else:
         sendMsg(bot, update, "BOOM, me salí de la lista :/", True)
 
@@ -504,8 +507,10 @@ def connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video):
 
     if results == None or (results['tracks']['total'] != None and results['tracks']['total'] == 0):
         saveDataSong(update, None)
+        return False
     else:
         addToSpotifyPlaylist(results, update)
+        return True
 
 
 def censorYoutubeVideo(videoTitle):
@@ -602,6 +607,7 @@ def addTime(now, object):
     else:
         return ""
 
+
 def loadDictionary(bot, update):
     global botDict
     try:
@@ -613,6 +619,59 @@ def loadDictionary(bot, update):
         botDict = botDict["data"]
     except IOError:
         botDict = {}
+
+def youtubeLink(bot, update):
+    try:
+        videoid = ""
+        if 'youtu.be' not in update.message.text.lower():
+            videoid = update.message.text.split('v=')
+            videoid = videoid[1].split(' ')[0]
+            videoid = videoid.split('&')[0]
+        else:
+            videoid = update.message.text.split('youtu.be/')
+            videoid = videoid[1].split(' ')[0]
+            videoid = videoid.split('&')[0]
+        youtube = YoutubeAPI(
+            {'key': settings["main"]["youtubeapikey"]})
+        video = youtube.get_video_info(videoid)
+        videoTitle = video['snippet']['title'].lower()
+        videoTitle = replaceYouTubeVideoName(videoTitle)
+
+        if censorYoutubeVideo(videoTitle):
+            update.message.reply_text(
+                '...', reply_to_message_id=update.message.message_id)
+        else:
+            videoTags = ""
+            tagsIndex = 0
+            videoTags = gimmeTags(video, videoTags, 3)
+            if videoTitle != None and videoTags != None:
+                return connectToSpotifyAndCheckAPI(
+                    update, videoTitle, videoTags, video)
+            else:
+                saveDataSong(update, None)
+    except:
+        saveDataSong(update, None)
+    return False
+
+def spotifyLink(bot, update):
+    try:
+        trackid = update.message.text.split("track/")
+        trackid = trackid[1].split(" ")
+        if "?" in trackid:
+            trackid = trackid[1].split("?")
+        trackid = trackid[0]
+        callSpotifyApiToAddSong([trackid])
+        return True
+    except:
+        saveDataSong(update, None)
+    return False
+
+def checkYoutubeSpotifyLinks(bot, update):
+    for i in range(len(update.message.entities)):
+        if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
+            return youtubeLink(bot, update)
+        elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
+            return spotifyLink(bot, update)
 
 def echo(bot, update):
     global canTalk
@@ -630,48 +689,8 @@ def echo(bot, update):
         elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
             godMode = True
 
-        for i in range(len(update.message.entities)):
-            if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
-                try:
-                    videoid = ""
-                    if 'youtu.be' not in update.message.text.lower():
-                        videoid = update.message.text.split('v=')
-                        videoid = videoid[1].split(' ')[0]
-                        videoid = videoid.split('&')[0]
-                    else:
-                        videoid = update.message.text.split('youtu.be/')
-                        videoid = videoid[1].split(' ')[0]
-                        videoid = videoid.split('&')[0]
-                    youtube = YoutubeAPI(
-                        {'key': settings["main"]["youtubeapikey"]})
-                    video = youtube.get_video_info(videoid)
-                    videoTitle = video['snippet']['title'].lower()
-                    videoTitle = replaceYouTubeVideoName(videoTitle)
-
-                    if censorYoutubeVideo(videoTitle):
-                        update.message.reply_text(
-                            '...', reply_to_message_id=update.message.message_id)
-                    else:
-                        videoTags = ""
-                        tagsIndex = 0
-                        videoTags = gimmeTags(video, videoTags, 3)
-                        if videoTitle != None and videoTags != None:
-                            connectToSpotifyAndCheckAPI(
-                                update, videoTitle, videoTags, video)
-                        else:
-                            saveDataSong(update, None)
-                except:
-                    saveDataSong(update, None)
-            elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
-                try:
-                    trackid = update.message.text.split("track/")
-                    trackid = trackid[1].split(" ")
-                    if "?" in trackid:
-                        trackid = trackid[1].split("?")
-                    trackid = trackid[0]
-                    callSpotifyApiToAddSong([trackid])
-                except:
-                    saveDataSong(update, None)
+        wasAdded = False
+        wasAdded = checkYoutubeSpotifyLinks(bot, update)
 
         # startJobs
         if firstMsg:
@@ -686,9 +705,42 @@ def echo(bot, update):
                 msgSplit[0] + " " + msgSplit[1] + " ", "")
             for i in range(len(update.message.entities)):
                 if update.message.entities[i].type == 'url':
-                    url = update.message.text[int(update.message.entities[i]["offset"]):int(int(update.message.entities[i]["offset"])+int(update.message.entities[i]["length"]))]
-                    msg= msg.replace(url.lower(), url)
+                    url = update.message.text[int(update.message.entities[i]["offset"]):int(int(
+                        update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
+                    msg = msg.replace(url.lower(), url)
             rememberJobs(bot, update, msg)
+
+        elif "miguelito dame la lista" in update.message.text.lower():
+            gimmeTheSpotifyPlaylistLink(bot, update)
+        elif "miguelito añade" in update.message.text.lower() and wasAdded is not True:
+            hasUrl = False
+            videoTitle = update.message.text.lower().replace("miguelito añade ", "")
+            for i in range(len(update.message.entities)):
+                if update.message.entities[i].type == 'url':
+                    hasUrl = True
+
+            if hasUrl == False:
+                if censorYoutubeVideo(videoTitle):
+                    update.message.reply_text(
+                        'No. :)', reply_to_message_id=update.message.message_id)
+                else:
+                    connectToSpotifyAndCheckAPI(
+                        update, videoTitle, [], None)
+            else:
+                checkYoutubeSpotifyLinks(bot, update)
+        elif "miguelito recomienda" in update.message.text.lower():
+            recommendAGroup(bot, update)
+
+        elif re.search(r'\bpole estonia\b', update.message.text.lower()):
+            global lastPoleEstonia
+            now = datetime.now()
+            if now.date() != lastPoleEstonia.date() and now.hour >= 23:
+                update.message.reply_text(
+                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
+                savePoleStats(update)
+                lastPoleEstonia = now
+        elif "estoniarank" in update.message.text.lower():
+            gimmeTheRank(update)
 
         if godMode and canTalk:
             foundKey = False
@@ -698,7 +750,8 @@ def echo(bot, update):
             while dictionaryIndex < len(botDict["keywords"]) and foundKey is not True:
                 if len(botDict["keywords"][dictionaryIndex]["regexpValue"]) > 0:
                     while indexArray < len(botDict["keywords"][dictionaryIndex]["regexpValue"]) and foundKey is not True:
-                        regexr = re.compile(botDict["keywords"][dictionaryIndex]["regexpValue"][indexArray])
+                        regexr = re.compile(
+                            botDict["keywords"][dictionaryIndex]["regexpValue"][indexArray])
                         if regexr.search(update.message.text.lower()):
                             if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
                                 botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
@@ -723,32 +776,7 @@ def echo(bot, update):
                 dictionaryIndex += 1
 
             if foundKey is not True:
-                if "miguelito dame la lista" in update.message.text.lower():
-                    gimmeTheSpotifyPlaylistLink(bot, update)
-                elif "miguelito añade" in update.message.text.lower():
-                    videoTitle = update.message.text.lower().replace("miguelito añade ", "")
-
-                    if censorYoutubeVideo(videoTitle):
-                        update.message.reply_text(
-                            'No. :)', reply_to_message_id=update.message.message_id)
-                    else:
-                        connectToSpotifyAndCheckAPI(
-                            update, videoTitle, [], None)
-                elif "miguelito recomienda" in update.message.text.lower():
-                    recommendAGroup(bot, update)
-
-                elif re.search(r'\bpole estonia\b', update.message.text.lower()):
-                    global lastPoleEstonia
-                    now = datetime.now()
-                    if now.date() != lastPoleEstonia.date() and now.hour >= 23:
-                        update.message.reply_text(
-                            'El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
-                        savePoleStats(update)
-                        lastPoleEstonia = now
-                elif "estoniarank" in update.message.text.lower():
-                    gimmeTheRank(update)
-
-                elif "random" in update.message.text.lower():
+                if "random" in update.message.text.lower():
                     indexRandom = getRandomByValue(len(botDict["keywords"]))
                     sendData(bot, update, botDict["keywords"][indexRandom])
 
