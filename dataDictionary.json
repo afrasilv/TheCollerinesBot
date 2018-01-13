@@ -96,7 +96,7 @@
       "randomMaxValue": 7,
       "path": ["/gifs/pffff.mp4"],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 10,
       "kindTime": "min",
       "notIn": [],
       "isReply": false
@@ -369,7 +369,7 @@
       "randomMaxValue": 3,
       "path": ["/zetayzetazeta"],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 3,
       "kindTime": "min",
       "notIn": [],
       "isReply": false
@@ -411,27 +411,12 @@
       "type": "img",
       "regexpValue": ["\\bsecta\\b"],
       "msgToCheck": [],
-      "randomMaxValue": 0,
+      "randomMaxValue": 5,
       "path": ["/imgs/secta.jpg",
         "/imgs/secta1.jpg"
       ],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
-      "kindTime": "min",
-      "notIn": [],
-      "isReply": false
-    },
-    {
-      "id": "secta",
-      "type": "img",
-      "regexpValue": ["\\bsecta\\b"],
-      "msgToCheck": [],
-      "randomMaxValue": 0,
-      "path": ["/imgs/secta.jpg",
-        "/imgs/secta1.jpg"
-      ],
-      "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 1,
       "kindTime": "min",
       "notIn": [],
       "isReply": false
@@ -444,7 +429,7 @@
       "randomMaxValue": 3,
       "path": ["/imgs/nazi.jpg"],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 5,
       "kindTime": "min",
       "notIn": [],
       "isReply": false
@@ -512,7 +497,7 @@
       "randomMaxValue": 0,
       "path": ["/stickers/kylo.webp"],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 2,
       "kindTime": "min",
       "notIn": [],
       "isReply": false
@@ -525,7 +510,7 @@
       "randomMaxValue": 4,
       "path": ["/stickers/costra.webp"],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 5,
       "kindTime": "min",
       "notIn": [],
       "isReply": false

@@ -461,13 +461,18 @@ def recommendAGroup(bot, update):
     token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
                                        ["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
     sp = spotipy.Spotify(auth=token)
-    results = sp.user_playlist(
-        settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"])
-    #results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
+    offsetPlaylist = getRandomByValue(1100)
+    # user_playlist_tracks(user, playlist_id=None, fields=None, limit=100, offset=0, market=None)
+    results = sp.user_playlist_tracks(
+        settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], None, 1, offsetPlaylist)
     playlistData = json.dumps(results)
     playlistData = json.loads(playlistData)
-    index = getRandomByValue(len(playListData["tracks"]) -1)
-    sendMsg(bot, update, "Ahí te va " + playListData["tracks"][index], True)
+    if len(playlistData["items"]) > 0:
+        index = getRandomByValue(len(playlistData["items"]) -1)
+        track = playlistData["items"][index]["track"]
+        sendMsg(bot, update, "Ahí te va " + track["external_urls"]["spotify"], True)
+    else:
+        sendMsg(bot, update, "BOOM, me salí de la lista :/", True)
 
 
 def gimmeTheSpotifyPlaylistLink(bot, update):
