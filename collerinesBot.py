@@ -293,7 +293,7 @@ def randomResponse(update, bot):
     if randomValue < 13 and randomValue > 11:
         bot.send_voice(chat_id=update.message.chat_id, voice=open(
             os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDictbotDict["audios"]["yordPath"][0], 'rb'))
+            '/data' + botDict["audios"]["yordPath"][0], 'rb'))
     elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
@@ -313,11 +313,11 @@ def randomResponse(update, bot):
                 update.message.text, reply_to_message_id=update.message.message_id)
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
                 os.path.join(os.path.dirname(__file__)) +
-                '/data' + botDictbotDict["stickers"]["dinofaurioPath"][0], 'rb'))
+                '/data' + botDict["stickers"]["dinofaurioPath"][0], 'rb'))
     elif randomValue == 10:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
             os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDictbotDict["stickers"]["approvalStickerPath"][0], 'rb'), reply_to_message_id=update.message.message_id)
+            '/data' + botDict["stickers"]["approvalStickerPath"][0], 'rb'), reply_to_message_id=update.message.message_id)
     elif randomValue <= 9 and randomValue >= 3:
         randomMsgIndex = getRandomByValue(len(botDict["randomMsg"]) - 1)
         update.message.reply_text(
@@ -327,7 +327,7 @@ def randomResponse(update, bot):
         update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
         update.message.reply_text(
             update.message.text, reply_to_message_id=update.message.message_id)
-        randomMsgIndex = getRandomByValue(len(botDictbotDict["stickers"]["mimimimiStickerPath"]) - 1)
+        randomMsgIndex = getRandomByValue(len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
             dataPath + botDict["stickers"]["mimimimiStickerPath"][randomMsgIndex], 'rb'))
 
@@ -448,6 +448,9 @@ def addToSpotifyPlaylist(results, update):
     for j in range(len(results['tracks']['items'])):
         idsToAdd.insert(0, results['tracks']['items'][j]['id'])
 
+    callSpotifyApiToAddSong(idsToAdd)
+
+def callSpotifyApiToAddSong(idsToAdd):
     scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
     token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
                                        ["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
@@ -464,7 +467,7 @@ def recommendAGroup(bot, update):
     offsetPlaylist = getRandomByValue(1100)
     # user_playlist_tracks(user, playlist_id=None, fields=None, limit=100, offset=0, market=None)
     results = sp.user_playlist_tracks(
-        settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], None, 1, offsetPlaylist)
+        settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], None, 100, offsetPlaylist)
     playlistData = json.dumps(results)
     playlistData = json.loads(playlistData)
     if len(playlistData["items"]) > 0:
@@ -488,6 +491,7 @@ def replaceYouTubeVideoName(videoTitle):
     videoTitle = videoTitle.lower().replace("videoclip oficiai", "")
     videoTitle = videoTitle.lower().replace("video clip oficiai", "")
     videoTitle = videoTitle.lower().replace("videoclip", "")
+    videoTitle = videoTitle.lower().replace("\"", "")
     return videoTitle
 
 
@@ -656,6 +660,16 @@ def echo(bot, update):
                                 update, videoTitle, videoTags, video)
                         else:
                             saveDataSong(update, None)
+                except:
+                    saveDataSong(update, None)
+            elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
+                try:
+                    trackid = update.message.text.split("track/")
+                    trackid = trackid[1].split(" ")
+                    if "?" in trackid:
+                        trackid = trackid[1].split("?")
+                    trackid = trackid[0]
+                    callSpotifyApiToAddSong([trackid])
                 except:
                     saveDataSong(update, None)
 
