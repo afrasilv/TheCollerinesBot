@@ -589,12 +589,18 @@ def checkIfSendData(bot, update, object):
                 randomValue = getRandomByValue(object["randomMaxValue"])
                 if randomValue <= 1:
                     sendData(bot, update, object)
+                    if object["doubleMsg"] is True:
+                        sendData(bot, update, object["doubleObj"])
                     return True
             else:
                 sendData(bot, update, object)
+                if object["doubleMsg"] is True:
+                    sendData(bot, update, object["doubleObj"])
                 return True
     else:
         sendData(bot, update, object)
+        if object["doubleMsg"] is True:
+            sendData(bot, update, object["doubleObj"])
         return True
     return False
 
@@ -779,6 +785,8 @@ def echo(bot, update):
                 if "random" in update.message.text.lower():
                     indexRandom = getRandomByValue(len(botDict["keywords"]))
                     sendData(bot, update, botDict["keywords"][indexRandom])
+                    if botDict["keywords"][indexRandom]["doubleMsg"] is True:
+                        sendData(bot, update, object["doubleObj"])
 
                 elif len(update.message.text) > 7:  # mimimimimimi
                     randomResponse(update, bot)

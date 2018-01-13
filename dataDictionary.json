@@ -5,10 +5,12 @@
       "regexpValue": ["\\bvalencia\\b"],
       "msgToCheck": [],
       "randomMaxValue": 4,
-      "path": ["/voices/teamvalencia.ogg"],
+      "path": ["/voices/teamvalencia.ogg", "/voices/musti_valencia.ogg"],
       "lastTimeSentIt": "",
       "timeToIncrement": 2,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -19,11 +21,13 @@
       "msgToCheck": [],
       "randomMaxValue": 0,
       "path": ["/voices/m3Javi.ogg",
-        "/voices/m3Javig.ogg", "/voices/m3Feli.ogg"
+        "/voices/m3Javig.ogg", "/voices/m3Feli.ogg", "/voices/m3Pilarica.ogg"
       ],
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -37,6 +41,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 2,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -50,6 +56,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 1,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -63,6 +71,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -82,6 +92,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -98,6 +110,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 10,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -114,6 +128,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -133,6 +149,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -149,6 +167,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -165,6 +185,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -178,6 +200,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -194,6 +218,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -207,6 +233,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -220,6 +248,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -233,6 +263,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -246,6 +278,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -259,6 +293,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -278,6 +314,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -293,6 +331,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -306,6 +346,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": ["/yee"],
       "isReply": false
     },
@@ -319,6 +361,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -332,6 +376,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 2,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -345,6 +391,12 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": true,
+      "doubleObj": {
+          "type": "voice",
+          "path": ["/voices/keleputo.ogg"],
+          "isReply": false
+        },
       "notIn": [],
       "isReply": false
     },
@@ -358,6 +410,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -371,6 +425,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 3,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -384,6 +440,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": ["/txumino"],
       "isReply": false
     },
@@ -403,6 +461,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -418,6 +478,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 1,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -431,6 +493,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 5,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -444,6 +508,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -457,6 +523,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -470,6 +538,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 2,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -486,6 +556,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 0,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -499,6 +571,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 2,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -512,6 +586,8 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 5,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -521,10 +597,12 @@
       "regexpValue": ["\\bhuevo\\b", "\\bhuevos\\b"],
       "msgToCheck": [],
       "randomMaxValue": 15,
-      "path": ["/stickers/huevo.webp"],
+      "path": ["/stickers/huevo.webp", "/stickers/huevo1.webp", "/stickers/huevo2.webp"],
       "lastTimeSentIt": "",
       "timeToIncrement": 5,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     },
@@ -538,19 +616,66 @@
       "lastTimeSentIt": "",
       "timeToIncrement": 5,
       "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
+      "notIn": [],
+      "isReply": false
+    },
+    {
+      "id": "basura",
+      "type": "voice",
+      "regexpValue": ["\\bbasura\\b"],
+      "msgToCheck": [],
+      "randomMaxValue": 3,
+      "path": ["/voices/alan_basura.ogg"],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 2,
+      "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
+      "notIn": [],
+      "isReply": false
+    },
+    {
+      "id": "chustas",
+      "type": "voice",
+      "regexpValue": ["\\bchusta\\b"],
+      "msgToCheck": [],
+      "randomMaxValue": 3,
+      "path": ["/voices/fumachustas.ogg"],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 3,
+      "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
+      "notIn": [],
+      "isReply": false
+    },
+    {
+      "id": "teQuiero",
+      "type": "voice",
+      "regexpValue": ["\\bte quiero\\b"],
+      "msgToCheck": [],
+      "randomMaxValue": 2,
+      "path": ["/voices/ferran_tequiero.ogg"],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 2,
+      "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
       "notIn": [],
       "isReply": false
     }
   ],
   "randomMsg": ["ok", "geniaaaaaal", "fataaaaaal", "/geniaaaaaal", "/fataaaaaal", "Myrath macho", "/jajj", "/jjaj", "/yee", "A topeth!", "Kvelertak:\nY es que yo sin ti\nCollera:\nY tu sin mi\nDime quien puede ser feliz\nFranchu:\nESTO NO ME GUSTA\nÑordis:\nETO NO ME GUTAAAAA", "¿Estáis todos bien?"],
-  "audios" : {
-    "yordPath" : ["/voices/yord.ogg"]
+  "audios": {
+    "yordPath": ["/voices/yord.ogg"]
   },
-  "stickers" : {
+  "stickers": {
     "mimimimiStickerPath": ["/stickers/mimimi.webp",
       "/stickers/mimimi1.webp", "/stickers/mimimi2.webp"
     ],
     "dinofaurioPath": ["/stickers/alef.webp"],
-    "approvalStickerPath" : ["/stickers/approval.webp"]
+    "approvalStickerPath": ["/stickers/approval.webp"]
   }
 }
