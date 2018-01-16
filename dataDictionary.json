@@ -596,7 +596,7 @@
       "type": "sticker",
       "regexpValue": ["\\bhuevo\\b", "\\bhuevos\\b"],
       "msgToCheck": [],
-      "randomMaxValue": 15,
+      "randomMaxValue": 7,
       "path": ["/stickers/huevo.webp", "/stickers/huevo1.webp", "/stickers/huevo2.webp"],
       "lastTimeSentIt": "",
       "timeToIncrement": 5,
