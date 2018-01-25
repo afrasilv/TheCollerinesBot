@@ -80,7 +80,7 @@ def checkHourToRemember(msg, timeObject):
     # Check if hour
     msgArray = msg.split(" ")
     msgHourData = msgArray[0]
-    if (msgArray[0] == "a" and "la" in msgArray[1]):
+    if (msgArray[0] == "a" and ("la" in msgArray[1] or "las" in msgArray[1])):
         msgHourData = msgArray[2]
         msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "", 1)
     if ":" in msgHourData:
