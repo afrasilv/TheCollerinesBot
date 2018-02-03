@@ -21,6 +21,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.util as util
 from youtubeApi import YoutubeAPI
 from operator import itemgetter
+from telegram.ext.dispatcher import run_async
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -35,6 +36,7 @@ canTalk = True
 godMode = True
 firstMsg = True
 botDict = {}
+downloadData = None
 lastFileDownloadedCount = 0
 weekdayConstant = ['lunes', 'martes', 'miércoles',
                    'jueves', 'viernes', 'sábado', 'domingo']
@@ -293,7 +295,7 @@ def randomResponse(update, bot):
     if randomValue < 13 and randomValue > 11:
         bot.send_voice(chat_id=update.message.chat_id, voice=open(
             os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDict["audios"]["yordPath"][0], 'rb'))
+            '/data' + botDict["audios"][0], 'rb'))
     elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
@@ -342,12 +344,12 @@ def isAdmin(bot, update):
 
 def startJobs(bot, update):
     now = datetime.now() - timedelta(days=1)
-    now = now.replace(hour=19, minute=00)
+    now = now.replace(hour=getRandomByValue(24), minute=getRandomByValue(60))
     job_daily = j.run_daily(callback_andalucia, now.time(), days=(
         0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
-    now = now.replace(hour=2, minute=00)
-    job_daily = j.run_daily(callback_bye, now.time(), days=(
-        0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
+    # now = now.replace(hour=2, minute=00)
+    # job_daily = j.run_daily(callback_bye, now.time(), days=(
+    #     0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
     data = loadMemories()
     for item in data:
         j.run_once(callback_remember, dateutil.parser.parse(
@@ -617,7 +619,7 @@ def addTime(now, object):
 def loadDictionary(bot, update):
     global botDict
     try:
-        json_file = open('dataDictionary.json', 'r')
+        json_file = open('dataDictionary.json', encoding="utf-8")
         botDict = json.load(json_file)
         data = json.dumps(
             {'data': botDict})
@@ -625,6 +627,7 @@ def loadDictionary(bot, update):
         botDict = botDict["data"]
     except IOError:
         botDict = {}
+
 
 def youtubeLink(bot, update):
     try:
@@ -659,6 +662,7 @@ def youtubeLink(bot, update):
         saveDataSong(update, None)
     return False
 
+
 def spotifyLink(bot, update):
     try:
         trackid = update.message.text.split("track/")
@@ -672,6 +676,7 @@ def spotifyLink(bot, update):
         saveDataSong(update, None)
     return False
 
+
 def checkYoutubeSpotifyLinks(bot, update):
     for i in range(len(update.message.entities)):
         if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
@@ -679,11 +684,72 @@ def checkYoutubeSpotifyLinks(bot, update):
         elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
             return spotifyLink(bot, update)
 
+## miguelito mete text##hola__in#0##0#min###huehuehuehue
+def addDataToJson(text):
+    global downloadData
+    msg = replaceStr(text, "miguelito mete")
+    msgSplitted = msg.split("#")
+    msg = replaceStr(msg, msgSplitted[0])
+    if msgSplitted[0] == "random":
+        botDict['randomMsg'].append(msg)
+    elif msgSplitted[0] == "dinosaurio":
+        botDict['dinofaurioPath'].append(msg)
+    elif msgSplitted[0] == "mimimi":
+        botDict['mimimimiStickerPath'].append(msg)
+    else:
+        msgToCheck = []
+        for item in msgSplitted[2].split("--"):
+            print(item)
+            itemSplitted = item.split("__")
+            print(itemSplitted)
+            msgToCheck.append(
+                {"text": itemSplitted[0], "type": itemSplitted[1]})
+
+        downloadData = {
+            "type": msgSplitted[0],
+            "regexpValue": [msgSplitted[1].split("--")] if len(msgSplitted[1]) > 0 else [],
+            "msgToCheck": msgToCheck,
+            "randomMaxValue": int(msgSplitted[3]),
+            "lastTimeSentIt": msgSplitted[4],
+            "timeToIncrement": int(msgSplitted[5]),
+            "kindTime": msgSplitted[6],
+            "doubleMsg": bool(msgSplitted[7]),
+            "doubleObj": {},
+            "notIn": [msgSplitted[8].split("--")] if len(msgSplitted[1]) > 0 else [],
+            "isReply": False
+        }
+        if len(msgSplitted) > 10 and msgSplitted[10] == "true":
+            downloadData["doubleObj"] = {
+                "type": msgSplitted[11],
+                "path": [],
+                "isReply": false
+            }
+
+    if msgSplitted[0] == "text":
+        downloadData["path"] = msgSplitted[9].split("--")
+        botDict["keywords"].append(downloadData)
+
+    saveDictionary()
+
+
+def saveDictionary():
+    with open('dataDictionary.json', 'w') as outfile:
+        json.dump(botDict, outfile)
+
+
+@run_async
 def echo(bot, update):
     global canTalk
     global firstMsg
     global godMode
     global botDict
+    global downloadData
+
+    # if downloadData is not None and update.message.from_user.username == settings["main"]["fatherid"]:
+    # if downloadData.type == "voice"
+    #     file_id = message.voice.file_id
+    #     newFile = bot.get_file(file_id)
+    #     newFile.download('voice.ogg')
 
     if str(update.message.chat_id) == str(settings["main"]["groupid"]):
         if update.message.text != None and "miguelito para" == update.message.text.lower():
@@ -790,6 +856,9 @@ def echo(bot, update):
 
                 elif len(update.message.text) > 7:  # mimimimimimi
                     randomResponse(update, bot)
+
+        if "miguelito mete" in update.message.text.lower():
+            addDataToJson(update.message.text.lower())
 
 
 def error(bot, update, error):
