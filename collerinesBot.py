@@ -344,7 +344,7 @@ def isAdmin(bot, update):
 
 def startJobs(bot, update):
     now = datetime.now() - timedelta(days=1)
-    now = now.replace(hour=getRandomByValue(24), minute=getRandomByValue(60))
+    now = now.replace(hour=getRandomByValue(23), minute=getRandomByValue(59))
     job_daily = j.run_daily(callback_andalucia, now.time(), days=(
         0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
     # now = now.replace(hour=2, minute=00)
@@ -699,9 +699,7 @@ def addDataToJson(text):
     else:
         msgToCheck = []
         for item in msgSplitted[2].split("--"):
-            print(item)
             itemSplitted = item.split("__")
-            print(itemSplitted)
             msgToCheck.append(
                 {"text": itemSplitted[0], "type": itemSplitted[1]})
 
