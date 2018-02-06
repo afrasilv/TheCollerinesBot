@@ -129,8 +129,8 @@ Miguelito recuerda a <username> el <weekday> a las hh:mm some text -> remember t
 ```
 #### Add new data...
 ```
-Miguelito añade random <some text> -> add new data to "randomMsg" array
-Miguelito añade repite <some text> -> add new data to "randomJobMsg" array
+Miguelito mete random <some text> -> add new data to "randomMsg" array
+...
 ```
 
 ## Extraball
