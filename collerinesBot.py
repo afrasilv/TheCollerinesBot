@@ -848,7 +848,7 @@ def echo(bot, update):
 
             if foundKey is not True:
                 if "random" in update.message.text.lower():
-                    indexRandom = getRandomByValue(len(botDict["keywords"]))
+                    indexRandom = getRandomByValue(len(botDict["keywords"]) - 1)
                     sendData(bot, update, botDict["keywords"][indexRandom])
                     if botDict["keywords"][indexRandom]["doubleMsg"] is True:
                         sendData(bot, update, object["doubleObj"])

@@ -95,8 +95,10 @@ userNames.json ->
 	"value": "telegramId"
 }]
 ```
+dataDictionary.json
 
-## How work Miguelito
+
+## How works Miguelito
 ### Commands
 #### Add Youtube songs to Spotify List
 ```
@@ -110,6 +112,25 @@ Miguelito añade <songname> <groupName - Not necessary if is the first song in S
 Miguelito get the video name and remove all text that be inside () and [] to search in Spotify API.
 If he can't find the song he will try with the different video-tags of youtube
 
+or a spotify song link with "track/<idsong>-/whatever https://open.spotify.com/track/1TrUEdT8FmBmcKVyfucbnw?si=BXGgTDv_Qs-8-Sv_NdrBHA
+
+```
+#### Remember that...
+```
+Miguelito recuerda a las hh:mm some text -> remember to the user that sent it some text at that hour of same day or next day is the time was passed.
+Miguelito recuerda el dd/mm/yyyy some text -> remember to the user that sent it some text at actual hour/min.
+Miguelito recuerda el dd/mm/yyyy a las hh:mm some text -> remember to the user that sent it some text at actual hour/min.
+Miguelito recuerda a <@username/realName/name keyword in userNames.json> a las hh:mm some text -> remember to that user some text in selected date.
+Miguelito recuerda a <@username/realName/name keyword in userNames.json> el dd/mm/yyyy some text -> remember to that user some text in selected date.
+Miguelito recuerda a <@username/realName/name keyword in userNames.json> el dd/mm/yyyy a las hh:mm some text -> remember to that user some text in selected date.
+Miguelito recuerda <dateConfigName == mañana/pasado/pasadomañana/luego/después> some text -> remember to that user some text in selected date.
+Miguelito recuerda a <username> <dateConfigName == mañana/pasado/pasadomañana/luego/después> some text -> remember to that user some text in selected date.
+Miguelito recuerda a <username> el <weekday> a las hh:mm some text -> remember to that user some text in selected date.
+```
+#### Add new data...
+```
+Miguelito mete random <some text> -> add new data to "randomMsg" array
+...
 ```
 
 ## Extraball
@@ -120,3 +141,5 @@ https://api.telegram.org/bot< bot token_id value >/sendMessage?chat_id=< chat_id
 ## Special Thanks
 
 Spotipy is from -> https://github.com/plamere/spotipy 
+
+Ypirqui from @kokuma -> https://github.com/juanalonso/ypirqui
