@@ -558,7 +558,7 @@ def sendSticker(bot, update, pathSticker, isReply):
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
             pathSticker, 'rb'))
 
-
+@run_async
 def sendData(bot, update, object):
     if object["type"] == "voice":
         sendVoice(
@@ -699,7 +699,9 @@ def addDataToJson(text):
     else:
         msgToCheck = []
         for item in msgSplitted[2].split("--"):
+            print(item)
             itemSplitted = item.split("__")
+            print(itemSplitted)
             msgToCheck.append(
                 {"text": itemSplitted[0], "type": itemSplitted[1]})
 
@@ -735,7 +737,6 @@ def saveDictionary():
         json.dump(botDict, outfile)
 
 
-@run_async
 def echo(bot, update):
     global canTalk
     global firstMsg
