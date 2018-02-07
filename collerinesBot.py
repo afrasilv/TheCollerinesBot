@@ -16,7 +16,8 @@ import os
 import sys
 from threading import Thread
 import logging
-from spotifyYouTubeClass import SpotifyYouTubeClass
+from SpotifyYouTubeClass import spotifyYouTubeClass
+from RememberClass import rememberClass
 from telegram.ext.dispatcher import run_async
 
 # Enable logging
@@ -74,211 +75,10 @@ def help(bot, update):
     update.message.reply_text('asdqwe')
 
 
-def checkHourToRemember(msg, timeObject):
-    # Check if hour
-    msgArray = msg.split(" ")
-    msgHourData = msgArray[0]
-    if (msgArray[0] == "a" and ("la" in msgArray[1] or "las" in msgArray[1])):
-        msgHourData = msgArray[2]
-        msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "", 1)
-    if ":" in msgHourData:
-        hourDataSplitted = msgHourData.split(":")
-        timeObject["hour"] = hourDataSplitted[0]
-        timeObject["min"] = hourDataSplitted[1]
-        msg = msg.replace(msgHourData + " ", "", 1)
-        if int(timeObject["min"]) > 59:
-            hours = int(timeObject["hour"]) + 1
-            mins = int(timeObject["min"]) - 59
-            timeObject["hour"] = hours
-            timeObject["min"] = mins
-    elif isinstance(msgHourData, int):
-        timeObject["hour"] = msgHourData
-        msg = msg.replace(msgHourData + " ", "", 1)
-
-    return msg, timeObject
-
-
-def checkRememberDate(now, timeObject, isWeekday):
-    if isWeekday == None:
-        if "type" in timeObject and timeObject["type"] == "day":
-            now = now + timedelta(days=int(timeObject["value"]))
-        elif "type" in timeObject and timeObject["type"] == "hour":
-            now = now + timedelta(hours=int(timeObject["value"]))
-
-    if "hour" in timeObject and timeObject["hour"] != None:
-        now = now.replace(hour=int(timeObject["hour"]))
-        if timeObject["min"] != None:
-            now = now.replace(minute=int(timeObject["min"]))
-    return now
-
-
 def replaceStr(msg, str):
     if str in msg:
         msg = msg.replace(str + " ", "", 1)
     return msg
-
-
-def checkDayDifference(diffDayCount, now, timeObject):
-    if diffDayCount == 0 and "hor" in timeObject and now.hour <= int(timeObject["hour"]):
-        if "min" in timeObject and now.minute < int(timeObject["min"]):
-            print("nice hour")
-        else:
-            diffDayCount += 1
-    return diffDayCount
-
-
-def getUsernameToNotify(msg, update):
-    data = []
-    try:
-        json_file = open('userNames.json', 'r')
-        data = json.load(json_file)
-    except IOError:
-        data = []
-
-    msgArray = msg.split(" ")
-    index = 0
-    while index < len(data):
-        if data[index]["name"] in msgArray[1]:
-            msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "", 1)
-            return data[index]["value"], msg
-        index += 1
-    return update.message.from_user.name, msg
-
-
-def rememberJobs(bot, update, msg):
-    timeObject = checkTimeToRemember(msg)
-    usernameToNotify, msg = getUsernameToNotify(msg, update)
-    # with key words in config json
-    if timeObject != None:
-        msg = msg.replace(timeObject["name"] + " ", "", 1)
-        msg, timeObject = checkHourToRemember(msg, timeObject)
-
-        msgArray = msg.split(" ")
-        msg = replaceStr(msg, "que")
-
-        now = datetime.now()
-        now = checkRememberDate(now, timeObject, None)
-        if datetime.now() > now:
-            now = now + timedelta(days=1)
-
-    # with dd/mm/yyyy config
-    elif re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg):
-        msgArray = msg.split(" ")
-        msg = replaceStr(msg, "el")
-
-        dateWithoutSplit = re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg)
-        dateString = dateWithoutSplit.group(0)
-        dateSplitted = dateString.split('/')
-        now = datetime.now()
-
-        msg = replaceStr(msg, dateString)
-        msg = replaceStr(msg, "que")
-
-        now = now.replace(int(dateSplitted[2]), int(
-            dateSplitted[1]), int(dateSplitted[0]))
-        timeObject = {}
-        msg, timeObject = checkHourToRemember(msg, timeObject)
-        now = checkRememberDate(now, timeObject, None)
-        if datetime.now() > now:
-            now = now + timedelta(days=1)
-
-    # with weekday config
-    else:
-        msgArray = msg.split(" ")
-        msg = replaceStr(msg, "el")
-
-        found = None
-        index = 0
-        while index < len(weekdayConstant) and found != True:
-            if weekdayConstant[index] in msg:
-                found = True
-                msg = msg.replace(weekdayConstant[index] + " ", "", 1)
-            else:
-                index += 1
-        now = datetime.now()
-        todayNumber = now.weekday()
-        diffDayCount = 0
-        # check how many days is from today
-        if found:
-            if int(todayNumber) < index:
-                diffDayCount = index - int(todayNumber) + 1
-            else:
-                diffDayCount = (6 - int(todayNumber)) + index + 1
-
-        msg = replaceStr(msg, "que")
-
-        timeObject = {}
-        msg, timeObject = checkHourToRemember(msg, timeObject)
-        now = checkRememberDate(now, timeObject, True)
-        diffDayCount = checkDayDifference(
-            diffDayCount, datetime.now(), timeObject)
-        now = now + timedelta(days=diffDayCount)
-
-    update.message.reply_text(
-        "Vale", reply_to_message_id=update.message.message_id)
-    now = now.replace(second=0)
-    saveMessageToRemember(
-        usernameToNotify, msg, now.isoformat())
-    j.run_once(callback_remember, now, context=update.message.chat_id)
-
-
-def saveMessageToRemember(username, msg, when):
-    data = []
-    try:
-        json_file = open('memories.json', 'r')
-        data = json.load(json_file)
-        data.append({'username': username, 'msg': msg, 'when': when})
-    except IOError:
-        data = [{'username': username, 'msg': msg, 'when': when}]
-
-    with open('memories.json', 'w') as outfile:
-        json.dump(data, outfile)
-
-
-def loadMemories():
-    try:
-        json_file = open('memories.json', 'r')
-        data = json.load(json_file)
-    except IOError:
-        data = {}
-    data = json.dumps(
-        {'data': data})
-    data = json.loads(data)
-    return data["data"]
-
-
-def gimmeMyMemories():
-    data = loadMemories()
-    data = sorted(
-        data,
-        key=lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
-    )
-    # msg = data[0]
-    msg = data.pop()
-    with open('memories.json', 'w') as outfile:
-        json.dump(data, outfile)
-    return msg
-
-
-def callback_remember(bot, job):
-    msg = gimmeMyMemories()
-    bot.send_message(chat_id=job.context, text="EH! " +
-                     msg["username"] + " te recuerdo que " + msg["msg"])
-
-
-def checkTimeToRemember(msg):
-    data = []
-    try:
-        json_file = open('dateConfig.json', 'r')
-        data = json.load(json_file)
-    except IOError:
-        return None
-    index = 0
-    while index < len(data):
-        if data[index]["name"] in msg:
-            return data[index]
-        index += 1
-    return None
 
 
 def getRandomByValue(value):
@@ -289,9 +89,8 @@ def getRandomByValue(value):
 def randomResponse(update, bot):
     randomValue = getRandomByValue(1400)
     if randomValue < 13 and randomValue > 11:
-        bot.send_voice(chat_id=update.message.chat_id, voice=open(
-            os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDict["audios"][0], 'rb'))
+        sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
+            '/data' + botDict["audios"][0])
     elif randomValue == 11:
         array = update.message.text.split()
         randomIndex = getRandomByValue(3)
@@ -309,17 +108,14 @@ def randomResponse(update, bot):
         if wasChanged:
             update.message.reply_text(
                 update.message.text, reply_to_message_id=update.message.message_id)
-            bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-                os.path.join(os.path.dirname(__file__)) +
-                '/data' + botDict["stickers"]["dinofaurioPath"][0], 'rb'))
+            sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
+                '/data' + botDict["stickers"]["dinofaurioPath"][0], False)
     elif randomValue == 10:
-        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDict["stickers"]["approvalStickerPath"][0], 'rb'), reply_to_message_id=update.message.message_id)
+        sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
+            '/data' + botDict["stickers"]["approvalStickerPath"][0], True)
     elif randomValue <= 9 and randomValue >= 3:
         randomMsgIndex = getRandomByValue(len(botDict["randomMsg"]) - 1)
-        update.message.reply_text(
-            botDict["randomMsg"][randomMsgIndex], reply_to_message_id=update.message.message_id)
+        sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
     elif randomValue < 2:
         update.message.text = unidecode(update.message.text)
         update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
@@ -327,8 +123,7 @@ def randomResponse(update, bot):
             update.message.text, reply_to_message_id=update.message.message_id)
         randomMsgIndex = getRandomByValue(
             len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
-        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            dataPath + botDict["stickers"]["mimimimiStickerPath"][randomMsgIndex], 'rb'))
+        sendSticker(bot, update, dataPath + botDict["stickers"], False)
 
 
 def isAdmin(bot, update):
@@ -340,25 +135,17 @@ def isAdmin(bot, update):
 
 def startJobs(bot, update):
     now = datetime.now() - timedelta(days=1)
-    now = now.replace(hour=getRandomByValue(23), minute=getRandomByValue(59))
+    restTime = getRandomByValue(2)
+    now = now.replace(hour=17 + restTime, minute=getRandomByValue(59))
     job_daily = j.run_daily(callback_andalucia, now.time(), days=(
         0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
     # now = now.replace(hour=2, minute=00)
     # job_daily = j.run_daily(callback_bye, now.time(), days=(
     #     0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
-    data = loadMemories()
+    data = rememberClass.loadMemories()
     for item in data:
         j.run_once(callback_remember, dateutil.parser.parse(
             item["when"]), context=update.message.chat_id)
-
-
-def gimmeTags(video, videoTags, maxTags):
-    tagsIndex = 0
-    if video['snippet'].get('tags') != None:
-        while tagsIndex < len(video['snippet']['tags']) and tagsIndex < maxTags:
-            videoTags += video['snippet']['tags'][tagsIndex] + " "
-            tagsIndex += 1
-    return videoTags
 
 
 def savePoleStats(update):
@@ -404,6 +191,7 @@ def gimmeTheRank(update):
     update.message.reply_text(
         messageValue, reply_to_message_id=update.message.message_id)
 
+
 def sendGif(bot, update, pathGif):
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=telegram.ChatAction.UPLOAD_PHOTO)
@@ -435,6 +223,7 @@ def sendSticker(bot, update, pathSticker, isReply):
     else:
         bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
             pathSticker, 'rb'))
+
 
 @run_async
 def sendData(bot, update, object):
@@ -489,7 +278,7 @@ def addTime(now, object):
     if object["timeToIncrement"] is not 0:
         timeObject = {'type': object["kindTime"],
                       'value':  object["timeToIncrement"]}
-        return checkRememberDate(now, timeObject, None).isoformat()
+        return rememberClass.checkRememberDate(now, timeObject, None).isoformat()
     else:
         return ""
 
@@ -507,7 +296,7 @@ def loadDictionary(bot, update):
         botDict = {}
 
 
-## miguelito mete text##hola__in#0##0#min###huehuehuehue
+# miguelito mete text##hola__in#0##0#min###huehuehuehue
 def addDataToJson(text):
     global downloadData
     msg = replaceStr(text, "miguelito mete")
@@ -559,9 +348,11 @@ def saveDictionary():
     with open('dataDictionary.json', 'w') as outfile:
         json.dump(botDict, outfile)
 
+
 def gimmeTheSpotifyPlaylistLink(bot, update):
     update.message.reply_text(
         'ahí te va! ' + settings["spotify"]["spotifyplaylistlink"])
+
 
 def echo(bot, update):
     global canTalk
@@ -605,7 +396,7 @@ def echo(bot, update):
                     url = update.message.text[int(update.message.entities[i]["offset"]):int(int(
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
-            rememberJobs(bot, update, msg)
+            rememberClass.rememberJobs(j, update, msg)
 
         elif "miguelito dame la lista" in update.message.text.lower():
             gimmeTheSpotifyPlaylistLink(bot, update)
@@ -674,7 +465,8 @@ def echo(bot, update):
 
             if foundKey is not True:
                 if "random" in update.message.text.lower():
-                    indexRandom = getRandomByValue(len(botDict["keywords"]) - 1)
+                    indexRandom = getRandomByValue(
+                        len(botDict["keywords"]) - 1)
                     sendData(bot, update, botDict["keywords"][indexRandom])
                     if botDict["keywords"][indexRandom]["doubleMsg"] is True:
                         sendData(bot, update, object["doubleObj"])

@@ -9,6 +9,7 @@ import json
 import os
 import re
 
+
 class SpotifyYouTubeClass:
 
     # Save Data song if it didn't find
@@ -77,7 +78,7 @@ class SpotifyYouTubeClass:
             index = getRandomByValue(len(playlistData["items"]) - 1)
             track = playlistData["items"][index]["track"]
             return "Ahí te va " +
-                    track["external_urls"]["spotify"]
+                track["external_urls"]["spotify"]
         else:
             return "BOOM, me salí de la lista :/"
 
@@ -95,7 +96,8 @@ class SpotifyYouTubeClass:
     def connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video):
         client_credentials_manager = SpotifyClientCredentials(
             client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
-        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        sp = spotipy.Spotify(
+            client_credentials_manager=client_credentials_manager)
         sp.trace = False
         results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
 
@@ -168,3 +170,11 @@ class SpotifyYouTubeClass:
                 return youtubeLink(update)
             elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
                 return spotifyLink(update)
+
+    def gimmeTags(video, videoTags, maxTags):
+        tagsIndex = 0
+        if video['snippet'].get('tags') != None:
+            while tagsIndex < len(video['snippet']['tags']) and tagsIndex < maxTags:
+                videoTags += video['snippet']['tags'][tagsIndex] + " "
+                tagsIndex += 1
+        return videoTags
