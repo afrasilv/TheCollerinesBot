@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import json
+import os
+import re
+from random import randint
+
+class Utils:
+
+    def getRandomByValue(value):
+        randomValue = randint(0, value)
+        return randomValue
+
+    def loadFile(fileName, isOrdered, errorInit):
+        data = {}
+        try:
+            if isOrdered:
+                json_file = open(fileName, 'r')
+                data = json.load(json_file, object_pairs_hook=OrderedDict)
+            else:
+                json_file = open(fileName, encoding="utf-8")
+                data = json.load(json_file)
+                data = json.dumps(
+                    {'data': data})
+                data = json.loads(data)
+                data = data["data"]
+        except IOError:
+            data = errorInit
+        return data
+
+    def saveFile(fileName, fileData):
+        with open('dataDictionary.json', 'w') as outfile:
+            json.dump(botDict, outfile)
+
+    def replaceStr(msg, str):
+        if str in msg:
+            msg = msg.replace(str + " ", "", 1)
+        return msg

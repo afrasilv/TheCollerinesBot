@@ -4,6 +4,7 @@
 import json
 import os
 import re
+from .utils import Utils
 
 
 class RememberClass:
@@ -78,7 +79,7 @@ class RememberClass:
             msg, timeObject = checkHourToRemember(msg, timeObject)
 
             msgArray = msg.split(" ")
-            msg = replaceStr(msg, "que")
+            msg = Utils.replaceStr(msg, "que")
 
             now = datetime.now()
             now = checkRememberDate(now, timeObject, None)
@@ -88,15 +89,15 @@ class RememberClass:
         # with dd/mm/yyyy config
         elif re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg):
             msgArray = msg.split(" ")
-            msg = replaceStr(msg, "el")
+            msg = Utils.replaceStr(msg, "el")
 
             dateWithoutSplit = re.search(r'([0-9]+/[0-9]+/[0-9]+)', msg)
             dateString = dateWithoutSplit.group(0)
             dateSplitted = dateString.split('/')
             now = datetime.now()
 
-            msg = replaceStr(msg, dateString)
-            msg = replaceStr(msg, "que")
+            msg = Utils.replaceStr(msg, dateString)
+            msg = Utils.replaceStr(msg, "que")
 
             now = now.replace(int(dateSplitted[2]), int(
                 dateSplitted[1]), int(dateSplitted[0]))
@@ -109,7 +110,7 @@ class RememberClass:
         # with weekday config
         else:
             msgArray = msg.split(" ")
-            msg = replaceStr(msg, "el")
+            msg = Utils.replaceStr(msg, "el")
 
             found = None
             index = 0
@@ -129,7 +130,7 @@ class RememberClass:
                 else:
                     diffDayCount = (6 - int(todayNumber)) + index + 1
 
-            msg = replaceStr(msg, "que")
+            msg = Utils.replaceStr(msg, "que")
 
             timeObject = {}
             msg, timeObject = checkHourToRemember(msg, timeObject)

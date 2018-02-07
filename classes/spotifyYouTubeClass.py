@@ -4,7 +4,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.util as util
-from youtubeApi import YoutubeAPI
+from .youtubeApi import YoutubeAPI
 import json
 import os
 import re

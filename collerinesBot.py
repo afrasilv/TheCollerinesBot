@@ -6,7 +6,6 @@ import re
 import pickle
 from unidecode import unidecode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from random import randint
 from datetime import datetime, timedelta
 import dateutil.parser
 from configparser import ConfigParser
@@ -16,9 +15,10 @@ import os
 import sys
 from threading import Thread
 import logging
-from SpotifyYouTubeClass import spotifyYouTubeClass
-from RememberClass import rememberClass
-from telegram.ext.dispatcher import run_async
+from classes.spotifyYouTubeClass import SpotifyYouTubeClass
+from classes.rememberClass import RememberClass
+from classes.checkAndSendDataClass import CheckAndSendDataClass
+from classes.utils import Utils
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -74,58 +74,6 @@ def start(bot, update):
 def help(bot, update):
     update.message.reply_text('asdqwe')
 
-
-def replaceStr(msg, str):
-    if str in msg:
-        msg = msg.replace(str + " ", "", 1)
-    return msg
-
-
-def getRandomByValue(value):
-    randomValue = randint(0, value)
-    return randomValue
-
-
-def randomResponse(update, bot):
-    randomValue = getRandomByValue(1400)
-    if randomValue < 13 and randomValue > 11:
-        sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDict["audios"][0])
-    elif randomValue == 11:
-        array = update.message.text.split()
-        randomIndex = getRandomByValue(3)
-        wasChanged = None
-        if randomIndex == 0:
-            wasChanged = bool(re.search(r'[VvSs]+', update.message.text))
-            update.message.text = re.sub(r'[VvSs]+', 'f', update.message.text)
-        elif randomIndex == 1:
-            wasChanged = bool(re.search(r'[Vv]+', update.message.text))
-            update.message.text = re.sub(r'[Vv]+', 'f', update.message.text)
-        else:
-            wasChanged = bool(re.search(r'[TtVvSsCc]+', update.message.text))
-            update.message.text = re.sub(
-                r'[TtVvSsCc]+', 'f', update.message.text)
-        if wasChanged:
-            update.message.reply_text(
-                update.message.text, reply_to_message_id=update.message.message_id)
-            sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
-                '/data' + botDict["stickers"]["dinofaurioPath"][0], False)
-    elif randomValue == 10:
-        sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
-            '/data' + botDict["stickers"]["approvalStickerPath"][0], True)
-    elif randomValue <= 9 and randomValue >= 3:
-        randomMsgIndex = getRandomByValue(len(botDict["randomMsg"]) - 1)
-        sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
-    elif randomValue < 2:
-        update.message.text = unidecode(update.message.text)
-        update.message.text = re.sub(r'[AEOUaeou]+', 'i', update.message.text)
-        update.message.reply_text(
-            update.message.text, reply_to_message_id=update.message.message_id)
-        randomMsgIndex = getRandomByValue(
-            len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
-        sendSticker(bot, update, dataPath + botDict["stickers"], False)
-
-
 def isAdmin(bot, update):
     if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
         return True
@@ -135,14 +83,14 @@ def isAdmin(bot, update):
 
 def startJobs(bot, update):
     now = datetime.now() - timedelta(days=1)
-    restTime = getRandomByValue(2)
-    now = now.replace(hour=17 + restTime, minute=getRandomByValue(59))
+    restTime = Utils.getRandomByValue(2)
+    now = now.replace(hour=17 + restTime, minute=Utils.getRandomByValue(59))
     job_daily = j.run_daily(callback_andalucia, now.time(), days=(
         0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
     # now = now.replace(hour=2, minute=00)
     # job_daily = j.run_daily(callback_bye, now.time(), days=(
     #     0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
-    data = rememberClass.loadMemories()
+    data = RememberClass.loadMemories()
     for item in data:
         j.run_once(callback_remember, dateutil.parser.parse(
             item["when"]), context=update.message.chat_id)
@@ -150,11 +98,7 @@ def startJobs(bot, update):
 
 def savePoleStats(update):
     username = update.message.from_user.name.replace("@", "")
-    try:
-        json_file = open('polestats.json', 'r')
-        data = json.load(json_file, object_pairs_hook=OrderedDict)
-    except IOError:
-        data = [{'username': username, 'count': 0}]
+    data = Utils.loadFile('polestats.json', True, [{'username': username, 'count': 0}])
 
     found = None
     i = 0
@@ -166,8 +110,7 @@ def savePoleStats(update):
     if found == None:
         data.append({'username': username, 'count': 1})
 
-    with open('polestats.json', 'w') as outfile:
-        json.dump(data, outfile)
+    Utils.saveFile('polestats.json', data)
 
 
 def gimmeTheRank(update):
@@ -192,116 +135,17 @@ def gimmeTheRank(update):
         messageValue, reply_to_message_id=update.message.message_id)
 
 
-def sendGif(bot, update, pathGif):
-    bot.sendChatAction(chat_id=update.message.chat_id,
-                       action=telegram.ChatAction.UPLOAD_PHOTO)
-    bot.sendDocument(chat_id=update.message.chat_id,
-                     document=open(pathGif, 'rb'))
-
-
-def sendVoice(bot, update, pathVoice):
-    bot.send_voice(chat_id=update.message.chat_id, voice=open(pathVoice, 'rb'))
-
-
-def sendImg(bot, update, pathImg):
-    bot.send_photo(chat_id=update.message.chat_id, photo=open(pathImg, 'rb'))
-
-
-def sendMsg(update, text, isReply):
-    if isReply:
-        update.message.reply_text(
-            text, reply_to_message_id=update.message.message_id)
-    else:
-        update.message.reply_text(
-            text)
-
-
-def sendSticker(bot, update, pathSticker, isReply):
-    if isReply:
-        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            pathSticker, 'rb'), reply_to_message_id=update.message.message_id)
-    else:
-        bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
-            pathSticker, 'rb'))
-
-
-@run_async
-def sendData(bot, update, object):
-    if object["type"] == "voice":
-        sendVoice(
-            bot, update, dataPath + getPath(object["path"]))
-    elif object["type"] == "gif":
-        sendGif(
-            bot, update, dataPath + getPath(object["path"]))
-    elif object["type"] == "text":
-        sendMsg(
-            update, getPath(object["path"]), object["isReply"])
-    elif object["type"] == "img":
-        sendImg(bot, update, dataPath + getPath(object["path"]))
-    elif object["type"] == "sticker":
-        sendSticker(bot, update, dataPath +
-                    getPath(object["path"]), object["isReply"])
-
-
-def getPath(arrayData):
-    index = getRandomByValue(len(arrayData) - 1)
-    return arrayData[index]
-
-
-def checkIfSendData(bot, update, object):
-    if len(object["lastTimeSentIt"]) is not 0:
-        lastTimeSentIt = datetime.strptime(
-            object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
-        now = datetime.now()
-        if now.date() > lastTimeSentIt.date():
-            if object["randomMaxValue"] is not 0:
-                randomValue = getRandomByValue(object["randomMaxValue"])
-                if randomValue <= 1:
-                    sendData(bot, update, object)
-                    if object["doubleMsg"] is True:
-                        sendData(bot, update, object["doubleObj"])
-                    return True
-            else:
-                sendData(bot, update, object)
-                if object["doubleMsg"] is True:
-                    sendData(bot, update, object["doubleObj"])
-                return True
-    else:
-        sendData(bot, update, object)
-        if object["doubleMsg"] is True:
-            sendData(bot, update, object["doubleObj"])
-        return True
-    return False
-
-
-def addTime(now, object):
-    if object["timeToIncrement"] is not 0:
-        timeObject = {'type': object["kindTime"],
-                      'value':  object["timeToIncrement"]}
-        return rememberClass.checkRememberDate(now, timeObject, None).isoformat()
-    else:
-        return ""
-
-
 def loadDictionary(bot, update):
     global botDict
-    try:
-        json_file = open('dataDictionary.json', encoding="utf-8")
-        botDict = json.load(json_file)
-        data = json.dumps(
-            {'data': botDict})
-        botDict = json.loads(data)
-        botDict = botDict["data"]
-    except IOError:
-        botDict = {}
-
+    botDict = Utils.loadFile('dataDictionary.json', False, {})
+    
 
 # miguelito mete text##hola__in#0##0#min###huehuehuehue
 def addDataToJson(text):
     global downloadData
-    msg = replaceStr(text, "miguelito mete")
+    msg = Utils.replaceStr(text, "miguelito mete")
     msgSplitted = msg.split("#")
-    msg = replaceStr(msg, msgSplitted[0])
+    msg = Utils.replaceStr(msg, msgSplitted[0])
     if msgSplitted[0] == "random":
         botDict['randomMsg'].append(msg)
     elif msgSplitted[0] == "dinosaurio":
@@ -345,8 +189,7 @@ def addDataToJson(text):
 
 
 def saveDictionary():
-    with open('dataDictionary.json', 'w') as outfile:
-        json.dump(botDict, outfile)
+    Utils.saveFile('dataDictionary.json', botDict)
 
 
 def gimmeTheSpotifyPlaylistLink(bot, update):
@@ -378,7 +221,7 @@ def echo(bot, update):
             godMode = True
 
         wasAdded = False
-        wasAdded = spotifyYouTubeClass.checkYoutubeSpotifyLinks(update)
+        wasAdded = SpotifyYouTubeClass.checkYoutubeSpotifyLinks(update)
 
         # startJobs
         if firstMsg:
@@ -396,7 +239,7 @@ def echo(bot, update):
                     url = update.message.text[int(update.message.entities[i]["offset"]):int(int(
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
-            rememberClass.rememberJobs(j, update, msg)
+            RememberClass.rememberJobs(j, update, msg)
 
         elif "miguelito dame la lista" in update.message.text.lower():
             gimmeTheSpotifyPlaylistLink(bot, update)
@@ -408,16 +251,16 @@ def echo(bot, update):
                     hasUrl = True
 
             if hasUrl == False:
-                if spotifyYouTubeClass.censorYoutubeVideo(videoTitle):
+                if SpotifyYouTubeClass.censorYoutubeVideo(videoTitle):
                     update.message.reply_text(
                         'No. :)', reply_to_message_id=update.message.message_id)
                 else:
-                    spotifyYouTubeClass.connectToSpotifyAndCheckAPI(
+                    SpotifyYouTubeClass.connectToSpotifyAndCheckAPI(
                         update, videoTitle, [], None)
             else:
-                spotifyYouTubeClass.checkYoutubeSpotifyLinks(update)
+                SpotifyYouTubeClass.checkYoutubeSpotifyLinks(update)
         elif "miguelito recomienda" in update.message.text.lower():
-            sendMsg(update, spotifyYouTubeClass.recommendAGroup(update), True)
+            sendMsg(update, SpotifyYouTubeClass.recommendAGroup(update), True)
 
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
@@ -431,48 +274,7 @@ def echo(bot, update):
             gimmeTheRank(update)
 
         if godMode and canTalk:
-            foundKey = False
-            indexArray = 0
-            dictionaryIndex = 0
-            now = datetime.now()
-            while dictionaryIndex < len(botDict["keywords"]) and foundKey is not True:
-                if len(botDict["keywords"][dictionaryIndex]["regexpValue"]) > 0:
-                    while indexArray < len(botDict["keywords"][dictionaryIndex]["regexpValue"]) and foundKey is not True:
-                        regexr = re.compile(
-                            botDict["keywords"][dictionaryIndex]["regexpValue"][indexArray])
-                        if regexr.search(update.message.text.lower()):
-                            if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
-                                botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
-                                    now, botDict["keywords"][dictionaryIndex])
-                            foundKey = True
-                        indexArray += 1
-                indexArray = 0
-                if len(botDict["keywords"][dictionaryIndex]["msgToCheck"]) > 0:
-                    while indexArray < len(botDict["keywords"][dictionaryIndex]["msgToCheck"]) and foundKey is not True:
-                        if botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["type"] == "in":
-                            if botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["text"] in update.message.text.lower():
-                                if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
-                                    botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
-                                        now, botDict["keywords"][dictionaryIndex])
-                                foundKey = True
-                        elif botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["text"] == update.message.text:
-                            if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
-                                botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
-                                    now, botDict["keywords"][dictionaryIndex])
-                            foundKey = True
-                        indexArray += 1
-                dictionaryIndex += 1
-
-            if foundKey is not True:
-                if "random" in update.message.text.lower():
-                    indexRandom = getRandomByValue(
-                        len(botDict["keywords"]) - 1)
-                    sendData(bot, update, botDict["keywords"][indexRandom])
-                    if botDict["keywords"][indexRandom]["doubleMsg"] is True:
-                        sendData(bot, update, object["doubleObj"])
-
-                elif len(update.message.text) > 7:  # mimimimimimi
-                    randomResponse(update, bot)
+            CheckAndSendDataClass.checkIfIsInDictionary(bot, update, botDict)
 
         if "miguelito mete" in update.message.text.lower():
             addDataToJson(update.message.text.lower())
