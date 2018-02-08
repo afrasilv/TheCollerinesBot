@@ -18,7 +18,7 @@ class CheckAndSendDataClass:
         randomValue = Utils().getRandomByValue(1400)
         if randomValue < 13 and randomValue > 11:
             self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
-                      '/data' + botDict["audios"][0])
+                      '/../data' + botDict["audios"][0])
         elif randomValue == 11:
             # dinofaurio feature
             array = update.message.text.split()
@@ -41,10 +41,10 @@ class CheckAndSendDataClass:
                 update.message.reply_text(
                     update.message.text, reply_to_message_id=update.message.message_id)
                 self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
-                            '/data' + botDict["stickers"]["dinofaurioPath"][0], False)
+                            '/../data' + botDict["stickers"]["dinofaurioPath"][0], False)
         elif randomValue == 10:
             self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
-                        '/data' + botDict["stickers"]["approvalStickerPath"][0], True)
+                        '/../data' + botDict["stickers"]["approvalStickerPath"][0], True)
         elif randomValue <= 9 and randomValue >= 3:
             # send a randomMsg
             randomMsgIndex = Utils().getRandomByValue(len(botDict["randomMsg"]) - 1)
@@ -58,7 +58,7 @@ class CheckAndSendDataClass:
                 update.message.text, reply_to_message_id=update.message.message_id)
             randomMsgIndex = Utils.getRandomByValue(
                 len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
-            dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
+            dataPath = os.path.join(os.path.dirname(__file__)) + '/../data'
             self.sendSticker(bot, update, dataPath + botDict["stickers"], False)
 
     @staticmethod
@@ -104,7 +104,7 @@ class CheckAndSendDataClass:
 
     @run_async
     def sendData(self, bot, update, object):
-        dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
+        dataPath = os.path.join(os.path.dirname(__file__)) + '/../data'
         if object["type"] == "voice":
             self.sendVoice(
                 bot, update, dataPath + self.getPath(object["path"]))
