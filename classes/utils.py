@@ -8,10 +8,12 @@ from random import randint
 
 class Utils:
 
+    @staticmethod
     def getRandomByValue(value):
         randomValue = randint(0, value)
         return randomValue
 
+    @staticmethod
     def loadFile(fileName, isOrdered, errorInit):
         data = {}
         try:
@@ -29,10 +31,12 @@ class Utils:
             data = errorInit
         return data
 
+    @staticmethod
     def saveFile(fileName, fileData):
         with open('dataDictionary.json', 'w') as outfile:
             json.dump(botDict, outfile)
 
+    @staticmethod
     def replaceStr(msg, str):
         if str in msg:
             msg = msg.replace(str + " ", "", 1)

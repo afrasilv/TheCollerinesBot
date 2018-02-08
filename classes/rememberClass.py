@@ -5,11 +5,16 @@ import json
 import os
 import re
 from .utils import Utils
-
+from datetime import datetime, timedelta
+import dateutil.parser
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 class RememberClass:
 
-    def checkHourToRemember(msg, timeObject):
+    weekdayConstant = ['lunes', 'martes', 'miércoles',
+                       'jueves', 'viernes', 'sábado', 'domingo']
+
+    def checkHourToRemember(self, msg, timeObject):
         # Check if hour
         msgArray = msg.split(" ")
         msgHourData = msgArray[0]
@@ -32,7 +37,7 @@ class RememberClass:
 
         return msg, timeObject
 
-    def checkRememberDate(now, timeObject, isWeekday):
+    def checkRememberDate(self, now, timeObject, isWeekday):
         if isWeekday == None:
             if "type" in timeObject and timeObject["type"] == "day":
                 now = now + timedelta(days=int(timeObject["value"]))
@@ -45,7 +50,7 @@ class RememberClass:
                 now = now.replace(minute=int(timeObject["min"]))
         return now
 
-    def checkDayDifference(diffDayCount, now, timeObject):
+    def checkDayDifference(self, diffDayCount, now, timeObject):
         if diffDayCount == 0 and "hor" in timeObject and now.hour <= int(timeObject["hour"]):
             if "min" in timeObject and now.minute < int(timeObject["min"]):
                 print("nice hour")
@@ -53,7 +58,7 @@ class RememberClass:
                 diffDayCount += 1
         return diffDayCount
 
-    def getUsernameToNotify(msg, update):
+    def getUsernameToNotify(self, msg, update):
         data = []
         try:
             json_file = open('userNames.json', 'r')
@@ -70,19 +75,20 @@ class RememberClass:
             index += 1
         return update.message.from_user.name, msg
 
-    def rememberJobs(job_queue, update, msg):
-        timeObject = checkTimeToRemember(msg)
-        usernameToNotify, msg = getUsernameToNotify(msg, update)
+
+    def rememberJobs(self, bot, job_queue, update, msg):
+        timeObject = self.checkTimeToRemember(msg)
+        usernameToNotify, msg = self.getUsernameToNotify(msg, update)
         # with key words in config json
         if timeObject != None:
             msg = msg.replace(timeObject["name"] + " ", "", 1)
-            msg, timeObject = checkHourToRemember(msg, timeObject)
+            msg, timeObject = self.checkHourToRemember(msg, timeObject)
 
             msgArray = msg.split(" ")
             msg = Utils.replaceStr(msg, "que")
 
             now = datetime.now()
-            now = checkRememberDate(now, timeObject, None)
+            now = self.checkRememberDate(now, timeObject, None)
             if datetime.now() > now:
                 now = now + timedelta(days=1)
 
@@ -102,8 +108,8 @@ class RememberClass:
             now = now.replace(int(dateSplitted[2]), int(
                 dateSplitted[1]), int(dateSplitted[0]))
             timeObject = {}
-            msg, timeObject = checkHourToRemember(msg, timeObject)
-            now = checkRememberDate(now, timeObject, None)
+            msg, timeObject = self.checkHourToRemember(msg, timeObject)
+            now = self.checkRememberDate(now, timeObject, None)
             if datetime.now() > now:
                 now = now + timedelta(days=1)
 
@@ -114,10 +120,10 @@ class RememberClass:
 
             found = None
             index = 0
-            while index < len(weekdayConstant) and found != True:
-                if weekdayConstant[index] in msg:
+            while index < len(self.weekdayConstant) and found != True:
+                if self.weekdayConstant[index] in msg:
                     found = True
-                    msg = msg.replace(weekdayConstant[index] + " ", "", 1)
+                    msg = msg.replace(self.weekdayConstant[index] + " ", "", 1)
                 else:
                     index += 1
             now = datetime.now()
@@ -133,20 +139,20 @@ class RememberClass:
             msg = Utils.replaceStr(msg, "que")
 
             timeObject = {}
-            msg, timeObject = checkHourToRemember(msg, timeObject)
-            now = checkRememberDate(now, timeObject, True)
-            diffDayCount = checkDayDifference(
+            msg, timeObject = self.checkHourToRemember(msg, timeObject)
+            now = self.checkRememberDate(now, timeObject, True)
+            diffDayCount = self.checkDayDifference(
                 diffDayCount, datetime.now(), timeObject)
             now = now + timedelta(days=diffDayCount)
 
         update.message.reply_text(
             "Vale", reply_to_message_id=update.message.message_id)
         now = now.replace(second=0)
-        saveMessageToRemember(
+        self.saveMessageToRemember(
             usernameToNotify, msg, now.isoformat())
-        job_queue.run_once(callback_remember, now,
-                           context=update.message.chat_id)
+        return now
 
+    @staticmethod
     def saveMessageToRemember(username, msg, when):
         data = []
         try:
@@ -159,6 +165,7 @@ class RememberClass:
         with open('memories.json', 'w') as outfile:
             json.dump(data, outfile)
 
+    @staticmethod
     def loadMemories():
         try:
             json_file = open('memories.json', 'r')
@@ -170,8 +177,8 @@ class RememberClass:
         data = json.loads(data)
         return data["data"]
 
-    def gimmeMyMemories():
-        data = loadMemories()
+    def gimmeMyMemories(self):
+        data = self.loadMemories()
         data = sorted(
             data,
             key=lambda x: datetime.strptime(x['when'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True
@@ -182,11 +189,12 @@ class RememberClass:
             json.dump(data, outfile)
         return msg
 
-    def callback_remember(bot, job):
-        msg = gimmeMyMemories()
-        bot.send_message(chat_id=job.context, text="EH! " +
+    def callback_remember(self, bot, chat_id):
+        msg = self.gimmeMyMemories()
+        bot.send_message(chat_id=chat_id, text="EH! " +
                          msg["username"] + " te recuerdo que " + msg["msg"])
 
+    @staticmethod
     def checkTimeToRemember(msg):
         data = []
         try:

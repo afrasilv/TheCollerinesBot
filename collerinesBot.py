@@ -35,9 +35,6 @@ firstMsg = True
 botDict = {}
 downloadData = None
 lastFileDownloadedCount = 0
-weekdayConstant = ['lunes', 'martes', 'miércoles',
-                   'jueves', 'viernes', 'sábado', 'domingo']
-
 
 def ini_to_dict(path):
     """ Read an ini path in to a dict
@@ -90,10 +87,9 @@ def startJobs(bot, update):
     # now = now.replace(hour=2, minute=00)
     # job_daily = j.run_daily(callback_bye, now.time(), days=(
     #     0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
-    data = RememberClass.loadMemories()
+    data = RememberClass().loadMemories()
     for item in data:
-        j.run_once(callback_remember, dateutil.parser.parse(
-            item["when"]), context=update.message.chat_id)
+        j.run_once(RememberClass().callback_remember(bot, update.message.chat_id), dateutil.parser.parse(item["when"]), context=update.message.chat_id)
 
 
 def savePoleStats(update):
@@ -138,7 +134,7 @@ def gimmeTheRank(update):
 def loadDictionary(bot, update):
     global botDict
     botDict = Utils.loadFile('dataDictionary.json', False, {})
-    
+
 
 # miguelito mete text##hola__in#0##0#min###huehuehuehue
 def addDataToJson(text):
@@ -220,8 +216,9 @@ def echo(bot, update):
         elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
             godMode = True
 
+        spotifyAPI = SpotifyYouTubeClass()
         wasAdded = False
-        wasAdded = SpotifyYouTubeClass.checkYoutubeSpotifyLinks(update)
+        wasAdded = spotifyAPI.checkYoutubeSpotifyLinks(update)
 
         # startJobs
         if firstMsg:
@@ -239,7 +236,9 @@ def echo(bot, update):
                     url = update.message.text[int(update.message.entities[i]["offset"]):int(int(
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
-            RememberClass.rememberJobs(j, update, msg)
+            print("entro")
+            responseTime = RememberClass().rememberJobs(bot, j, update, msg)
+            j.run_once(RememberClass().callback_remember(bot, update.message.chat_id), responseTime, context=update.message.chat_id)
 
         elif "miguelito dame la lista" in update.message.text.lower():
             gimmeTheSpotifyPlaylistLink(bot, update)
@@ -251,16 +250,16 @@ def echo(bot, update):
                     hasUrl = True
 
             if hasUrl == False:
-                if SpotifyYouTubeClass.censorYoutubeVideo(videoTitle):
+                if spotifyAPI.censorYoutubeVideo(videoTitle):
                     update.message.reply_text(
                         'No. :)', reply_to_message_id=update.message.message_id)
                 else:
-                    SpotifyYouTubeClass.connectToSpotifyAndCheckAPI(
+                    spotifyAPI.connectToSpotifyAndCheckAPI(
                         update, videoTitle, [], None)
             else:
-                SpotifyYouTubeClass.checkYoutubeSpotifyLinks(update)
+                spotifyAPI.checkYoutubeSpotifyLinks(update)
         elif "miguelito recomienda" in update.message.text.lower():
-            sendMsg(update, SpotifyYouTubeClass.recommendAGroup(update), True)
+            sendMsg(update, spotifyAPI.recommendAGroup(update), True)
 
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
@@ -273,8 +272,8 @@ def echo(bot, update):
         elif "estoniarank" in update.message.text.lower():
             gimmeTheRank(update)
 
-        if godMode and canTalk:
-            CheckAndSendDataClass.checkIfIsInDictionary(bot, update, botDict)
+        elif godMode and canTalk:
+            CheckAndSendDataClass().checkIfIsInDictionary(bot, update, botDict)
 
         if "miguelito mete" in update.message.text.lower():
             addDataToJson(update.message.text.lower())

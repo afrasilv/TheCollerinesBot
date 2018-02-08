@@ -1,25 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import telegram
 import json
 import os
 import re
 from telegram.ext.dispatcher import run_async
 from .utils import Utils
+from .rememberClass import RememberClass
 from datetime import datetime, timedelta
 import dateutil.parser
 from unidecode import unidecode
 
 class CheckAndSendDataClass:
 
-    def randomResponse(update, bot):
-        randomValue = Utils.getRandomByValue(1400)
+    def randomResponse(self, update, bot):
+        randomValue = Utils().getRandomByValue(1400)
         if randomValue < 13 and randomValue > 11:
-            sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
+            self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
                       '/data' + botDict["audios"][0])
         elif randomValue == 11:
             array = update.message.text.split()
-            randomIndex = Utils.getRandomByValue(3)
+            randomIndex = Utils().getRandomByValue(3)
             wasChanged = None
             if randomIndex == 0:
                 wasChanged = bool(re.search(r'[VvSs]+', update.message.text))
@@ -37,14 +39,14 @@ class CheckAndSendDataClass:
             if wasChanged:
                 update.message.reply_text(
                     update.message.text, reply_to_message_id=update.message.message_id)
-                sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
+                self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
                             '/data' + botDict["stickers"]["dinofaurioPath"][0], False)
         elif randomValue == 10:
-            sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
+            self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
                         '/data' + botDict["stickers"]["approvalStickerPath"][0], True)
         elif randomValue <= 9 and randomValue >= 3:
-            randomMsgIndex = Utils.getRandomByValue(len(botDict["randomMsg"]) - 1)
-            sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
+            randomMsgIndex = Utils().getRandomByValue(len(botDict["randomMsg"]) - 1)
+            self.sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
         elif randomValue < 2:
             update.message.text = unidecode(update.message.text)
             update.message.text = re.sub(
@@ -53,22 +55,27 @@ class CheckAndSendDataClass:
                 update.message.text, reply_to_message_id=update.message.message_id)
             randomMsgIndex = Utils.getRandomByValue(
                 len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
-            sendSticker(bot, update, dataPath + botDict["stickers"], False)
+            dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
+            self.sendSticker(bot, update, dataPath + botDict["stickers"], False)
 
+    @staticmethod
     def sendGif(bot, update, pathGif):
         bot.sendChatAction(chat_id=update.message.chat_id,
                            action=telegram.ChatAction.UPLOAD_PHOTO)
         bot.sendDocument(chat_id=update.message.chat_id,
                          document=open(pathGif, 'rb'))
 
+    @staticmethod
     def sendVoice(bot, update, pathVoice):
         bot.send_voice(chat_id=update.message.chat_id,
                        voice=open(pathVoice, 'rb'))
 
+    @staticmethod
     def sendImg(bot, update, pathImg):
         bot.send_photo(chat_id=update.message.chat_id,
                        photo=open(pathImg, 'rb'))
 
+    @staticmethod
     def sendMsg(update, text, isReply):
         if isReply:
             update.message.reply_text(
@@ -77,6 +84,7 @@ class CheckAndSendDataClass:
             update.message.reply_text(
                 text)
 
+    @staticmethod
     def sendSticker(bot, update, pathSticker, isReply):
         if isReply:
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
@@ -85,67 +93,69 @@ class CheckAndSendDataClass:
             bot.send_sticker(chat_id=update.message.chat_id, sticker=open(
                 pathSticker, 'rb'))
 
-
+    @staticmethod
     def getPath(arrayData):
-        index = Utils.getRandomByValue(len(arrayData) - 1)
+        index = Utils().getRandomByValue(len(arrayData) - 1)
         return arrayData[index]
 
 
     @run_async
-    def sendData(bot, update, object):
+    def sendData(self, bot, update, object):
+        dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
         if object["type"] == "voice":
-            sendVoice(
-                bot, update, dataPath + getPath(object["path"]))
+            self.sendVoice(
+                bot, update, dataPath + self.getPath(object["path"]))
         elif object["type"] == "gif":
-            sendGif(
-                bot, update, dataPath + getPath(object["path"]))
+            self.sendGif(
+                bot, update, dataPath + self.getPath(object["path"]))
         elif object["type"] == "text":
-            sendMsg(
-                update, getPath(object["path"]), object["isReply"])
+            self.sendMsg(
+                update, self.getPath(object["path"]), object["isReply"])
         elif object["type"] == "img":
-            sendImg(bot, update, dataPath + getPath(object["path"]))
+            self.sendImg(bot, update, dataPath + self.getPath(object["path"]))
         elif object["type"] == "sticker":
-            sendSticker(bot, update, dataPath +
-                        getPath(object["path"]), object["isReply"])
+            self.sendSticker(bot, update, dataPath +
+                        self.getPath(object["path"]), object["isReply"])
 
 
 
-    def checkIfSendData(bot, update, object):
+    def checkIfSendData(self, bot, update, object):
         if len(object["lastTimeSentIt"]) is not 0:
             lastTimeSentIt = datetime.strptime(
                 object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
             now = datetime.now()
             if now.date() > lastTimeSentIt.date():
                 if object["randomMaxValue"] is not 0:
-                    randomValue = Utils.getRandomByValue(object["randomMaxValue"])
+                    randomValue = Utils().getRandomByValue(object["randomMaxValue"])
                     if randomValue <= 1:
-                        sendData(bot, update, object)
+                        self.sendData(bot, update, object)
                         if object["doubleMsg"] is True:
-                            sendData(bot, update, object["doubleObj"])
+                            self.sendData(bot, update, object["doubleObj"])
                         return True
                 else:
-                    sendData(bot, update, object)
+                    self.sendData(bot, update, object)
                     if object["doubleMsg"] is True:
-                        sendData(bot, update, object["doubleObj"])
+                        self.sendData(bot, update, object["doubleObj"])
                     return True
         else:
-            sendData(bot, update, object)
+            self.sendData(bot, update, object)
             if object["doubleMsg"] is True:
-                sendData(bot, update, object["doubleObj"])
+                self.sendData(bot, update, object["doubleObj"])
             return True
         return False
 
 
+    @staticmethod
     def addTime(now, object):
         if object["timeToIncrement"] is not 0:
             timeObject = {'type': object["kindTime"],
                           'value':  object["timeToIncrement"]}
-            return rememberClass.checkRememberDate(now, timeObject, None).isoformat()
+            return RememberClass().checkRememberDate(now, timeObject, None).isoformat()
         else:
             return ""
 
 
-    def checkIfIsInDictionary(bot, update, botDict):
+    def checkIfIsInDictionary(self, bot, update, botDict):
         foundKey = False
         indexArray = 0
         dictionaryIndex = 0
@@ -156,8 +166,8 @@ class CheckAndSendDataClass:
                     regexr = re.compile(
                         botDict["keywords"][dictionaryIndex]["regexpValue"][indexArray])
                     if regexr.search(update.message.text.lower()):
-                        if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
-                            botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
+                        if self.checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
+                            botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = self.addTime(
                                 now, botDict["keywords"][dictionaryIndex])
                         foundKey = True
                     indexArray += 1
@@ -166,13 +176,13 @@ class CheckAndSendDataClass:
                 while indexArray < len(botDict["keywords"][dictionaryIndex]["msgToCheck"]) and foundKey is not True:
                     if botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["type"] == "in":
                         if botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["text"] in update.message.text.lower():
-                            if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
-                                botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
+                            if self.checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
+                                botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = self.addTime(
                                     now, botDict["keywords"][dictionaryIndex])
                             foundKey = True
                     elif botDict["keywords"][dictionaryIndex]["msgToCheck"][indexArray]["text"] == update.message.text:
-                        if checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
-                            botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = addTime(
+                        if self.checkIfSendData(bot, update, botDict["keywords"][dictionaryIndex]):
+                            botDict["keywords"][dictionaryIndex]["lastTimeSentIt"] = self.addTime(
                                 now, botDict["keywords"][dictionaryIndex])
                         foundKey = True
                     indexArray += 1
@@ -180,11 +190,11 @@ class CheckAndSendDataClass:
 
         if foundKey is not True:
             if "random" in update.message.text.lower():
-                indexRandom = Utils.getRandomByValue(
+                indexRandom = Utils().getRandomByValue(
                     len(botDict["keywords"]) - 1)
-                sendData(bot, update, botDict["keywords"][indexRandom])
+                self.sendData(bot, update, botDict["keywords"][indexRandom])
                 if botDict["keywords"][indexRandom]["doubleMsg"] is True:
-                    sendData(bot, update, object["doubleObj"])
+                    self.sendData(bot, update, object["doubleObj"])
 
             elif len(update.message.text) > 7:  # mimimimimimi
-                randomResponse(update, bot)
+                self.randomResponse(update, bot)

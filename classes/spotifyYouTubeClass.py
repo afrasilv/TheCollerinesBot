@@ -29,7 +29,7 @@ class SpotifyYouTubeClass:
             update.message.reply_text(
                 "No está. :_(", reply_to_message_id=update.message.message_id)
 
-    def callSpotifyApi(videoTitle, videoTags, video, sp, update):
+    def callSpotifyApi(self, videoTitle, videoTags, video, sp, update):
         try:
             results = sp.search(q=videoTitle, limit=1)
             if int(results['tracks']['total']) == 0:
@@ -44,17 +44,18 @@ class SpotifyYouTubeClass:
                 results = sp.search(q=videoTags, limit=1)
             return results
         except:
-            saveDataSong(update, True)
+            self.saveDataSong(update, True)
 
-    def addToSpotifyPlaylist(results, update):
+    def addToSpotifyPlaylist(self, results, update):
         resultTracksList = results['tracks']
         idsToAdd = []
 
         for j in range(len(results['tracks']['items'])):
             idsToAdd.insert(0, results['tracks']['items'][j]['id'])
 
-        callSpotifyApiToAddSong(idsToAdd)
+        self.callSpotifyApiToAddSong(idsToAdd)
 
+    @staticmethod
     def callSpotifyApiToAddSong(idsToAdd):
         scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
         token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
@@ -63,6 +64,7 @@ class SpotifyYouTubeClass:
         results = sp.user_playlist_add_tracks(
             settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
 
+    @staticmethod
     def recommendAGroup(update):
         scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
         token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
@@ -77,11 +79,11 @@ class SpotifyYouTubeClass:
         if len(playlistData["items"]) > 0:
             index = getRandomByValue(len(playlistData["items"]) - 1)
             track = playlistData["items"][index]["track"]
-            return "Ahí te va " +
-                track["external_urls"]["spotify"]
+            return "Ahí te va " + track["external_urls"]["spotify"]
         else:
             return "BOOM, me salí de la lista :/"
 
+    @staticmethod
     def replaceYouTubeVideoName(videoTitle):
         videoTitle = re.sub(r'\([\[a-zA-Z :\'0-9\]]+\)', '', videoTitle)
         videoTitle = re.sub(r'\[[\[a-zA-Z :\'0-9\]]+\]', '', videoTitle)
@@ -93,21 +95,22 @@ class SpotifyYouTubeClass:
         videoTitle = videoTitle.lower().replace("\"", "")
         return videoTitle
 
-    def connectToSpotifyAndCheckAPI(update, videoTitle, videoTags, video):
+    def connectToSpotifyAndCheckAPI(self, update, videoTitle, videoTags, video):
         client_credentials_manager = SpotifyClientCredentials(
             client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
         sp = spotipy.Spotify(
             client_credentials_manager=client_credentials_manager)
         sp.trace = False
-        results = callSpotifyApi(videoTitle, videoTags, video, sp, update)
+        results = self.callSpotifyApi(videoTitle, videoTags, video, sp, update)
 
         if results == None or (results['tracks']['total'] != None and results['tracks']['total'] == 0):
-            saveDataSong(update, None)
+            self.saveDataSong(update, None)
             return False
         else:
-            addToSpotifyPlaylist(results, update)
+            self.addToSpotifyPlaylist(results, update)
             return True
 
+    @staticmethod
     def censorYoutubeVideo(videoTitle):
         json_file = open(os.path.join(os.path.dirname(
             __file__), "youtubeCensor.json"), 'r')
@@ -118,7 +121,7 @@ class SpotifyYouTubeClass:
                 return True
         return None
 
-    def youtubeLink(update):
+    def youtubeLink(self, update):
         try:
             videoid = ""
             if 'youtu.be' not in update.message.text.lower():
@@ -135,7 +138,7 @@ class SpotifyYouTubeClass:
             videoTitle = video['snippet']['title'].lower()
             videoTitle = replaceYouTubeVideoName(videoTitle)
 
-            if censorYoutubeVideo(videoTitle):
+            if self.censorYoutubeVideo(videoTitle):
                 update.message.reply_text(
                     '...', reply_to_message_id=update.message.message_id)
             else:
@@ -146,31 +149,32 @@ class SpotifyYouTubeClass:
                     return connectToSpotifyAndCheckAPI(
                         update, videoTitle, videoTags, video)
                 else:
-                    saveDataSong(update, None)
+                    self.saveDataSong(update, None)
         except:
-            saveDataSong(update, None)
+            self.saveDataSong(update, None)
         return False
 
-    def spotifyLink(update):
+    def spotifyLink(self, update):
         try:
             trackid = update.message.text.split("track/")
             trackid = trackid[1].split(" ")
             if "?" in trackid:
                 trackid = trackid[1].split("?")
             trackid = trackid[0]
-            callSpotifyApiToAddSong([trackid])
+            self.callSpotifyApiToAddSong([trackid])
             return True
         except:
-            saveDataSong(update, None)
+            self.saveDataSong(update, None)
         return False
 
-    def checkYoutubeSpotifyLinks(update):
+    def checkYoutubeSpotifyLinks(self, update):
         for i in range(len(update.message.entities)):
             if update.message.entities[i].type == 'url' and ('youtu.be' in update.message.text.lower() or 'youtube.com' in update.message.text.lower()):
-                return youtubeLink(update)
+                return self.youtubeLink(update)
             elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
-                return spotifyLink(update)
+                return self.spotifyLink(update)
 
+    @staticmethod
     def gimmeTags(video, videoTags, maxTags):
         tagsIndex = 0
         if video['snippet'].get('tags') != None:
