@@ -39,6 +39,7 @@ weekdayConstant = ['lunes', 'martes', 'miércoles',
                    'jueves', 'viernes', 'sábado', 'domingo']
 
 
+# Load the config file with keys and tokens
 def ini_to_dict(path):
     """ Read an ini path in to a dict
     :param path: Path to file
@@ -55,11 +56,11 @@ def ini_to_dict(path):
     return return_value
 
 
-# Create the EventHandler and pass it your bot's token.
 config = ConfigParser()
 settings = ini_to_dict(os.path.join(os.path.dirname(__file__), "config.ini"))
 updater = Updater(settings["main"]["token"])
 
+# Init the job_queue
 j = updater.job_queue
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -74,14 +75,14 @@ def start(bot, update):
 def help(bot, update):
     update.message.reply_text('asdqwe')
 
-
+# Check if user is an admin
 def isAdmin(bot, update):
     if update.message.from_user.username != None and update.message.from_user.id in get_admin_ids(bot, update.message.chat_id):
         return True
     else:
         return None
 
-
+# start rememberjobs and other callbacks
 def startJobs(bot, update):
     now = datetime.now() - timedelta(days=1)
     restTime = Utils.getRandomByValue(2)
@@ -136,16 +137,17 @@ def gimmeTheRank(update):
     update.message.reply_text(
         messageValue, reply_to_message_id=update.message.message_id)
 
-
+# Load dictionary data with all bot data
 def loadDictionary(bot, update):
     global botDict
     botDict = Utils.loadFile('dataDictionary.json', False, {})
 
-
+# compare the hour that user set in the message
 def checkHourToRemember(msg, timeObject):
     # Check if hour
     msgArray = msg.split(" ")
     msgHourData = msgArray[0]
+    # remove "a la" or "a las" of the msg
     if (msgArray[0] == "a" and ("la" in msgArray[1] or "las" in msgArray[1])):
         msgHourData = msgArray[2]
         msg = msg.replace(msgArray[0] + " " + msgArray[1] + " ", "", 1)
@@ -159,13 +161,14 @@ def checkHourToRemember(msg, timeObject):
             mins = int(timeObject["min"]) - 59
             timeObject["hour"] = hours
             timeObject["min"] = mins
+    # just the hour
     elif isinstance(msgHourData, int):
         timeObject["hour"] = msgHourData
         msg = msg.replace(msgHourData + " ", "", 1)
 
     return msg, timeObject
 
-
+# set the right datetime to remember by weekday and/or hh:mm dataParsed
 def checkRememberDate(now, timeObject, isWeekday):
     if isWeekday == None:
         if "type" in timeObject and timeObject["type"] == "day":
@@ -179,7 +182,7 @@ def checkRememberDate(now, timeObject, isWeekday):
             now = now.replace(minute=int(timeObject["min"]))
     return now
 
-
+# check if hh:mm selected is > than actual to increment a day
 def checkDayDifference(diffDayCount, now, timeObject):
     if diffDayCount == 0 and "hor" in timeObject and now.hour <= int(timeObject["hour"]):
         if "min" in timeObject and now.minute < int(timeObject["min"]):
@@ -188,7 +191,7 @@ def checkDayDifference(diffDayCount, now, timeObject):
             diffDayCount += 1
     return diffDayCount
 
-
+# check if introduced name is in the json to get the username
 def getUsernameToNotify(msg, update):
     data = []
     try:
@@ -206,9 +209,11 @@ def getUsernameToNotify(msg, update):
         index += 1
     return update.message.from_user.name, msg
 
-
+# Parse message to get all data
 def rememberJobs(bot, job_queue, update, msg):
+    #compare time with the dateConfig.json
     timeObject = checkTimeToRemember(msg)
+    # check is have username in the msg
     usernameToNotify, msg = getUsernameToNotify(msg, update)
     # with key words in config json
     if timeObject != None:
@@ -244,7 +249,7 @@ def rememberJobs(bot, job_queue, update, msg):
         if datetime.now() > now:
             now = now + timedelta(days=1)
 
-    # with weekday config
+    # with weekday config or hh:mm
     else:
         msgArray = msg.split(" ")
         msg = Utils.replaceStr(msg, "el")
@@ -283,7 +288,7 @@ def rememberJobs(bot, job_queue, update, msg):
         usernameToNotify, msg, now.isoformat())
     return now
 
-
+# save message in a json_file
 def saveMessageToRemember(username, msg, when):
     data = []
     try:
@@ -296,7 +301,7 @@ def saveMessageToRemember(username, msg, when):
     with open('memories.json', 'w') as outfile:
         json.dump(data, outfile)
 
-
+# load memories to execute the jobs
 def loadMemories():
     try:
         json_file = open('memories.json', 'r')
@@ -308,7 +313,7 @@ def loadMemories():
     data = json.loads(data)
     return data["data"]
 
-
+# get the first memory
 def gimmeMyMemories(self):
     data = loadMemories()
     data = sorted(
@@ -327,7 +332,7 @@ def callback_remember(bot, chat_id):
     bot.send_message(chat_id=chat_id, text="EH! " +
                      msg["username"] + " te recuerdo que " + msg["msg"])
 
-
+# Load dateConfig file and check if some key is in the msg
 def checkTimeToRemember(msg):
     data = []
     try:
@@ -349,6 +354,7 @@ def addDataToJson(text):
     msg = Utils.replaceStr(text, "miguelito mete")
     msgSplitted = msg.split("#")
     msg = Utils.replaceStr(msg, msgSplitted[0])
+    # add randoms messages
     if msgSplitted[0] == "random":
         botDict['randomMsg'].append(msg)
     elif msgSplitted[0] == "dinosaurio":
@@ -429,6 +435,7 @@ def echo(bot, update):
 
         # startJobs
         if firstMsg:
+            # load config data and jobs
             startJobs(bot, update)
             loadDictionary(bot, update)
             firstMsg = None
@@ -443,7 +450,6 @@ def echo(bot, update):
                     url = update.message.text[int(update.message.entities[i]["offset"]):int(int(
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
-            print("entro")
             responseTime = rememberJobs(bot, j, update, msg)
             j.run_once(callback_remember(
                 bot, update.message.chat_id), responseTime, context=update.message.chat_id)
@@ -453,6 +459,7 @@ def echo(bot, update):
         elif "miguelito añade" in update.message.text.lower() and wasAdded is not True:
             hasUrl = False
             videoTitle = update.message.text.lower().replace("miguelito añade ", "")
+            # check if there is an url in the msg
             for i in range(len(update.message.entities)):
                 if update.message.entities[i].type == 'url':
                     hasUrl = True
@@ -462,11 +469,13 @@ def echo(bot, update):
                     update.message.reply_text(
                         'No. :)', reply_to_message_id=update.message.message_id)
                 else:
+                    # check if msg is like <song> <band> // numb linkin park to search in spotify api
                     spotifyAPI.connectToSpotifyAndCheckAPI(
                         update, videoTitle, [], None)
             else:
                 spotifyAPI.checkYoutubeSpotifyLinks(update)
         elif "miguelito recomienda" in update.message.text.lower():
+            #send a random song of the spotify playlist
             sendMsg(update, spotifyAPI.recommendAGroup(update), True)
 
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
@@ -528,6 +537,7 @@ def get_admin_ids(bot, chat_id):
 
 
 def downloadPhotos(bot, update):
+    # download all photos of the group
     if str(update.message.chat_id) == str(settings["main"]["group4photos"]):
         global lastFileDownloadedCount
         file_id = update.message.photo[-1].file_id

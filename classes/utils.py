@@ -10,6 +10,7 @@ class Utils:
 
     @staticmethod
     def getRandomByValue(value):
+        # get random value to 0 <= value
         randomValue = randint(0, value)
         return randomValue
 
@@ -38,6 +39,7 @@ class Utils:
 
     @staticmethod
     def replaceStr(msg, str):
+        # remove the first (or selected number) occurrence of str and a empty space
         if str in msg:
             msg = msg.replace(str + " ", "", 1)
         return msg

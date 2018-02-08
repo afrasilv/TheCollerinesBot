@@ -14,12 +14,14 @@ from unidecode import unidecode
 
 class CheckAndSendDataClass:
 
+    # send a random response to the msg
     def randomResponse(self, update, bot):
         randomValue = Utils().getRandomByValue(1400)
         if randomValue < 13 and randomValue > 11:
             self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
                       '/data' + botDict["audios"][0])
         elif randomValue == 11:
+            # dinofaurio feature
             array = update.message.text.split()
             randomIndex = Utils().getRandomByValue(3)
             wasChanged = None
@@ -45,9 +47,11 @@ class CheckAndSendDataClass:
             self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
                         '/data' + botDict["stickers"]["approvalStickerPath"][0], True)
         elif randomValue <= 9 and randomValue >= 3:
+            # send a randomMsg
             randomMsgIndex = Utils().getRandomByValue(len(botDict["randomMsg"]) - 1)
             self.sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
         elif randomValue < 2:
+            # replace vowels to "i"
             update.message.text = unidecode(update.message.text)
             update.message.text = re.sub(
                 r'[AEOUaeou]+', 'i', update.message.text)
@@ -120,11 +124,13 @@ class CheckAndSendDataClass:
 
 
     def checkIfSendData(self, bot, update, object):
+        # compare the next time sent it // TODO change keyname
         if len(object["lastTimeSentIt"]) is not 0:
             lastTimeSentIt = datetime.strptime(
                 object["lastTimeSentIt"], '%Y-%m-%dT%H:%M:%S.%f')
             now = datetime.now()
             if now.date() > lastTimeSentIt.date():
+                # get a randomValue to check if it have to send it or no
                 if object["randomMaxValue"] is not 0:
                     randomValue = Utils().getRandomByValue(object["randomMaxValue"])
                     if randomValue <= 1:
@@ -133,11 +139,13 @@ class CheckAndSendDataClass:
                             self.sendData(bot, update, object["doubleObj"])
                         return True
                 else:
+                    # if randomMaxValue is 0 the data is not censored
                     self.sendData(bot, update, object)
                     if object["doubleMsg"] is True:
                         self.sendData(bot, update, object["doubleObj"])
                     return True
         else:
+            # if time is 0 the data is not censored
             self.sendData(bot, update, object)
             if object["doubleMsg"] is True:
                 self.sendData(bot, update, object["doubleObj"])
@@ -147,6 +155,7 @@ class CheckAndSendDataClass:
 
     @staticmethod
     def addTime(now, object):
+        # increment nextTimeToShowIt
         if object["timeToIncrement"] is not 0:
             timeObject = {'type': object["kindTime"],
                           'value':  object["timeToIncrement"]}
@@ -156,6 +165,7 @@ class CheckAndSendDataClass:
 
 
     def checkIfIsInDictionary(self, bot, update, botDict):
+        # check if some keyword of the dictionary is in the msg
         foundKey = False
         indexArray = 0
         dictionaryIndex = 0
