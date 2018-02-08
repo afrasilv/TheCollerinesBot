@@ -25,7 +25,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-dataPath = os.path.join(os.path.dirname(__file__)) + '/data'
+dataPath = os.path.join(os.path.dirname(__file__)) + '/data/..'
 
 lastPoleEstonia = datetime.now() - timedelta(days=1)
 canTalk = True
@@ -112,7 +112,7 @@ def savePoleStats(update):
     if found == None:
         data.append({'username': username, 'count': 1})
 
-    Utils.saveFile('polestats.json', data)
+    Utils.saveFile('../polestats.json', data)
 
 
 def gimmeTheRank(update):
@@ -167,7 +167,6 @@ def checkHourToRemember(msg, timeObject):
 
     return msg, timeObject
 
-
 # check if hh:mm selected is > than actual to increment a day
 def checkDayDifference(diffDayCount, now, timeObject):
     if diffDayCount == 0 and "hor" in timeObject and now.hour <= int(timeObject["hour"]):
@@ -196,7 +195,7 @@ def getUsernameToNotify(msg, update):
     return update.message.from_user.name, msg
 
 # Parse message to get all data
-def rememberJobs(bot, job_queue, update, msg):
+def rememberJobs(bot, update, msg):
     #compare time with the dateConfig.json
     timeObject = checkTimeToRemember(msg)
     # check is have username in the msg
@@ -384,7 +383,7 @@ def addDataToJson(text):
 
 
 def saveDictionary():
-    Utils.saveFile('dataDictionary.json', botDict)
+    Utils.saveFile('../dataDictionary.json', botDict)
 
 
 def gimmeTheSpotifyPlaylistLink(bot, update):
@@ -436,9 +435,7 @@ def echo(bot, update):
                     url = update.message.text[int(update.message.entities[i]["offset"]):int(int(
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
-            responseTime = rememberJobs(bot, j, update, msg)
-            j.run_once(callback_remember, responseTime, context=update.message.chat_id)
-
+            rememberJobs(bot, update, msg)
         elif "miguelito dame la lista" in update.message.text.lower():
             gimmeTheSpotifyPlaylistLink(bot, update)
         elif "miguelito añade" in update.message.text.lower() and wasAdded is not True:
@@ -461,7 +458,7 @@ def echo(bot, update):
                 spotifyAPI.checkYoutubeSpotifyLinks(update)
         elif "miguelito recomienda" in update.message.text.lower():
             #send a random song of the spotify playlist
-            sendMsg(update, spotifyAPI.recommendAGroup(update), True)
+            CheckAndSendDataClass().sendMsg(update, spotifyAPI.recommendAGroup(update), True)
 
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia

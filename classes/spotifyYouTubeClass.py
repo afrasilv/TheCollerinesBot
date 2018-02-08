@@ -81,8 +81,7 @@ class SpotifyYouTubeClass:
         results = sp.user_playlist_add_tracks(
             self.settings["spotify"]["spotifyuser"], self.settings["spotify"]["spotifyplaylist"], idsToAdd)
 
-    @staticmethod
-    def recommendAGroup(update):
+    def recommendAGroup(self, update):
         scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
         token = util.prompt_for_user_token(self.settings["spotify"]["spotifyuser"], scope, client_id=self.settings["spotify"]
                                            ["spotifyclientid"], client_secret=self.settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')

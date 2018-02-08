@@ -14,7 +14,7 @@ from unidecode import unidecode
 class CheckAndSendDataClass:
 
     # send a random response to the msg
-    def randomResponse(self, update, bot):
+    def randomResponse(self, update, bot, botDict):
         randomValue = Utils().getRandomByValue(1400)
         if randomValue < 13 and randomValue > 11:
             self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
@@ -206,4 +206,4 @@ class CheckAndSendDataClass:
                     self.sendData(bot, update, object["doubleObj"])
 
             elif len(update.message.text) > 7:  # mimimimimimi
-                self.randomResponse(update, bot)
+                self.randomResponse(update, bot, botDict)

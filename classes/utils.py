@@ -36,8 +36,8 @@ class Utils:
 
     @staticmethod
     def saveFile(fileName, fileData):
-        with open('dataDictionary.json', 'w') as outfile:
-            json.dump(botDict, outfile)
+        with open(fileName, 'w') as outfile:
+            json.dump(fileData, outfile)
 
     @staticmethod
     def replaceStr(msg, str):
