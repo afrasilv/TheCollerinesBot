@@ -11,6 +11,8 @@ import re
 
 
 class SpotifyYouTubeClass:
+    settings = {}
+
 
     # Save Data song if it didn't find
     def saveDataSong(update, sendMessage):
@@ -68,28 +70,27 @@ class SpotifyYouTubeClass:
 
         self.callSpotifyApiToAddSong(idsToAdd)
 
-    @staticmethod
-    def callSpotifyApiToAddSong(idsToAdd):
+    def callSpotifyApiToAddSong(self, idsToAdd):
         # scope to access to the list and it can modify it
         scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
         # get the app token with userid, scope, client_id, client_secret and redirect_uri (run a server to show a web to grant access to the app with ur user)
-        token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
-                                           ["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
+        token = util.prompt_for_user_token(self.settings["spotify"]["spotifyuser"], scope, client_id=self.settings["spotify"]
+                                           ["spotifyclientid"], client_secret=self.settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
         # call to spotify API to save the songid to the list
         sp = spotipy.Spotify(auth=token)
         results = sp.user_playlist_add_tracks(
-            settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], idsToAdd)
+            self.settings["spotify"]["spotifyuser"], self.settings["spotify"]["spotifyplaylist"], idsToAdd)
 
     @staticmethod
     def recommendAGroup(update):
         scope = 'playlist-modify playlist-modify-public user-library-read playlist-modify-private'
-        token = util.prompt_for_user_token(settings["spotify"]["spotifyuser"], scope, client_id=settings["spotify"]
-                                           ["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
+        token = util.prompt_for_user_token(self.settings["spotify"]["spotifyuser"], scope, client_id=self.settings["spotify"]
+                                           ["spotifyclientid"], client_secret=self.settings["spotify"]["spotifysecret"], redirect_uri='http://localhost:8000')
         sp = spotipy.Spotify(auth=token)
         offsetPlaylist = getRandomByValue(1100)
         # user_playlist_tracks(user, playlist_id=None, fields=None, limit=100, offset=0, market=None)
         results = sp.user_playlist_tracks(
-            settings["spotify"]["spotifyuser"], settings["spotify"]["spotifyplaylist"], None, 100, offsetPlaylist)
+            self.settings["spotify"]["spotifyuser"], self.settings["spotify"]["spotifyplaylist"], None, 100, offsetPlaylist)
         playlistData = json.dumps(results)
         playlistData = json.loads(playlistData)
         if len(playlistData["items"]) > 0:
@@ -114,7 +115,7 @@ class SpotifyYouTubeClass:
 
     def connectToSpotifyAndCheckAPI(self, update, videoTitle, videoTags, video):
         client_credentials_manager = SpotifyClientCredentials(
-            client_id=settings["spotify"]["spotifyclientid"], client_secret=settings["spotify"]["spotifysecret"])
+            client_id=self.settings["spotify"]["spotifyclientid"], client_secret=self.settings["spotify"]["spotifysecret"])
         sp = spotipy.Spotify(
             client_credentials_manager=client_credentials_manager)
         sp.trace = False
@@ -131,7 +132,7 @@ class SpotifyYouTubeClass:
     @staticmethod
     def censorYoutubeVideo(videoTitle):
         json_file = open(os.path.join(os.path.dirname(
-            __file__), "youtubeCensor.json"), 'r')
+            __file__), "../youtubeCensor.json"), 'r')
         youtubeCensorData = json.load(json_file)
 
         for item in youtubeCensorData:
@@ -151,7 +152,7 @@ class SpotifyYouTubeClass:
                 videoid = videoid[1].split(' ')[0]
                 videoid = videoid.split('&')[0]
             youtube = YoutubeAPI(
-                {'key': settings["main"]["youtubeapikey"]})
+                {'key': self.settings["main"]["youtubeapikey"]})
             video = youtube.get_video_info(videoid)
             videoTitle = video['snippet']['title'].lower()
             videoTitle = self.replaceYouTubeVideoName(videoTitle)
@@ -193,3 +194,6 @@ class SpotifyYouTubeClass:
             elif update.message.entities[i].type == 'url' and 'spotify.com' in update.message.text:
                 #spotify link in the message
                 return self.spotifyLink(update)
+
+    def __init__(self, settings):
+        self.settings = settings

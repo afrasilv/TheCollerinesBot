@@ -7,7 +7,6 @@ import os
 import re
 from telegram.ext.dispatcher import run_async
 from .utils import Utils
-from .rememberClass import RememberClass
 from datetime import datetime, timedelta
 import dateutil.parser
 from unidecode import unidecode
@@ -159,7 +158,7 @@ class CheckAndSendDataClass:
         if object["timeToIncrement"] is not 0:
             timeObject = {'type': object["kindTime"],
                           'value':  object["timeToIncrement"]}
-            return RememberClass().checkRememberDate(now, timeObject, None).isoformat()
+            return Utils().checkRememberDate(now, timeObject, None).isoformat()
         else:
             return ""
 

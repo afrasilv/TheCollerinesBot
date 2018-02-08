@@ -94,8 +94,7 @@ def startJobs(bot, update):
     #     0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
     data = loadMemories()
     for item in data:
-        j.run_once(callback_remember(bot, update.message.chat_id),
-                   dateutil.parser.parse(item["when"]), context=update.message.chat_id)
+        j.run_once(callback_remember, dateutil.parser.parse(item["when"]), context=update.message.chat_id)
 
 
 def savePoleStats(update):
@@ -168,19 +167,6 @@ def checkHourToRemember(msg, timeObject):
 
     return msg, timeObject
 
-# set the right datetime to remember by weekday and/or hh:mm dataParsed
-def checkRememberDate(now, timeObject, isWeekday):
-    if isWeekday == None:
-        if "type" in timeObject and timeObject["type"] == "day":
-            now = now + timedelta(days=int(timeObject["value"]))
-        elif "type" in timeObject and timeObject["type"] == "hour":
-            now = now + timedelta(hours=int(timeObject["value"]))
-
-    if "hour" in timeObject and timeObject["hour"] != None:
-        now = now.replace(hour=int(timeObject["hour"]))
-        if timeObject["min"] != None:
-            now = now.replace(minute=int(timeObject["min"]))
-    return now
 
 # check if hh:mm selected is > than actual to increment a day
 def checkDayDifference(diffDayCount, now, timeObject):
@@ -224,7 +210,7 @@ def rememberJobs(bot, job_queue, update, msg):
         msg = Utils.replaceStr(msg, "que")
 
         now = datetime.now()
-        now = checkRememberDate(now, timeObject, None)
+        now = Utils().checkRememberDate(now, timeObject, None)
         if datetime.now() > now:
             now = now + timedelta(days=1)
 
@@ -245,7 +231,7 @@ def rememberJobs(bot, job_queue, update, msg):
             dateSplitted[1]), int(dateSplitted[0]))
         timeObject = {}
         msg, timeObject = checkHourToRemember(msg, timeObject)
-        now = checkRememberDate(now, timeObject, None)
+        now = Utils().checkRememberDate(now, timeObject, None)
         if datetime.now() > now:
             now = now + timedelta(days=1)
 
@@ -276,7 +262,7 @@ def rememberJobs(bot, job_queue, update, msg):
 
         timeObject = {}
         msg, timeObject = checkHourToRemember(msg, timeObject)
-        now = checkRememberDate(now, timeObject, True)
+        now = Utils().checkRememberDate(now, timeObject, True)
         diffDayCount = checkDayDifference(
             diffDayCount, datetime.now(), timeObject)
         now = now + timedelta(days=diffDayCount)
@@ -314,7 +300,7 @@ def loadMemories():
     return data["data"]
 
 # get the first memory
-def gimmeMyMemories(self):
+def gimmeMyMemories():
     data = loadMemories()
     data = sorted(
         data,
@@ -327,10 +313,10 @@ def gimmeMyMemories(self):
     return msg
 
 
-def callback_remember(bot, chat_id):
+def callback_remember(bot, job):
     msg = gimmeMyMemories()
-    bot.send_message(chat_id=chat_id, text="EH! " +
-                     msg["username"] + " te recuerdo que " + msg["msg"])
+    bot.send_message(chat_id=job.context, text="EH! " +
+        msg["username"] + " te recuerdo que " + msg["msg"])
 
 # Load dateConfig file and check if some key is in the msg
 def checkTimeToRemember(msg):
@@ -429,7 +415,7 @@ def echo(bot, update):
         elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
             godMode = True
 
-        spotifyAPI = SpotifyYouTubeClass()
+        spotifyAPI = SpotifyYouTubeClass(settings)
         wasAdded = False
         wasAdded = spotifyAPI.checkYoutubeSpotifyLinks(update)
 
@@ -451,8 +437,7 @@ def echo(bot, update):
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
             responseTime = rememberJobs(bot, j, update, msg)
-            j.run_once(callback_remember(
-                bot, update.message.chat_id), responseTime, context=update.message.chat_id)
+            j.run_once(callback_remember, responseTime, context=update.message.chat_id)
 
         elif "miguelito dame la lista" in update.message.text.lower():
             gimmeTheSpotifyPlaylistLink(bot, update)

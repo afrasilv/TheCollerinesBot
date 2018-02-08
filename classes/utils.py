@@ -5,6 +5,8 @@ import json
 import os
 import re
 from random import randint
+from datetime import datetime, timedelta
+
 
 class Utils:
 
@@ -43,3 +45,18 @@ class Utils:
         if str in msg:
             msg = msg.replace(str + " ", "", 1)
         return msg
+
+    # set the right datetime to remember by weekday and/or hh:mm dataParsed
+    @staticmethod
+    def checkRememberDate(now, timeObject, isWeekday):
+        if isWeekday == None:
+            if "type" in timeObject and timeObject["type"] == "day":
+                now = now + timedelta(days=int(timeObject["value"]))
+            elif "type" in timeObject and timeObject["type"] == "hour":
+                now = now + timedelta(hours=int(timeObject["value"]))
+
+        if "hour" in timeObject and timeObject["hour"] != None:
+            now = now.replace(hour=int(timeObject["hour"]))
+            if timeObject["min"] != None:
+                now = now.replace(minute=int(timeObject["min"]))
+        return now
