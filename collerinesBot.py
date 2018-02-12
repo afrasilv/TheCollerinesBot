@@ -99,7 +99,7 @@ def startJobs(bot, update):
 
 def savePoleStats(update):
     username = update.message.from_user.name.replace("@", "")
-    data = Utils.loadFile('polestats.json', True, [
+    data = Utils.loadFile('../polestats.json', True, [
                           {'username': username, 'count': 0}])
 
     found = None

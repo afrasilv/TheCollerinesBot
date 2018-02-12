@@ -15,6 +15,7 @@ class SpotifyYouTubeClass:
 
 
     # Save Data song if it didn't find
+    @staticmethod
     def saveDataSong(update, sendMessage):
         data = []
         try:
