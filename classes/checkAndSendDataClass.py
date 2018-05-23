@@ -16,10 +16,10 @@ class CheckAndSendDataClass:
     # send a random response to the msg
     def randomResponse(self, update, bot, botDict):
         randomValue = Utils().getRandomByValue(1400)
-        if randomValue < 13 and randomValue > 11:
+        if randomValue < 18 and randomValue > 15:
             self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
                       '/../data' + botDict["audios"][0])
-        elif randomValue == 11:
+        elif randomValue == 14:
             # dinofaurio feature
             array = update.message.text.split()
             randomIndex = Utils().getRandomByValue(3)
@@ -27,25 +27,25 @@ class CheckAndSendDataClass:
             if randomIndex == 0:
                 wasChanged = bool(re.search(r'[VvSs]+', update.message.text))
                 update.message.text = re.sub(
-                    r'[VvSs]+', 'f', update.message.text)
+                    r'[XxVvSs]+', 'f', update.message.text)
             elif randomIndex == 1:
                 wasChanged = bool(re.search(r'[Vv]+', update.message.text))
                 update.message.text = re.sub(
-                    r'[Vv]+', 'f', update.message.text)
+                    r'[XxVvZz]+', 'f', update.message.text)
             else:
                 wasChanged = bool(
                     re.search(r'[TtVvSsCc]+', update.message.text))
                 update.message.text = re.sub(
-                    r'[TtVvSsCc]+', 'f', update.message.text)
+                    r'[XxZzTtVvSsCc]+', 'f', update.message.text)
             if wasChanged:
                 update.message.reply_text(
                     update.message.text, reply_to_message_id=update.message.message_id)
                 self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
                             '/../data' + botDict["stickers"]["dinofaurioPath"][0], False)
-        elif randomValue == 10:
+        elif randomValue == 13:
             self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
                         '/../data' + botDict["stickers"]["approvalStickerPath"][0], True)
-        elif randomValue <= 9 and randomValue >= 3:
+        elif randomValue <= 12 and randomValue >= 3:
             # send a randomMsg
             randomMsgIndex = Utils().getRandomByValue(len(botDict["randomMsg"]) - 1)
             self.sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
