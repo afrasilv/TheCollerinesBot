@@ -268,31 +268,6 @@
       "isReply": false
     },
     {
-      "id": "cabra",
-      "type": "gif",
-      "regexpValue": [
-        "qué\\?"
-      ],
-      "msgToCheck": [
-        {
-          "text": "que?",
-          "type": "eq"
-        }
-      ],
-      "randomMaxValue": 0,
-      "path": [
-        "/gifs/cabra.mp4",
-        "/gifs/quev2.mp4"
-      ],
-      "lastTimeSentIt": "",
-      "timeToIncrement": 0,
-      "kindTime": "min",
-      "doubleMsg": false,
-      "doubleObj": {},
-      "notIn": [],
-      "isReply": false
-    },
-    {
       "id": "random",
       "type": "gif",
       "regexpValue": [
@@ -403,12 +378,12 @@
           "type": "in"
         }
       ],
-      "randomMaxValue": 4,
+      "randomMaxValue": 8,
       "path": [
         "/gifs/templo.mp4"
       ],
       "lastTimeSentIt": "",
-      "timeToIncrement": 0,
+      "timeToIncrement": 1,
       "kindTime": "min",
       "doubleMsg": false,
       "doubleObj": {},
@@ -1094,10 +1069,47 @@
       "doubleObj": {},
       "notIn": [],
       "isReply": false
+    }, {
+      "id": "andalucia",
+      "type": "sticker",
+      "regexpValue": [
+        "\\bandaluc[ií]a\\b"
+      ],
+      "msgToCheck": [],
+      "randomMaxValue": 3,
+      "path": [
+        "/stickers/alan_and.webp"
+      ],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 1,
+      "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
+      "notIn": [],
+      "isReply": false
+    }, {
+      "id": "rata",
+      "type": "sticker",
+      "regexpValue": [],
+      "msgToCheck": ["niño rata"],
+      "randomMaxValue": 0,
+      "path": [
+        "/stickers/rata.webp"
+      ],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 0,
+      "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
+      "notIn": [],
+      "isReply": false
     }
   ],
   "randomMsg": [
     "ok",
+    "ok",
+    "basta",
+    "basta",
     "geniaaaaaal",
     "fataaaaaal",
     "/geniaaaaaal",
@@ -1107,8 +1119,10 @@
     "/jjaj",
     "/yee",
     "A topeth!",
-    "Kvelertak:\nY es que yo sin ti\nCollera:\nY tu sin mi\nDime quien puede ser feliz\nFranchu:\nESTO NO ME GUSTA\nÑordis:\nETO NO ME GUTAAAAA",
-    "¿estáis todos bien?"
+    "¿estáis todos bien?",
+    "/txumino",
+    "hola",
+    "pero a ti qué te pasa?"
   ],
   "audios": {
     "yordPath": [

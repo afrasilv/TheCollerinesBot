@@ -28,6 +28,9 @@ logger = logging.getLogger(__name__)
 dataPath = os.path.join(os.path.dirname(__file__)) + '/data/..'
 
 lastPoleEstonia = datetime.now() - timedelta(days=1)
+lastPoleAlan = datetime.now() - timedelta(days=1)
+lastPoleNordis = datetime.now() - timedelta(days=1)
+lastPolePedante = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
 firstMsg = True
@@ -97,9 +100,23 @@ def startJobs(bot, update):
         j.run_once(callback_remember, dateutil.parser.parse(item["when"]), context=update.message.chat_id)
 
 
-def savePoleStats(update):
+def savePoleStats(update, path):
     username = update.message.from_user.name.replace("@", "")
-    data = Utils.loadFile('polestats.json', True, [
+    path = ''
+    if path == 'pole':
+        path += 'polestats.json
+        pass
+    elif path == 'alan':
+        path += 'polealanstats.json
+        pass
+    elif path == 'nordis:
+        path += 'polenordisstats.json
+        pass
+    elif path == 'pedante:
+        path += 'polepedantestats.json
+        pass
+
+    data = Utils.loadFile(path, True, [
                           {'username': username, 'count': 0}])
 
     found = None
@@ -112,12 +129,26 @@ def savePoleStats(update):
     if found == None:
         data.append({'username': username, 'count': 1})
 
-    Utils.saveFile('polestats.json', data)
+    Utils.saveFile('polestats.json'path, data)
 
 
-def gimmeTheRank(update):
+def gimmeTheRank(update, path):
+    path = ''
+    if path == 'pole':
+        path += 'polestats.json
+        pass
+    elif path == 'alan':
+        path += 'polealanstats.json
+        pass
+    elif path == 'nordis:
+        path += 'polenordisstats.json
+        pass
+    elif path == 'pedante:
+        path += 'polepedantestats.json
+        pass
+        
     try:
-        json_file = open('polestats.json', 'r')
+        json_file = open(path, 'r')
         data = json.load(json_file, object_pairs_hook=OrderedDict)
     except IOError:
         data = {}
@@ -469,7 +500,37 @@ def echo(bot, update):
                 savePoleStats(update)
                 lastPoleEstonia = now
         elif "estoniarank" in update.message.text.lower():
-            gimmeTheRank(update)
+            gimmeTheRank(update, 'pole')
+        elif re.search(r'\bpole alan\b', update.message.text.lower()):
+            global lastPoleAlan
+            now = datetime.now()
+            if now.date() != lastPoleAlan.date() and now.hour >= 15:
+                update.message.reply_text(
+                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole Alán')
+                savePoleStats(update, 'alan')
+                lastPoleAlan = now
+        elif "alanrank" in update.message.text.lower():
+            gimmeTheRank(update, 'alan')
+        elif re.search(r'\bpole ñordis\b', update.message.text.lower()):
+            global lastPoleNordis
+            now = datetime.now()
+            if now.date() != lastPoleNordis.date() and now.hour >= 15:
+                update.message.reply_text(
+                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole Ñordis')
+                savePoleStats(update, 'nordis')
+                lastPoleNordis = now
+        elif "ñordisrank" in update.message.text.lower():
+            gimmeTheRank(update, 'nordis')
+        elif re.search(r'\b\*\b', update.message.text.lower()) and update.message.text.lower().count('*') == 1:
+            global lastPolePedante
+            now = datetime.now()
+            if now.date() != lastPolePedante.date() and now.hour >= 15:
+                update.message.reply_text(
+                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole pedante')
+                savePoleStats(update, 'pedante')
+                lastPolePedante = now
+        elif "pedanterank" in update.message.text.lower():
+            gimmeTheRank(update, 'pedante')
 
         elif godMode and canTalk:
             CheckAndSendDataClass().checkIfIsInDictionary(bot, update, botDict)
