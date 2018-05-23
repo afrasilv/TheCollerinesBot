@@ -100,21 +100,17 @@ def startJobs(bot, update):
         j.run_once(callback_remember, dateutil.parser.parse(item["when"]), context=update.message.chat_id)
 
 
-def savePoleStats(update, path):
+def savePoleStats(update, type):
     username = update.message.from_user.name.replace("@", "")
     path = ''
-    if path == 'pole':
-        path += 'polestats.json
-        pass
-    elif path == 'alan':
-        path += 'polealanstats.json
-        pass
-    elif path == 'nordis:
-        path += 'polenordisstats.json
-        pass
-    elif path == 'pedante:
-        path += 'polepedantestats.json
-        pass
+    if type == 'pole':
+        path += 'polestats.json'
+    elif type == 'alan':
+        path += 'polealanstats.json'
+    elif type == 'nordis':
+        path += 'polenordisstats.json'
+    elif type == 'pedante':
+        path += 'polepedantestats.json'
 
     data = Utils.loadFile(path, True, [
                           {'username': username, 'count': 0}])
@@ -129,23 +125,19 @@ def savePoleStats(update, path):
     if found == None:
         data.append({'username': username, 'count': 1})
 
-    Utils.saveFile('polestats.json'path, data)
+    Utils.saveFile(path, data)
 
 
-def gimmeTheRank(update, path):
+def gimmeTheRank(update, type):
     path = ''
-    if path == 'pole':
-        path += 'polestats.json
-        pass
-    elif path == 'alan':
-        path += 'polealanstats.json
-        pass
-    elif path == 'nordis:
-        path += 'polenordisstats.json
-        pass
-    elif path == 'pedante:
-        path += 'polepedantestats.json
-        pass
+    if type == 'pole':
+        path += 'polestats.json'
+    elif type == 'alan':
+        path += 'polealanstats.json'
+    elif type == 'nordis':
+        path += 'polenordisstats.json'
+    elif type == 'pedante':
+        path += 'polepedantestats.json'
         
     try:
         json_file = open(path, 'r')
@@ -497,7 +489,7 @@ def echo(bot, update):
             if now.date() != lastPoleEstonia.date() and now.hour >= 23:
                 update.message.reply_text(
                     'El usuario ' + update.message.from_user.name + ' ha hecho la pole estonia')
-                savePoleStats(update)
+                savePoleStats(update, 'pole')
                 lastPoleEstonia = now
         elif "estoniarank" in update.message.text.lower():
             gimmeTheRank(update, 'pole')
