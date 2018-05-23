@@ -99,7 +99,7 @@ def startJobs(bot, update):
 
 def savePoleStats(update):
     username = update.message.from_user.name.replace("@", "")
-    data = Utils.loadFile('../polestats.json', True, [
+    data = Utils.loadFile('polestats.json', True, [
                           {'username': username, 'count': 0}])
 
     found = None
@@ -112,7 +112,7 @@ def savePoleStats(update):
     if found == None:
         data.append({'username': username, 'count': 1})
 
-    Utils.saveFile('../polestats.json', data)
+    Utils.saveFile('polestats.json', data)
 
 
 def gimmeTheRank(update):
