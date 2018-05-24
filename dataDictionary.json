@@ -1,6 +1,26 @@
 {
   "keywords": [
     {
+      "id": "huehue",
+      "type": "gif",
+      "regexpValue": [
+        "\\bhuehue[hue]+\\b"
+      ],
+      "msgToCheck": [],
+      "randomMaxValue": 0,
+      "path": [
+        "/gifs/huehuehue.mp4",
+        "/gifs/huehuehue1.mp4"
+      ],
+      "lastTimeSentIt": "",
+      "timeToIncrement": 0,
+      "kindTime": "min",
+      "doubleMsg": false,
+      "doubleObj": {},
+      "notIn": [],
+      "isReply": false
+    },
+    {
       "id": "valencia",
       "type": "voice",
       "regexpValue": [
@@ -384,26 +404,6 @@
       ],
       "lastTimeSentIt": "",
       "timeToIncrement": 1,
-      "kindTime": "min",
-      "doubleMsg": false,
-      "doubleObj": {},
-      "notIn": [],
-      "isReply": false
-    },
-    {
-      "id": "huehue",
-      "type": "gif",
-      "regexpValue": [
-        "\\bhuehue[hue]+\\b"
-      ],
-      "msgToCheck": [],
-      "randomMaxValue": 0,
-      "path": [
-        "/gifs/huehuehue.mp4",
-        "/gifs/huehuehue1.mp4"
-      ],
-      "lastTimeSentIt": "",
-      "timeToIncrement": 0,
       "kindTime": "min",
       "doubleMsg": false,
       "doubleObj": {},
@@ -863,7 +863,7 @@
     },
     {
       "id": "cafe",
-      "type": "sticker",
+      "type": "gif",
       "regexpValue": [
         "\\bcafe\\b",
         "\\bcafé\\b"
@@ -1072,10 +1072,13 @@
     }, {
       "id": "andalucia",
       "type": "sticker",
-      "regexpValue": [
-        "\\bandaluc[ií]a\\b"
+      "regexpValue": [],
+      "msgToCheck": [
+        {
+          "text": "andalucía",
+          "type": "in"
+        }
       ],
-      "msgToCheck": [],
       "randomMaxValue": 3,
       "path": [
         "/stickers/alan_and.webp"
@@ -1091,7 +1094,12 @@
       "id": "rata",
       "type": "sticker",
       "regexpValue": [],
-      "msgToCheck": ["niño rata"],
+      "msgToCheck": [
+        {
+          "text": "niño rata",
+          "type": "in"
+        }
+      ],
       "randomMaxValue": 0,
       "path": [
         "/stickers/rata.webp"

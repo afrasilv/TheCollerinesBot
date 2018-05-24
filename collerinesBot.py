@@ -29,8 +29,6 @@ dataPath = os.path.join(os.path.dirname(__file__)) + '/data/..'
 
 lastPoleEstonia = datetime.now() - timedelta(days=1)
 lastPoleAlan = datetime.now() - timedelta(days=1)
-lastPoleNordis = datetime.now() - timedelta(days=1)
-lastPolePedante = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
 firstMsg = True
@@ -503,24 +501,16 @@ def echo(bot, update):
                 lastPoleAlan = now
         elif "alanrank" in update.message.text.lower():
             gimmeTheRank(update, 'alan')
-        elif re.search(r'\bpole ñordis\b', update.message.text.lower()):
-            global lastPoleNordis
-            now = datetime.now()
-            if now.date() != lastPoleNordis.date() and now.hour >= 15:
-                update.message.reply_text(
-                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole Ñordis')
-                savePoleStats(update, 'nordis')
-                lastPoleNordis = now
+        elif update.message.text.lower() == "pole ñordis":
+            update.message.reply_text(
+                'El usuario ' + update.message.from_user.name + ' ha hecho la pole Ñordis')
+            savePoleStats(update, 'nordis')
         elif "ñordisrank" in update.message.text.lower():
             gimmeTheRank(update, 'nordis')
         elif re.search(r'\b\*\b', update.message.text.lower()) and update.message.text.lower().count('*') == 1:
-            global lastPolePedante
-            now = datetime.now()
-            if now.date() != lastPolePedante.date() and now.hour >= 15:
-                update.message.reply_text(
-                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole pedante')
-                savePoleStats(update, 'pedante')
-                lastPolePedante = now
+            update.message.reply_text(
+                'El usuario ' + update.message.from_user.name + ' ha hecho la pole pedante')
+            savePoleStats(update, 'pedante')
         elif "pedanterank" in update.message.text.lower():
             gimmeTheRank(update, 'pedante')
 
