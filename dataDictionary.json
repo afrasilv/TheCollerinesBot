@@ -409,15 +409,22 @@
       "doubleObj": {},
       "notIn": [],
       "isReply": false
-    },
-    {
+    }, {
       "id": "yee",
       "type": "gif",
       "regexpValue": [
-        "\\byee\\b"
       ],
-      "msgToCheck": [],
-      "randomMaxValue": 0,
+      "msgToCheck": [
+        {
+          "text": "yee",
+          "type": "eq"
+        },
+{
+          "text": "Yee",
+          "type": "eq"
+        }
+      ],
+      "randomMaxValue": 7,
       "path": [
         "/gifs/yee.mp4"
       ],
@@ -426,9 +433,7 @@
       "kindTime": "min",
       "doubleMsg": false,
       "doubleObj": {},
-      "notIn": [
-        "/yee"
-      ],
+      "notIn": [],
       "isReply": false
     },
     {

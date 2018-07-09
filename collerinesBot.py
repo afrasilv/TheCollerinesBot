@@ -107,8 +107,10 @@ def savePoleStats(update, type):
         path += 'polealanstats.json'
     elif type == 'nordis':
         path += 'polenordisstats.json'
-    elif type == 'pedante':
-        path += 'polepedantestats.json'
+    elif type == 'rae':
+        path += 'poleraestats.json'
+    elif type == 'yonki':
+        path += 'poleyonki.json'
 
     data = Utils.loadFile(path, True, [
                           {'username': username, 'count': 0}])
@@ -134,8 +136,10 @@ def gimmeTheRank(update, type):
         path += 'polealanstats.json'
     elif type == 'nordis':
         path += 'polenordisstats.json'
-    elif type == 'pedante':
-        path += 'polepedantestats.json'
+    elif type == 'rae':
+        path += 'poleraestats.json'
+    elif type == 'yonki':
+        path += 'poleyonki.json'
         
     try:
         json_file = open(path, 'r')
@@ -507,12 +511,18 @@ def echo(bot, update):
             savePoleStats(update, 'nordis')
         elif "ñordisrank" in update.message.text.lower():
             gimmeTheRank(update, 'nordis')
-        elif re.search(r'\b\*\b', update.message.text.lower()) and update.message.text.lower().count('*') == 1:
+        elif update.message.text.lower() == "pole yonki":
             update.message.reply_text(
-                'El usuario ' + update.message.from_user.name + ' ha hecho la pole pedante')
-            savePoleStats(update, 'pedante')
-        elif "pedanterank" in update.message.text.lower():
-            gimmeTheRank(update, 'pedante')
+                'El usuario ' + update.message.from_user.name + ' ha hecho la pole yonki')
+            savePoleStats(update, 'yonki')
+        elif "yonkirank" in update.message.text.lower():
+            gimmeTheRank(update, 'yonki')
+        elif re.search(r'\*$', update.message.text.lower()) and update.message.text.lower().count('*') == 1:
+            update.message.reply_text(
+                'El usuario ' + update.message.from_user.name + ' ha hecho la pole RAE')
+            savePoleStats(update, 'rae')
+        elif "raerank" in update.message.text.lower():
+            gimmeTheRank(update, 'rae')
 
         elif godMode and canTalk:
             CheckAndSendDataClass().checkIfIsInDictionary(bot, update, botDict)
