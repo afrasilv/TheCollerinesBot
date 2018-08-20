@@ -1,5 +1,8 @@
 *.ini
-polestats.json
+polealanstats.json
+polenordisstats.json
+poleraestats.json
+poleyonki.json
 *.cache-aalex12
 *.txt
 memories.json

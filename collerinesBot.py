@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 dataPath = os.path.join(os.path.dirname(__file__)) + '/data/..'
 
 lastPoleEstonia = datetime.now() - timedelta(days=1)
-lastPoleAlan = datetime.now() - timedelta(days=1)
+lastPoleXero = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
 firstMsg = True
@@ -103,8 +103,8 @@ def savePoleStats(update, type):
     path = ''
     if type == 'pole':
         path += 'polestats.json'
-    elif type == 'alan':
-        path += 'polealanstats.json'
+    elif type == 'xero':
+        path += 'polexerostats.json'
     elif type == 'nordis':
         path += 'polenordisstats.json'
     elif type == 'rae':
@@ -132,8 +132,8 @@ def gimmeTheRank(update, type):
     path = ''
     if type == 'pole':
         path += 'polestats.json'
-    elif type == 'alan':
-        path += 'polealanstats.json'
+    elif type == 'xero':
+        path += 'polexerostats.json'
     elif type == 'nordis':
         path += 'polenordisstats.json'
     elif type == 'rae':
@@ -495,16 +495,16 @@ def echo(bot, update):
                 lastPoleEstonia = now
         elif "estoniarank" in update.message.text.lower():
             gimmeTheRank(update, 'pole')
-        elif re.search(r'\bpole alan\b', update.message.text.lower()):
-            global lastPoleAlan
+        elif re.search(r'\bpole xero\b', update.message.text.lower()):
+            global lastPoleXero
             now = datetime.now()
-            if now.date() != lastPoleAlan.date() and now.hour >= 15:
+            if now.date() != lastPoleXero.date() and now.hour >= 15:
                 update.message.reply_text(
-                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole Alán')
-                savePoleStats(update, 'alan')
-                lastPoleAlan = now
-        elif "alanrank" in update.message.text.lower():
-            gimmeTheRank(update, 'alan')
+                    'El usuario ' + update.message.from_user.name + ' ha hecho la pole Xero')
+                savePoleStats(update, 'xero')
+                lastPoleXero = now
+        elif "xerorank" in update.message.text.lower():
+            gimmeTheRank(update, 'xero')
         elif update.message.text.lower() == "pole ñordis":
             update.message.reply_text(
                 'El usuario ' + update.message.from_user.name + ' ha hecho la pole Ñordis')
