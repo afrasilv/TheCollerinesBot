@@ -431,8 +431,7 @@ def echo(bot, update):
     #     newFile = bot.get_file(file_id)
     #     newFile.download('voice.ogg')
 
-    #if str(update.message.chat_id) == str(settings["main"]["groupid"]):
-    if True == True: 
+    if str(update.message.chat_id) == str(settings["main"]["groupid"]):
         if update.message.text != None and "miguelito para" == update.message.text.lower():
             stop(bot, update)
         elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
