@@ -32,6 +32,7 @@ lastPoleXero = datetime.now() - timedelta(days=1)
 canTalk = True
 godMode = True
 firstMsg = True
+
 botDict = {}
 downloadData = None
 lastFileDownloadedCount = 0
@@ -88,8 +89,7 @@ def startJobs(bot, update):
     now = datetime.now() - timedelta(days=1)
     restTime = Utils.getRandomByValue(2)
     now = now.replace(hour=17 + restTime, minute=Utils.getRandomByValue(59))
-    job_daily = j.run_daily(callback_andalucia, now.time(), days=(
-        0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
+    j.run_once(callback_andalucia, now, context=update.message.chat_id)
     # now = now.replace(hour=2, minute=00)
     # job_daily = j.run_daily(callback_bye, now.time(), days=(
     #     0, 1, 2, 3, 4, 5, 6), context=update.message.chat_id)
@@ -294,6 +294,8 @@ def rememberJobs(bot, update, msg):
     update.message.reply_text(
         "Vale", reply_to_message_id=update.message.message_id)
     now = now.replace(second=0)
+
+    j.run_once(callback_remember, now, context=update.message.chat_id)
     saveMessageToRemember(
         usernameToNotify, msg, now.isoformat())
     return now
@@ -366,7 +368,7 @@ def addDataToJson(text):
     msg = Utils.replaceStr(msg, msgSplitted[0])
     # add randoms messages
     if msgSplitted[0] == "random":
-        botDict['randomMsg'].append(msg)
+        botDict['randomMsg'].append(msgSplitted[1])
     elif msgSplitted[0] == "dinosaurio":
         botDict['dinofaurioPath'].append(msg)
     elif msgSplitted[0] == "mimimi":
@@ -397,7 +399,7 @@ def addDataToJson(text):
             downloadData["doubleObj"] = {
                 "type": msgSplitted[11],
                 "path": [],
-                "isReply": false
+                "isReply": False
             }
 
     if msgSplitted[0] == "text":
@@ -408,7 +410,7 @@ def addDataToJson(text):
 
 
 def saveDictionary():
-    Utils.saveFile('../dataDictionary.json', botDict)
+    Utils.saveFile('dataDictionary.json', botDict)
 
 
 def gimmeTheSpotifyPlaylistLink(bot, update):
@@ -429,7 +431,8 @@ def echo(bot, update):
     #     newFile = bot.get_file(file_id)
     #     newFile.download('voice.ogg')
 
-    if str(update.message.chat_id) == str(settings["main"]["groupid"]):
+    #if str(update.message.chat_id) == str(settings["main"]["groupid"]):
+    if True == True: 
         if update.message.text != None and "miguelito para" == update.message.text.lower():
             stop(bot, update)
         elif update.message.text != None and "miguelito sigue" == update.message.text.lower():
@@ -439,9 +442,9 @@ def echo(bot, update):
         elif update.message.text != None and "miguelito vuelve" == update.message.text.lower() and update.message.from_user.username == settings["main"]["fatherid"]:
             godMode = True
 
-        spotifyAPI = SpotifyYouTubeClass(settings)
+        #spotifyAPI = SpotifyYouTubeClass(settings)
         wasAdded = False
-        wasAdded = spotifyAPI.checkYoutubeSpotifyLinks(update)
+        #wasAdded = spotifyAPI.checkYoutubeSpotifyLinks(update)
 
         # startJobs
         if firstMsg:
@@ -461,29 +464,29 @@ def echo(bot, update):
                         update.message.entities[i]["offset"]) + int(update.message.entities[i]["length"]))]
                     msg = msg.replace(url.lower(), url)
             rememberJobs(bot, update, msg)
-        elif "miguelito dame la lista" in update.message.text.lower():
-            gimmeTheSpotifyPlaylistLink(bot, update)
-        elif "miguelito añade" in update.message.text.lower() and wasAdded is not True:
-            hasUrl = False
-            videoTitle = update.message.text.lower().replace("miguelito añade ", "")
+ #       elif "miguelito dame la lista" in update.message.text.lower():
+ #           gimmeTheSpotifyPlaylistLink(bot, update)
+ #       elif "miguelito añade" in update.message.text.lower() and wasAdded is not True:
+ #           hasUrl = False
+#            videoTitle = update.message.text.lower().replace("miguelito añade ", "")
             # check if there is an url in the msg
-            for i in range(len(update.message.entities)):
-                if update.message.entities[i].type == 'url':
-                    hasUrl = True
+#            for i in range(len(update.message.entities)):
+#                if update.message.entities[i].type == 'url':
+#                    hasUrl = True
 
-            if hasUrl == False:
-                if spotifyAPI.censorYoutubeVideo(videoTitle):
-                    update.message.reply_text(
-                        'No. :)', reply_to_message_id=update.message.message_id)
-                else:
+#            if hasUrl == False:
+#                if spotifyAPI.censorYoutubeVideo(videoTitle):
+#                    update.message.reply_text(
+#                        'No. :)', reply_to_message_id=update.message.message_id)
+#                else:
                     # check if msg is like <song> <band> // numb linkin park to search in spotify api
-                    spotifyAPI.connectToSpotifyAndCheckAPI(
-                        update, videoTitle, [], None)
-            else:
-                spotifyAPI.checkYoutubeSpotifyLinks(update)
-        elif "miguelito recomienda" in update.message.text.lower():
+#                    spotifyAPI.connectToSpotifyAndCheckAPI(
+#                        update, videoTitle, [], None)
+#            else:
+#                spotifyAPI.checkYoutubeSpotifyLinks(update)
+#        elif "miguelito recomienda" in update.message.text.lower():
             #send a random song of the spotify playlist
-            CheckAndSendDataClass().sendMsg(update, spotifyAPI.recommendAGroup(update), True)
+#            CheckAndSendDataClass().sendMsg(update, spotifyAPI.recommendAGroup(update), True)
 
         elif re.search(r'\bpole estonia\b', update.message.text.lower()):
             global lastPoleEstonia
@@ -537,6 +540,10 @@ def error(bot, update, error):
 
 def callback_andalucia(bot, job):
     if str(job.context) == str(settings["main"]["groupid"]):
+        restTime = Utils.getRandomByValue(2)
+        now = datetime.now() + timedelta(days=1)
+        now = now.replace(hour=17 + restTime, minute=Utils.getRandomByValue(59))
+        j.run_once(callback_andalucia, now, context=job.context)
         bot.send_message(chat_id=job.context,
                          text="¡Buenos días, Andalucía! :D")
 
