@@ -9,3 +9,4 @@ memories.json
 userNames.json
 classes/__pycache__/checkAndSendDataClass.cpython-36.pyc
 *.pyc
+data

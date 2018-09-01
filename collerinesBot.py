@@ -441,7 +441,7 @@ def echo(bot, update):
 
         spotifyAPI = SpotifyYouTubeClass(settings)
         wasAdded = False
-        wasAdded = spotifyAPI.checkYoutubeSpotifyLinks(update)
+        #wasAdded = spotifyAPI.checkYoutubeSpotifyLinks(update)
 
         # startJobs
         if firstMsg:
