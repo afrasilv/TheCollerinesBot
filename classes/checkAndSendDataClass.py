@@ -10,12 +10,14 @@ from .utils import Utils
 from datetime import datetime, timedelta
 import dateutil.parser
 from unidecode import unidecode
+from emoji import emojize
 
 class CheckAndSendDataClass:
 
     # send a random response to the msg
     def randomResponse(self, update, bot, botDict):
         randomValue = Utils().getRandomByValue(1400)
+        randomValue = 5
         if randomValue < 18 and randomValue > 15:
             self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
                       '/../data' + botDict["audios"][0])
@@ -42,13 +44,10 @@ class CheckAndSendDataClass:
                     update.message.text, reply_to_message_id=update.message.message_id)
                 self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
                             '/../data' + botDict["stickers"]["dinofaurioPath"][0], False)
-        elif randomValue == 13:
-            self.sendSticker(bot, update, os.path.join(os.path.dirname(__file__)) +
-                        '/../data' + botDict["stickers"]["approvalStickerPath"][0], True)
         elif randomValue <= 12 and randomValue >= 3:
             # send a randomMsg
             randomMsgIndex = Utils().getRandomByValue(len(botDict["randomMsg"]) - 1)
-            self.sendMsg(update, botDict["randomMsg"][randomMsgIndex], False)
+            self.sendMsg(update, emojize(botDict["randomMsg"][randomMsgIndex], use_aliases=True), False)
         elif randomValue < 2:
             # replace vowels to "i"
             update.message.text = unidecode(update.message.text)
@@ -59,7 +58,7 @@ class CheckAndSendDataClass:
             randomMsgIndex = Utils.getRandomByValue(
                 len(botDict["stickers"]["mimimimiStickerPath"]) - 1)
             dataPath = os.path.join(os.path.dirname(__file__)) + '/../data'
-            self.sendSticker(bot, update, dataPath + botDict["stickers"], False)
+            self.sendSticker(bot, update, dataPath + botDict["stickers"]["mimimimiStickerPath"][randomMsgIndex], False)
 
     @staticmethod
     def sendGif(bot, update, pathGif):
@@ -119,8 +118,6 @@ class CheckAndSendDataClass:
         elif object["type"] == "sticker":
             self.sendSticker(bot, update, dataPath +
                         self.getPath(object["path"]), object["isReply"])
-
-
 
     def checkIfSendData(self, bot, update, object):
         # compare the next time sent it // TODO change keyname
