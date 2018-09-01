@@ -17,7 +17,6 @@ class CheckAndSendDataClass:
     # send a random response to the msg
     def randomResponse(self, update, bot, botDict):
         randomValue = Utils().getRandomByValue(1400)
-        randomValue = 5
         if randomValue < 18 and randomValue > 15:
             self.sendVoice(bot, update, os.path.join(os.path.dirname(__file__)) +
                       '/../data' + botDict["audios"][0])
